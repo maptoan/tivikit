@@ -86,7 +86,7 @@ object CapNhat {
     @Volatile var moTuThongBao = false
 
     /** Tải APK bản mới vào cache (tải sẵn rồi mà còn đúng thì dùng lại) và kiểm tra; sai cỡ / SHA-256 thì báo lỗi, không cài. */
-    fun taiVe(ctx: Context, ban: BanMoi): File {
+    @Synchronized fun taiVe(ctx: Context, ban: BanMoi): File {
         // Tên file theo số bản (versionCode), không lấy versionName của JSON làm đường dẫn.
         val f = File(ctx.cacheDir, "cap-nhat/TiviKit-${ban.versionCode}.apk").apply { parentFile?.mkdirs() }
         if (f.isFile && hopLe(f.readBytes(), ban)) return f

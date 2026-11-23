@@ -71,17 +71,20 @@ class SshLg(private val ip: String, private val matKhau: String, private val man
             ch.setCommand(lenh)
             val vao = ch.inputStream
             ch.connect(8000)
+            val doc = java.io.InputStreamReader(vao, Charsets.UTF_8)
             val tat = StringBuilder(); val hang = StringBuilder()
             val het = System.currentTimeMillis() + giay * 1000L
-            val buf = ByteArray(4096)
+            val buf = CharArray(4096)
             while (System.currentTimeMillis() < het) {
-                while (vao.available() > 0) {
-                    val n = vao.read(buf); if (n < 0) break
-                    val chu = String(buf, 0, n, Charsets.UTF_8)
-                    tat.append(chu)
-                    for (c in chu) if (c == '\n') { dong(hang.toString()); hang.clear() } else hang.append(c)
+                while (vao.available() > 0 || doc.ready()) {
+                    val n = doc.read(buf); if (n < 0) break
+                    tat.append(buf, 0, n)
+                    for (i in 0 until n) {
+                        val c = buf[i]
+                        if (c == '\n') { dong(hang.toString()); hang.clear() } else hang.append(c)
+                    }
                 }
-                if (ch.isClosed && vao.available() == 0) break
+                if (ch.isClosed && vao.available() == 0 && !doc.ready()) break
                 Thread.sleep(100)
             }
             if (hang.isNotEmpty()) dong(hang.toString())

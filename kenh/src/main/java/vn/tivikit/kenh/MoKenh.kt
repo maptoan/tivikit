@@ -62,9 +62,9 @@ class MoKenh : Activity() {
         else -> Kenh.TV360
     }
 
-    private fun lenh(k: Kenh): Intent = when {
+    private fun lenh(k: Kenh): Intent? = when {
         k.laIptv -> Intent().setClassName(Kenh.IPTV, Kenh.IPTV_PHAT).putExtra("ma", k.ma).putExtra("ten", k.ten)
-        k.laM3u -> Intent(Intent.ACTION_VIEW).setClassName(Kenh.M3U, Kenh.M3U_PHAT).putExtra(Kenh.M3U_MA_KENH, k.ma.toInt())
+        k.laM3u -> Intent(Intent.ACTION_VIEW).setClassName(Kenh.M3U, Kenh.M3U_PHAT).putExtra(Kenh.M3U_MA_KENH, k.ma.toIntOrNull() ?: return null)
         k.laFpt -> Intent(Intent.ACTION_VIEW, Uri.parse(Kenh.linkFpt(k.ma))).setPackage(Kenh.FPTPLAY)
         k.laVtvGo -> Intent(Intent.ACTION_VIEW, Uri.parse(Kenh.linkVtvGo(k.ma))).setPackage(Kenh.VTVGO)
         else -> lenhKenh(k)

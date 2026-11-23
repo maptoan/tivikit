@@ -60,12 +60,10 @@ class KenhDieuKhien(private val vm: PhienLamViec) {
      */
     suspend fun dan(chu: String): Boolean {
         val p = layPhien() ?: return false
-        return vm.io {
-            val ok = p.dan(chu)
-            // Rời màn trong lúc mở phiên: không giữ. Máy chủ bấm dán rồi mới báo nhưng phím đi bất đồng bộ: chờ chút rồi đóng.
-            if (!muonMo && phien !== p) { if (ok) Thread.sleep(200); p.dong() }
-            ok
-        }
+        val ok = vm.io { p.dan(chu) }
+        // Rời màn trong lúc mở phiên: không giữ. Máy chủ bấm dán rồi mới báo nhưng phím đi bất đồng bộ: chờ chút rồi đóng.
+        if (!muonMo && phien !== p) { if (ok) kotlinx.coroutines.delay(200); p.dong() }
+        return ok
     }
 
     /** Mở phiên ở nền (mất kết nối thì thôi, phím sau thử lại); mở xong mà màn đã rời thì đóng luôn. */
@@ -73,7 +71,9 @@ class KenhDieuKhien(private val vm: PhienLamViec) {
         if (!muonMo || hong || viecMo?.isActive == true) return
         viecMo = vm.viewModelScope.launch {
             val p = runCatching { layPhien() }.getOrNull()
-            if (p != null && phien !== p) p.dong()
+            if (p != null) khoa.withLock {
+                if (!muonMo || phien !== p) p.dong()
+            }
         }
     }
 
@@ -87,7 +87,10 @@ class KenhDieuKhien(private val vm: PhienLamViec) {
             hong = true
             return@withLock null
         }
-        if (muonMo) phien = p
+        if (muonMo) {
+            phien?.dong()
+            phien = p
+        }
         p
     }
 }

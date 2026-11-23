@@ -59,7 +59,7 @@ class AppTrenTv(private val adb: KetNoiAdb) {
         val ds = goi.filter { ThaoTacTv.TEN_GOI.matches(it) }
         if (ds.isEmpty()) return emptyList()
         return tuDanhSach(sh(
-            "for p in ${ds.joinToString(" ")}; do s=0; for f in \$(pm path \$p | cut -d: -f2); do s=\$((s + \$(stat -c %s \$f))); done; " +
+            "for p in ${ds.joinToString(" ")}; do s=0; for f in \$(pm path \$p 2>/dev/null | cut -d: -f2); do c=\$(stat -c %s \"\$f\" 2>/dev/null); s=\$((s + \${c:-0})); done; " +
                 "echo \"@@ \$p|\$s\"; dumpsys package \$p | grep -m 2 -E 'versionCode=|versionName='; done", 300))
     }
 
@@ -76,7 +76,7 @@ class AppTrenTv(private val adb: KetNoiAdb) {
     /** Các file APK của gói (base + split) kèm cỡ. */
     fun fileApk(pkg: String): List<Pair<String, Long>> {
         require(ThaoTacTv.TEN_GOI.matches(pkg)) { "pkg" }
-        return sh("for f in \$(pm path $pkg | cut -d: -f2); do echo \"\$(stat -c %s \$f) \$f\"; done").lines().mapNotNull { l ->
+        return sh("for f in \$(pm path $pkg 2>/dev/null | cut -d: -f2); do echo \"\$(stat -c %s \"\$f\" 2>/dev/null) \$f\"; done").lines().mapNotNull { l ->
             val co = l.trim().substringBefore(' ').toLongOrNull() ?: return@mapNotNull null
             val p = l.trim().substringAfter(' ')
             if (p.startsWith("/") && !p.contains('\'')) p to co else null

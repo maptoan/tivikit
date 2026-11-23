@@ -119,6 +119,7 @@ class MayThu(private val ctx: Context) {
 
     fun dung() {
         chay = false
+        tp.dong()
         dial.dung()
         lounge.dung()
         runCatching { khoaWifi?.release() }

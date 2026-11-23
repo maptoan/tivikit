@@ -61,7 +61,7 @@ class KetNoiAdb private constructor(
             runCatching { disconnect() }
             if (d.first != "127.0.0.1" && DoMang.doLau(d.first, d.second) != DoMang.Cong.MO) return false
             val ok = runCatching { super.connect(d.first, d.second) }.getOrDefault(false)
-            if (ok) lucNoiLai = System.currentTimeMillis()
+            if (ok) { lucNoiLai = System.currentTimeMillis(); coHeadC = null; coDd = null }
             return ok
         }
     }
@@ -217,6 +217,7 @@ class KetNoiAdb private constructor(
     private fun docHoacHetGio(stream: io.github.muntashirakon.adb.AdbStream, giay: Int, dau: String? = null, xong: (String) -> Boolean): String? {
         val out = BoDem()
         val dauB = dau?.toByteArray(Charsets.UTF_8)
+        @Volatile var daThayDau = false
         val hetHan = System.currentTimeMillis() + giay * 1000L
         val luong = Thread {
             runCatching {
@@ -227,7 +228,7 @@ class KetNoiAdb private constructor(
                     if (n < 0) break
                     val du = synchronized(out) {
                         out.them(buf, n)
-                        if (dauB != null) out.coOCuoi(dauB, n) else xong(out.chu())
+                        if (dauB != null) out.coOCuoi(dauB, n).also { if (it) daThayDau = true } else xong(out.chu())
                     }
                     if (du) break
                 }
@@ -238,6 +239,9 @@ class KetNoiAdb private constructor(
         if (luong.isAlive) {
             luong.interrupt()
             return null
+        }
+        if (dauB != null && !daThayDau) {
+            throw java.io.IOException("Luồng ADB đóng trước khi lệnh kết thúc")
         }
         return synchronized(out) { out.chu() }.replace("\r", "")
     }
@@ -274,16 +278,20 @@ class KetNoiAdb private constructor(
      */
     fun caiApk(apk: ByteArray): String {
         val stream = openStream("exec:cmd package install -r -S ${apk.size}")
-        val o = stream.openOutputStream()
-        val khoi = coKhoi()
-        var i = 0
-        while (i < apk.size) {
-            val n = minOf(khoi, apk.size - i)
-            o.write(apk, i, n)
-            i += n
+        return try {
+            val o = stream.openOutputStream()
+            val khoi = coKhoi()
+            var i = 0
+            while (i < apk.size) {
+                val n = minOf(khoi, apk.size - i)
+                o.write(apk, i, n)
+                i += n
+            }
+            o.flush()
+            docToiKhi(stream, 180) { it.contains("Success") || it.contains("Failure") || it.contains("Error") }
+        } finally {
+            runCatching { stream.close() }
         }
-        o.flush()
-        return docToiKhi(stream, 180) { it.contains("Success") || it.contains("Failure") || it.contains("Error") }
     }
 
     /**
@@ -305,8 +313,12 @@ class KetNoiAdb private constructor(
         tienDo: (Long) -> Unit = {},
     ): String {
         val stream = openStream("exec:$lenh")
-        doHet(stream, nguon, co, tienDo)
-        return docToiKhi(stream, giay, xong = xong)
+        return try {
+            doHet(stream, nguon, co, tienDo)
+            docToiKhi(stream, giay, xong = xong)
+        } finally {
+            runCatching { stream.close() }
+        }
     }
 
     /**
@@ -321,8 +333,11 @@ class KetNoiAdb private constructor(
             doVaoLenh("sh -c 'head -c $co > \"$duongDan\"; echo $dau'", nguon, co, 300, { it.contains(dau) }, tienDo)
         } else {
             val stream = openStream("exec:sh -c 'cat > \"$duongDan\"'")
-            doHet(stream, nguon, co, tienDo)
-            runCatching { stream.close() }
+            try {
+                doHet(stream, nguon, co, tienDo)
+            } finally {
+                runCatching { stream.close() }
+            }
         }
         repeat(20) {
             if (shell("stat -c %s \"$duongDan\" 2>/dev/null").trim().toLongOrNull() == co) return
@@ -362,15 +377,16 @@ class KetNoiAdb private constructor(
      * gửi 14 ảnh"). Không có `head -c` thì thử `dd`, rồi mới tới đường base64 (toybox có base64 từ Android 6).
      */
     fun ghiFile(duongDan: String, noiDung: ByteArray) {
+        require(duongDan.none { it in "\"'\$`\\" }) { "duongDan" }
         if (coHeadC() && runCatching { ghiNhanh(duongDan, noiDung, "head -c ${noiDung.size}") }.getOrDefault(false)) return
         // Android 8 không có head -c; dd đọc từng byte thì chậm hơn nhưng có sẵn từ rất lâu (CleanTV 2.10.2, Sony
         // KDL-43W800C: gửi ảnh nền "xong" mà hình nền không đổi, file trên tivi rỗng).
         if (coDd() && runCatching { ghiNhanh(duongDan, noiDung, "dd bs=1 count=${noiDung.size} 2>/dev/null") }.getOrDefault(false)) return
-        shell("rm -f $duongDan $duongDan.b64")
+        shell("rm -f \"$duongDan\" \"$duongDan.b64\"")
         val b64 = android.util.Base64.encodeToString(noiDung, android.util.Base64.NO_WRAP)
-        b64.chunked(3000).forEach { manh -> shell("printf '%s' '$manh' >> $duongDan.b64") }
-        shell("base64 -d $duongDan.b64 > $duongDan; rm -f $duongDan.b64")
-        if (shell("wc -c < $duongDan").trim().toIntOrNull() != noiDung.size) throw java.io.IOException("Tivi không nhận file ${duongDan.substringAfterLast('/')}")
+        b64.chunked(3000).forEach { manh -> shell("printf '%s' '$manh' >> \"$duongDan.b64\"") }
+        shell("base64 -d \"$duongDan.b64\" > \"$duongDan\"; rm -f \"$duongDan.b64\"")
+        if (shell("wc -c < \"$duongDan\"").trim().toIntOrNull() != noiDung.size) throw java.io.IOException("Tivi không nhận file ${duongDan.substringAfterLast('/')}")
     }
 
     /** Tivi có `head -c` / `dd` không, hỏi một lần mỗi kết nối. */
@@ -381,25 +397,29 @@ class KetNoiAdb private constructor(
      * toybox của Android 8 chưa có `head -c` (24/10/2026, Sony BRAVIA 2015 Android 8 kẹt ở "Đang gửi ảnh nền"): lệnh
      * báo lỗi ngay, phía tivi đóng luồng giữa lúc app còn đẩy byte nên kẹt. Không có thì thử dd, rồi mới tới base64.
      */
-    private fun coHeadC(): Boolean = coHeadC ?: (runCatching { shell("echo abc | head -c 2 2>/dev/null").trim() == "ab" }.getOrDefault(false)).also { coHeadC = it }
+    private fun coHeadC(): Boolean = coHeadC ?: runCatching { (shell("echo abc | head -c 2 2>/dev/null").trim() == "ab").also { coHeadC = it } }.getOrDefault(false)
 
-    private fun coDd(): Boolean = coDd ?: (runCatching { shell("echo abc | dd bs=1 count=2 2>/dev/null").trim() == "ab" }.getOrDefault(false)).also { coDd = it }
+    private fun coDd(): Boolean = coDd ?: runCatching { (shell("echo abc | dd bs=1 count=2 2>/dev/null").trim() == "ab").also { coDd = it } }.getOrDefault(false)
 
     /** Đẩy byte vào [lenh] (đọc đúng cỡ file từ stdin) rồi ghi ra [duongDan]; đúng cỡ thì true. */
     private fun ghiNhanh(duongDan: String, noiDung: ByteArray, lenh: String): Boolean {
         val dau = "__TVS_" + java.lang.Long.toHexString(System.nanoTime()) + "__"
-        val stream = openStream("exec:sh -c '$lenh > $duongDan; echo $dau'")
-        val o = stream.openOutputStream()
-        val khoi = coKhoi()
-        var i = 0
-        while (i < noiDung.size) {
-            val n = minOf(khoi, noiDung.size - i)
-            o.write(noiDung, i, n)
-            i += n
+        val stream = openStream("exec:sh -c '$lenh > \"$duongDan\"; echo $dau'")
+        try {
+            val o = stream.openOutputStream()
+            val khoi = coKhoi()
+            var i = 0
+            while (i < noiDung.size) {
+                val n = minOf(khoi, noiDung.size - i)
+                o.write(noiDung, i, n)
+                i += n
+            }
+            o.flush()
+            docToiKhi(stream, 120, dau) { it.contains(dau) }
+        } finally {
+            runCatching { stream.close() }
         }
-        o.flush()
-        docToiKhi(stream, 120, dau) { it.contains(dau) }
-        return shell("wc -c < $duongDan").trim().toIntOrNull() == noiDung.size
+        return shell("wc -c < \"$duongDan\"").trim().toIntOrNull() == noiDung.size
     }
 
     companion object {
@@ -420,7 +440,7 @@ class KetNoiAdb private constructor(
             if (fKhoa.exists() && fCert.exists()) {
                 runCatching {
                     val khoa = KeyFactory.getInstance("RSA").generatePrivate(PKCS8EncodedKeySpec(fKhoa.readBytes()))
-                    val cert = CertificateFactory.getInstance("X.509").generateCertificate(fCert.inputStream())
+                    val cert = fCert.inputStream().use { CertificateFactory.getInstance("X.509").generateCertificate(it) }
                     return KetNoiAdb(khoa, cert)
                 }
             }

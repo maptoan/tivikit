@@ -54,8 +54,10 @@ object GiaoThucScrcpy {
         val bb = ByteBuffer.wrap(b, 0, CO_DAU)
         if (b[0].toInt() and 0x80 != 0) return Dau.Phien(bb.getInt(4), bb.getInt(8))
         val ptsCo = bb.getLong(0)
+        val co = bb.getInt(8)
+        if (co < 0 || co > 16 * 1024 * 1024) throw java.io.IOException("Cỡ gói scrcpy không hợp lệ: $co")
         return Dau.Goi(cauHinh = ptsCo and (1L shl 62) != 0L, khoa = ptsCo and (1L shl 61) != 0L,
-            pts = ptsCo and ((1L shl 61) - 1), co = bb.getInt(8))
+            pts = ptsCo and ((1L shl 61) - 1), co = co)
     }
 
     /** Tên máy ở 64 byte đầu luồng (bỏ phần đệm 0). */

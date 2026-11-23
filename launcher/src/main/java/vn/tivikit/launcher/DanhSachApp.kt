@@ -16,7 +16,7 @@ import java.util.Locale
 data class AppTv(val goi: String, val ten: String, val heThong: Boolean = false, val capNhat: Long = 0)
 
 /** Ảnh của app: banner ngang (app tivi) hoặc biểu tượng trên nền màu lấy từ chính biểu tượng. */
-class AnhApp(val banner: ImageBitmap?, val bieuTuong: ImageBitmap?, val mau: Color)
+class AnhApp(val banner: ImageBitmap?, val bieuTuong: ImageBitmap?, val mau: Color, val capNhat: Long = 0)
 
 object DanhSachApp {
     /** App có màn mở (app tivi trước, app điện thoại cài thêm sau), xếp theo tên kiểu tiếng Việt; bỏ các gói [boQua]. */
@@ -55,7 +55,9 @@ object DanhSachApp {
             pm.getLeanbackLaunchIntentForPackage(goi)?.component?.let { pm.getActivityBanner(it) } ?: pm.getApplicationBanner(goi)
         }.getOrNull()?.let { runCatching { it.toBitmap(rong, rong * 9 / 16) }.getOrNull() }
         val bieuTuong = runCatching { pm.getApplicationIcon(goi).toBitmap(co, co) }.getOrNull()
-        return AnhApp(banner?.asImageBitmap(), bieuTuong?.asImageBitmap(), bieuTuong?.let { Color(mauNen(it)) } ?: Color(0xFF3A4060))
+        val capNhat = runCatching { pm.getPackageInfo(goi, 0).lastUpdateTime }.getOrDefault(0L)
+        val mau = if (banner == null && bieuTuong != null) Color(mauNen(bieuTuong)) else Color(0xFF3A4060)
+        return AnhApp(banner?.asImageBitmap(), bieuTuong?.asImageBitmap(), mau, capNhat)
     }
 
     /** Ảnh riêng phủ kín [w]×[h] (cắt phần thừa ở giữa, như ảnh nền); null nếu không giải mã được. */
@@ -69,6 +71,7 @@ object DanhSachApp {
         val nho = Bitmap.createScaledBitmap(b, 12, 12, true)
         val px = IntArray(144)
         nho.getPixels(px, 0, 12, 0, 0, 12, 12)
+        if (nho !== b) nho.recycle()
         return mauVua(px)
     }
 

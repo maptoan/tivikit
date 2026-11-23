@@ -63,10 +63,14 @@ class KhoSaoLuu(context: Context) {
     fun doc(khoa: String): BanSaoLuu? = runCatching { BanSaoLuu.tuJson(JSONObject(file(khoa).readText())) }.getOrNull()
 
     /** Ghi qua file tạm rồi đổi tên, để mất điện giữa chừng không làm hỏng bản cũ. */
-    fun ghi(b: BanSaoLuu) {
+    @Synchronized fun ghi(b: BanSaoLuu) {
+        val dich = file(b.khoa)
         val tam = File(thuMuc, "${b.khoa}.json.tam")
         tam.writeText(b.toJson().toString(1))
-        if (!tam.renameTo(file(b.khoa))) error("Không ghi được bản sao lưu")
+        if (!tam.renameTo(dich)) {
+            dich.delete()
+            if (!tam.renameTo(dich)) error("Không ghi được bản sao lưu")
+        }
     }
 
     fun tatCa(): List<BanSaoLuu> = thuMuc.listFiles { f -> f.name.endsWith(".json") }

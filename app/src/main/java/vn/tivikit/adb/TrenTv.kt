@@ -88,8 +88,9 @@ class TrenTv(private val adb: KetNoiAdb) {
                     'n' -> { b.append('\n'); i += 2 }
                     '\\' -> { b.append('\\'); i += 2 }
                     'u' -> {
-                        val ma = s.substring(i + 2, minOf(i + 6, s.length)).toIntOrNull(16)
-                        if (ma != null && i + 6 <= s.length) { b.append(ma.toChar()); i += 6 } else { b.append(c); i++ }
+                        val hex = if (i + 6 <= s.length) s.substring(i + 2, i + 6) else null
+                        val ma = if (hex != null && hex.all { it in '0'..'9' || it in 'a'..'f' || it in 'A'..'F' }) hex.toIntOrNull(16) else null
+                        if (ma != null) { b.append(ma.toChar()); i += 6 } else { b.append(c); i++ }
                     }
                     else -> { b.append(c); i++ }
                 }

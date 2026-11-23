@@ -23,19 +23,17 @@ private fun hop(vao: IntArray, ra: IntArray, w: Int, h: Int, r: Int, ngang: Bool
     val n = 2 * r + 1
     for (d in 0 until soDong) {
         val goc = if (ngang) d * w else d
-        var a = 0
         var rr = 0
         var g = 0
         var b = 0
         for (i in -r..r) {
             val p = vao[goc + i.coerceIn(0, dai - 1) * buoc]
-            a += p ushr 24; rr += (p shr 16) and 0xFF; g += (p shr 8) and 0xFF; b += p and 0xFF
+            rr += (p shr 16) and 0xFF; g += (p shr 8) and 0xFF; b += p and 0xFF
         }
         for (i in 0 until dai) {
-            ra[goc + i * buoc] = ((a / n) shl 24) or ((rr / n) shl 16) or ((g / n) shl 8) or (b / n)
+            ra[goc + i * buoc] = (0xFF000000.toInt()) or ((rr / n) shl 16) or ((g / n) shl 8) or (b / n)
             val bo = vao[goc + (i - r).coerceIn(0, dai - 1) * buoc]
             val them = vao[goc + (i + r + 1).coerceIn(0, dai - 1) * buoc]
-            a += (them ushr 24) - (bo ushr 24)
             rr += ((them shr 16) and 0xFF) - ((bo shr 16) and 0xFF)
             g += ((them shr 8) and 0xFF) - ((bo shr 8) and 0xFF)
             b += (them and 0xFF) - (bo and 0xFF)

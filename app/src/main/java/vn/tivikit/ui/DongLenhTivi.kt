@@ -253,7 +253,8 @@ class DongLenhTivi(private val vm: PhienLamViec) {
     private fun xa(cho: StringBuilder) {
         val s = synchronized(cho) { cho.toString().also { cho.setLength(0) } }
         if (s.isEmpty()) return
-        val phan = s.split('\n')
+        val gon = if (s.length > 64_000) "…\n" + s.takeLast(64_000) else s
+        val phan = gon.split('\n')
         val cuoi = dong.lastOrNull()
         if (doDang && cuoi != null) dong[dong.lastIndex] = cuoi.copy(chu = (cuoi.chu + phan[0]).take(DAI_TOI_DA))
         else dong += Dong(phan[0].take(DAI_TOI_DA), Loai.RA)

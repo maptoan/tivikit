@@ -174,27 +174,38 @@ object DangPhat {
      * dừng). null = còn màn đang hiện hay tạm dừng. Không có sự kiện nào (ở nền từ lâu, hay chưa có quyền xem thống kê) thì
      * luc = 0.
      */
-    fun roiManHinh(ctx: Context, goi: String): NgheNen.Roi? {
+    fun roiManHinh(ctx: Context, goi: String): NgheNen.Roi? = roiManHinh(ctx, setOf(goi))[goi]
+
+    /** Truy vấn UsageEvents một lần duy nhất cho tập [cacGoi] trong mỗi chu kỳ đọc. */
+    fun roiManHinh(ctx: Context, cacGoi: Set<String>, bay: Long = System.currentTimeMillis()): Map<String, NgheNen.Roi?> {
+        if (cacGoi.isEmpty()) return emptyMap()
         val coDung = Build.VERSION.SDK_INT >= 29
         val cho = if (coDung) NgheNen.CHO_DUNG else NgheNen.CHO_TAM_DUNG
-        val bay = System.currentTimeMillis()
+        val macDinh = NgheNen.Roi(0L, cho)
         val ds = runCatching { ctx.getSystemService(UsageStatsManager::class.java)?.queryEvents(bay - CUA_SO, bay + 60_000L) }.getOrNull()
-            ?: return NgheNen.Roi(0L, cho)
-        val man = HashMap<String, Int>()
-        var luc = 0L
+            ?: return cacGoi.associateWith { macDinh }
+        val man = HashMap<String, HashMap<String, Int>>()
+        val luc = HashMap<String, Long>()
         val e = UsageEvents.Event()
         while (ds.hasNextEvent()) {
             ds.getNextEvent(e)
-            if (e.packageName != goi) continue
+            val g = e.packageName
+            if (g !in cacGoi) continue
             val loai = e.eventType
             if (loai == MAN_HIEN || loai == MAN_TAM_DUNG || (coDung && loai == MAN_DUNG)) {
-                man[e.className.orEmpty()] = loai
-                luc = e.timeStamp
+                man.getOrPut(g) { HashMap() }[e.className.orEmpty()] = loai
+                luc[g] = e.timeStamp
             }
         }
-        if (man.isEmpty()) return NgheNen.Roi(0L, cho)
         val het = if (coDung) MAN_DUNG else MAN_TAM_DUNG
-        return if (man.values.all { it == het }) NgheNen.Roi(luc, cho) else null
+        return cacGoi.associateWith { g ->
+            val m = man[g]
+            when {
+                m.isNullOrEmpty() -> macDinh
+                m.values.all { it == het } -> NgheNen.Roi(luc[g] ?: 0L, cho)
+                else -> null
+            }
+        }
     }
 
     /**
@@ -207,7 +218,9 @@ object DangPhat {
         val ds = msm.getActiveSessions(ComponentName(ctx, NgheNhac::class.java))
         if (ds.isEmpty()) return null
         val phien = ds.map { NgheNen.Phien(it.packageName, it.playbackState?.state ?: PlaybackState.STATE_NONE) }
-        val chon = NgheNen.chung.chon(phien, coTieng(ctx), System.currentTimeMillis()) { g -> roiManHinh(ctx, g) } ?: return null
+        val bay = System.currentTimeMillis()
+        val roi = roiManHinh(ctx, phien.map { it.goi }.toSet(), bay)
+        val chon = NgheNen.chung.chon(phien, coTieng(ctx), bay) { g -> roi[g] } ?: return null
         val c = ds[chon.chiSo]
         val md = c.metadata
         val ten = tenApp(c.packageName)

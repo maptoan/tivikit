@@ -110,7 +110,6 @@ class PhatKenh : Activity() {
         if (k != kenh) { doiKieu = false; daTaiMoi = false; daPhat = false; thuLai = 0 }
         kenh = k
         doiKieu = doiKieu || kieuKhac
-        player?.release()
         val nguon = DefaultHttpDataSource.Factory()
             .setUserAgent(k.ua.ifEmpty { UA_MAC_DINH })
             .setAllowCrossProtocolRedirects(true)
@@ -120,24 +119,29 @@ class PhatKenh : Activity() {
         val muc = MediaItem.fromUri(k.link)
         val nguonPhat = if (kieuHls(k.link, doiKieu)) HlsMediaSource.Factory(nguon).createMediaSource(muc)
             else ProgressiveMediaSource.Factory(nguon).createMediaSource(muc)
-        val p = ExoPlayer.Builder(this).build()
-        p.setAudioAttributes(AudioAttributes.Builder().setUsage(C.USAGE_MEDIA).setContentType(C.AUDIO_CONTENT_TYPE_MOVIE).build(), true)
-        p.setVideoSurfaceView(hinh)
-        p.addListener(object : Player.Listener {
-            override fun onPlaybackStateChanged(trangThai: Int) {
-                if (trangThai != Player.STATE_READY) return
-                if (!daPhat) hien(k.ten)
-                daPhat = true
-            }
+        val p = player ?: ExoPlayer.Builder(this).build().also { moi ->
+            moi.setAudioAttributes(AudioAttributes.Builder().setUsage(C.USAGE_MEDIA).setContentType(C.AUDIO_CONTENT_TYPE_MOVIE).build(), true)
+            moi.setVideoSurfaceView(hinh)
+            moi.addListener(object : Player.Listener {
+                override fun onPlaybackStateChanged(trangThai: Int) {
+                    if (trangThai != Player.STATE_READY) return
+                    val hienTai = kenh ?: return
+                    if (!daPhat) hien(hienTai.ten)
+                    daPhat = true
+                }
 
-            override fun onVideoSizeChanged(c: VideoSize) = vuaKhung(c)
+                override fun onVideoSizeChanged(c: VideoSize) = vuaKhung(c)
 
-            override fun onPlayerError(e: PlaybackException) = loi(k, e)
-        })
+                override fun onPlayerError(e: PlaybackException) {
+                    val hienTai = kenh ?: return
+                    loi(hienTai, e)
+                }
+            })
+            player = moi
+        }
         p.setMediaSource(nguonPhat)
         p.prepare()
         p.playWhenReady = true
-        player = p
         hien(getString(R.string.dang_mo, k.ten), giu = true)
     }
 

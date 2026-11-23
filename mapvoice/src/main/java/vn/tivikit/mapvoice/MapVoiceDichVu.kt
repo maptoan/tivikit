@@ -259,6 +259,7 @@ class MapVoiceDichVu : AccessibilityService() {
         tuChon = null
         nghe?.dung()
         nghe = null
+        runCatching { viec.shutdownNow() }
         if (dangChay === this) dangChay = null
     }
 

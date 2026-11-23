@@ -65,6 +65,7 @@ object TienIch {
         if (ds.isEmpty()) return "true"
         return "for p in ${ds.joinToString(" ")}; do " +
             "f=\$(pm path \$p 2>/dev/null | head -n 1 | sed 's/^package://'); [ -n \"\$f\" ] || continue; " +
+            "[ \"\$p\" = \"com.ts.launcher\" ] && { dumpsys package com.ts.launcher 2>/dev/null | grep -q 'com.ts.launcher/.MainActivity' || continue; }; " +
             "s=\$(sha256sum \"\$f\" 2>/dev/null | cut -d ' ' -f 1); " +
             "v=\$(dumpsys package \$p | grep -m 2 -E 'versionCode=|versionName=' | tr '\\n' ' '); " +
             "echo \"TI|\$p|\$s|\$v\"; done"

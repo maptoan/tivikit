@@ -40,8 +40,9 @@ class GiuKetNoi(private val vm: PhienLamViec) {
 
     private var vong: Job? = null
     private val nhac = Channel<Unit>(Channel.CONFLATED)
-    /** Tự nối lỗi dù tivi có trả lời (tivi hỏi "Cho phép gỡ lỗi?" chưa ai bấm…): thôi tới lần app hiện lên sau, khỏi hỏi mãi. */
+    /** Tự nối lỗi dù tivi có trả lời (tivi hỏi "Cho phép gỡ lỗi?" chưa ai bấm…): thử tối đa 3 vòng rồi thôi tới lần app hiện lên sau. */
     private var thoiTuNoi = false
+    private var soLanTuNoiLoi = 0
 
     fun doiBat(b: Boolean) {
         bat = b
@@ -54,6 +55,7 @@ class GiuKetNoi(private val vm: PhienLamViec) {
         dich = "$host:$port"
         prefs.edit().putString("tu_noi", dich).apply()
         thoiTuNoi = false
+        soLanTuNoiLoi = 0
         lamOn()
     }
 
@@ -67,6 +69,7 @@ class GiuKetNoi(private val vm: PhienLamViec) {
     /** App hiện lên (ON_START): bắt đầu canh, hỏi ngay. */
     fun hien() {
         thoiTuNoi = false
+        soLanTuNoiLoi = 0
         if (vong?.isActive != true) vong = vm.viewModelScope.launch { canh() }
         nhac.trySend(Unit)
     }
@@ -83,7 +86,7 @@ class GiuKetNoi(private val vm: PhienLamViec) {
             // Ổn thì 15 giây một lượt; đang hỏng thì 5, 10, 20 rồi 30 giây; có ai nhắc thì hỏi ngay.
             withTimeoutOrNull(if (hong == 0) 15_000L else listOf(5_000L, 10_000L, 20_000L).getOrElse(hong - 1) { 30_000L }) { nhac.receive() }
             // Đang có việc (dọn, cài…): việc đó tự nối lại khi cần (damBaoKetNoi), không chen vào.
-            if (!bat || vm.dangBan) continue
+            if (!bat || vm.dangBan || vm.dangQuet) continue
             hong = if (mot()) 0 else hong + 1
         }
     }
@@ -113,11 +116,19 @@ class GiuKetNoi(private val vm: PhienLamViec) {
         val kq = vm.io { DoMang.doLau(host, port, vm.mangDo(host)) }
         if (kq != DoMang.Cong.MO) return cho(kq, port)
         // Trong lúc dò người dùng đã bấm việc khác: để yên.
-        if (vm.dangBan || vm.thongTin != null || vm.man != Man.CHINH) return lamOn()
+        if (vm.thongTin != null || vm.dangBan || vm.dangQuet || vm.man != Man.CHINH) return lamOn()
         vm.ip = host; vm.cong = port.toString()
         vm.ketNoi()
         snapshotFlow { vm.dangBan }.first { !it }
-        if (vm.thongTin == null) thoiTuNoi = true
+        if (vm.thongTin == null) {
+            soLanTuNoiLoi++
+            if (soLanTuNoiLoi >= 3) {
+                thoiTuNoi = true
+                return lamOn()
+            }
+            return cho(kq, port)
+        }
+        soLanTuNoiLoi = 0
         return lamOn()
     }
 

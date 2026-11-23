@@ -58,6 +58,10 @@ object KeHoach {
         "com.google.android.tv.remote.service", "com.google.android.tvlauncher",
         "com.google.android.apps.tv.launcherx", "com.google.android.leanbacklauncher", "com.mitv.tvhome",
         "com.gathin.tvhome", "com.ts.launcher",
+        // Gói lõi của Amazon Fire OS (Fire TV Stick / Cube / Fire TV Edition):
+        "com.amazon.tv.launcher", "com.amazon.firehomestarter", "com.amazon.tv.settings.v2",
+        "com.amazon.tv.settings", "com.amazon.device.settings", "com.amazon.tv.nimh",
+        "com.amazon.imp", "com.amazon.dcp", "com.amazon.ssm", "com.amazon.tmm.tutorial",
     )
     private val GIU_DAU = listOf("com.android.providers.", "com.android.networkstack", "com.google.android.networkstack")
 
@@ -109,7 +113,7 @@ object KeHoach {
     private val KHONG_TU_TICH = setOf("com.google.android.backdrop", "com.google.android.apps.tv.dreamx", "com.sony.dtv.b2b.hotelmode")
 
     /** Máy chiếu: gói lo lấy nét, chỉnh hình, motor — không bao giờ tắt (21/10/2026). */
-    private val GIU_MAY_CHIEU = Regex("focus|keystone|trapez|tixing|jiaozheng|duijiao|motor|calibr|projector|projection", RegexOption.IGNORE_CASE)
+    private val GIU_MAY_CHIEU = Regex("(?!^org\\.mozilla\\.focus$|^com\\.motorola\\.)(focus|keystone|trapez|tixing|jiaozheng|duijiao|motor|calibr|projector|projection|geometr|ladder)", RegexOption.IGNORE_CASE)
 
     /**
      * Home gốc của bo mạch CVTE (JVC, Vision, Super General, Artel…): tắt nó cùng lúc bật dịch vụ bắt phím làm JVC

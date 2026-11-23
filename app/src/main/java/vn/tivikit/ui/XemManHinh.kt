@@ -86,7 +86,13 @@ class XemManHinh(private val vm: PhienLamViec) {
         val y = (fy.coerceIn(0f, 1f) * cao).toInt().coerceAtMost(cao - 1)
         if (cheDoAnh) {
             // Ảnh chụp đúng cỡ màn hình tivi: chạm bằng `input tap`, rồi chụp lại cho thấy kết quả.
-            vm.viewModelScope.launch { runCatching { vm.io { vm.adb.shell("input tap $x $y") } } }
+            vm.viewModelScope.launch {
+                runCatching {
+                    vm.io { vm.adb.shell("input tap $x $y") }
+                    kotlinx.coroutines.delay(350)
+                    chup(lanChay)
+                }
+            }
             return
         }
         val p = phien ?: return
@@ -243,12 +249,16 @@ class XemManHinh(private val vm: PhienLamViec) {
     private class GiaiMa(val beMat: Surface, rong: Int, cao: Int, khiCoKhung: () -> Unit) {
         private val luong = HandlerThread("scrcpy-giai-ma").apply { start() }
         private val oVao = LinkedBlockingQueue<Int>()
-        private val codec: MediaCodec
+        private val codec: MediaCodec = try {
+            MediaCodec.createDecoderByType(MediaFormat.MIMETYPE_VIDEO_AVC)
+        } catch (e: Exception) {
+            luong.quitSafely()
+            throw e
+        }
         @Volatile private var daCoKhung = false
 
         init {
             try {
-                codec = MediaCodec.createDecoderByType(MediaFormat.MIMETYPE_VIDEO_AVC)
                 codec.setCallback(object : MediaCodec.Callback() {
                     override fun onInputBufferAvailable(c: MediaCodec, i: Int) { oVao.offer(i) }
                     override fun onOutputBufferAvailable(c: MediaCodec, i: Int, info: MediaCodec.BufferInfo) {
@@ -265,6 +275,7 @@ class XemManHinh(private val vm: PhienLamViec) {
                 codec.configure(f, beMat, null, 0)
                 codec.start()
             } catch (e: Exception) {
+                runCatching { codec.release() }
                 luong.quitSafely()
                 throw e
             }

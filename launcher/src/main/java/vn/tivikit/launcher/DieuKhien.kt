@@ -140,11 +140,12 @@ class DieuKhien(private val act: ComponentActivity, private val tt: TrangThaiHom
     /** Thứ tự nạp ảnh (cũ trước), để bỏ ảnh nạp lâu nhất khi cuộn hết thư viện app trên hộp ít RAM. */
     private val thuTuAnh = LinkedHashSet<String>()
 
-    /** Bớt ảnh còn [toiDa] (không tính ảnh dock / gần đây), bỏ ảnh nạp lâu nhất trước. */
-    private fun gioiHanAnh(toiDa: Int) {
+    /** Bớt ảnh còn [gioiHan] (không tính ảnh dock / gần đây), bỏ ảnh nạp lâu nhất trước. */
+    private fun gioiHanAnh(gioiHan: Int) {
+        val muc = if (tt.thuVien) maxOf(gioiHan, 42) else gioiHan
         val giu = (tt.dock + tt.ganDay).toSet()
         val it = thuTuAnh.iterator()
-        while (tt.anh.size > toiDa && it.hasNext()) {
+        while (tt.anh.size > muc && it.hasNext()) {
             val g = it.next()
             if (g !in giu) { it.remove(); tt.anh.remove(g) }
         }

@@ -108,7 +108,7 @@ object AnhNen {
         if (bien.outWidth <= 0 || bien.outHeight <= 0) return null
         var mau = 1
         while (bien.outWidth / (mau * 2) >= w && bien.outHeight / (mau * 2) >= h) mau *= 2
-        return mo().use { BitmapFactory.decodeStream(it, null, BitmapFactory.Options().apply { inSampleSize = mau }) }
+        return mo().use { BitmapFactory.decodeStream(it, null, BitmapFactory.Options().apply { inSampleSize = mau; inPreferredConfig = Bitmap.Config.RGB_565 }) }
     }
 
     /** Phủ kín [w]×[h]: phóng / thu giữ tỉ lệ rồi cắt phần thừa ở giữa (trả chính [src] nếu đã đúng cỡ). */

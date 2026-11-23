@@ -31,7 +31,9 @@ object AnhTr {
             ExifInterface.ORIENTATION_ROTATE_270 -> 270f
             else -> return anh
         }
-        return Bitmap.createBitmap(anh, 0, 0, anh.width, anh.height, Matrix().apply { postRotate(xoay) }, true)
+        val kq = Bitmap.createBitmap(anh, 0, 0, anh.width, anh.height, Matrix().apply { postRotate(xoay) }, true)
+        if (kq !== anh) anh.recycle()
+        return kq
     }
 
     /** Ảnh nền [rong] x [cao] (16:9) từ [tep]: cắt giữa cho vừa khung rồi thu / phóng, JPEG; null nếu không đọc được ảnh. */
@@ -39,8 +41,10 @@ object AnhTr {
         val anh = doc(tep, rong, cao) ?: return null
         val (x, y, w, h) = khungCat(anh.width, anh.height, rong, cao)
         val cat = Bitmap.createBitmap(anh, x, y, w, h)
+        if (cat !== anh) anh.recycle()
         val vua = Bitmap.createScaledBitmap(cat, rong, cao, true)
-        return ByteArrayOutputStream().also { vua.compress(Bitmap.CompressFormat.JPEG, 90, it) }.toByteArray()
+        if (vua !== cat) cat.recycle()
+        return ByteArrayOutputStream().also { vua.compress(Bitmap.CompressFormat.JPEG, 90, it); vua.recycle() }.toByteArray()
     }
 
     /** Khung cắt giữa ảnh [w] x [h] cho đúng tỉ lệ [rong]:[cao]: (x, y, rộng, cao). */

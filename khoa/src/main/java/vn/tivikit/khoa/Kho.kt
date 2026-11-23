@@ -21,7 +21,9 @@ class Kho(ctx: Context) {
     var khoaTay: Boolean get() = p.getBoolean("khoa_tay", false); set(v) = p.edit().putBoolean("khoa_tay", v).apply()
     /** Lúc TiviKit báo quên mã (0 = không có). */
     var yeuCauGo: Long get() = p.getLong("yeu_cau_go", 0); set(v) = p.edit().putLong("yeu_cau_go", v).apply()
+    var henGo: Long get() = yeuCauGo; set(v) { yeuCauGo = v }
     val cauHinh: CauHinh? get() = Luat.docJson(json)?.copy(coMa = p.contains("ma_mo"))
+    val daDat: Boolean get() = cauHinh?.let { it.bat && it.coMa } == true
 
     /**
      * Sổ thời gian tivi được xem (màn hình sáng, không chạy màn hình chờ, không bị khoá): ngày → giây, 14 ngày gần nhất.

@@ -55,8 +55,8 @@ object DnsRieng {
             require(idNextDnsHopLe(id)) { t("ID NextDNS gồm 6 chữ / số (xem my.nextdns.io → Setup), VD abc123.", "A NextDNS ID is 6 letters / digits (my.nextdns.io → Setup), e.g. abc123.") }
             hostNextDns(id, tenThietBi)
         }
-        Loai.TU_NHAP -> giaTri.trim().lowercase().removePrefix("tls://").also {
-            require(hostHopLe(it)) { t("Nhập tên máy chủ DNS-over-TLS, VD dns.example.com (không có https:// hay số cổng).", "Enter a DNS-over-TLS host name such as dns.example.com (no https:// or port).") }
+        Loai.TU_NHAP -> giaTri.trim().lowercase().removePrefix("tls://").removeSuffix("/").also {
+            require(hostHopLe(it)) { t("Nhập tên máy chủ DNS-over-TLS, VD dns.example.com (không nhập https://, địa chỉ IP như 8.8.8.8 hay số cổng).", "Enter a DNS-over-TLS host name such as dns.example.com (not https://, an IP address like 8.8.8.8, or a port).") }
         }
     }
 

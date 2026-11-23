@@ -83,7 +83,7 @@ class CauHinhProvider : ContentProvider() {
             }
             "quen-ma" -> {
                 // Không cần mã: ai cũng gửi được, nhưng phải chờ 24 giờ, tivi báo suốt lúc chờ, ai nhập đúng mã là huỷ.
-                if (kho.maMo != null && kho.yeuCauGo == 0L) kho.yeuCauGo = System.currentTimeMillis()
+                XacThuc.batDauGo(kho)
                 kq.putString("json", JSONObject().put("yeuCauGo", kho.yeuCauGo).put("goDuocLuc", kho.yeuCauGo + XacThuc.CHO_QUEN_MS).toString())
             }
             "doc" -> {
@@ -93,9 +93,10 @@ class CauHinhProvider : ContentProvider() {
                 val o = JSONObject(kho.json ?: "{}").apply { remove("pinBam"); remove("muoi") }
                 o.put("coOtp", ma != null)
                 o.put("soDuPhong", ma?.duPhong?.size ?: 0)
-                o.put("choGiay", (XacThuc.choCon(kho, bay) + 999) / 1000)
+                o.put("choGiay", XacThuc.conChanGiay(kho, bay))
+                val go = XacThuc.goDuoc(kho, bay)
                 o.put("yeuCauGo", kho.yeuCauGo)
-                o.put("goDuoc", XacThuc.goDuoc(kho, bay))
+                o.put("goDuoc", go)
                 o.put("moTamDen", kho.moTamDen)
                 o.put("dangKhoa", KhoaDichVu.dangKhoa)
                 o.put("dichVuChay", KhoaDichVu.dangChay != null)

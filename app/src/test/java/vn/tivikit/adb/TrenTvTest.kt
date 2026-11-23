@@ -47,9 +47,10 @@ class TrenTvTest {
     @Test fun boThoat_nguocCuaChuThoat() {
         assertEquals("a\tb\nc\\d Sơn 😀", TrenTv.boThoat("a\\tb\\nc\\\\d S\\u01a1n \\ud83d\\ude00"))
         assertEquals("SmartTube", TrenTv.boThoat("SmartTube"))
-        // Thoát dở ở cuối chuỗi: giữ nguyên, không ném lỗi.
+        // Thoát dở ở cuối chuỗi hoặc mã hex sai: giữ nguyên, không ném lỗi hay nuốt ký tự.
         assertEquals("abc\\", TrenTv.boThoat("abc\\"))
         assertEquals("x\\u12", TrenTv.boThoat("x\\u12"))
+        assertEquals("x\\u12zz", TrenTv.boThoat("x\\u12zz"))
     }
 
     @Test fun lenh_toanAscii() {

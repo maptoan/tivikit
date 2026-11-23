@@ -53,7 +53,8 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
     /** Khởi động lại Home để đọc cấu hình; bật lại dịch vụ trợ năng nếu force-stop làm rơi (theme.sh). */
     private val KHOI_DONG_LAI_HOME get() =
             "a=\$(settings get secure enabled_accessibility_services); am force-stop $pkgHome; am start -n $cmpHome >/dev/null; " +
-                "case \"\$a\" in *$pkgHome*) sleep 1; settings put secure enabled_accessibility_services ''; settings put secure accessibility_enabled 0; " +
+                "case \"\$a\" in *$pkgHome*) sleep 1; b=\$(echo \"\$a\" | sed -E -e 's#$pkgHome/[A-Za-z0-9_.\$]+##g' -e 's#::*#:#g' -e 's#^:##' -e 's#:\$##'); " +
+                "if [ -n \"\$b\" ]; then settings put secure enabled_accessibility_services \"\$b\"; else settings delete secure enabled_accessibility_services; fi; " +
                 "sleep 1; settings put secure enabled_accessibility_services \"\$a\"; settings put secure accessibility_enabled 1 ;; esac"
 
     /**
@@ -62,7 +63,8 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
      */
     private val TAT_HAN_HOME get() =
             "a=\$(settings get secure enabled_accessibility_services); am force-stop $pkgHome; " +
-                "case \"\$a\" in *$pkgHome*) sleep 1; settings put secure enabled_accessibility_services ''; settings put secure accessibility_enabled 0; " +
+                "case \"\$a\" in *$pkgHome*) sleep 1; b=\$(echo \"\$a\" | sed -E -e 's#$pkgHome/[A-Za-z0-9_.\$]+##g' -e 's#::*#:#g' -e 's#^:##' -e 's#:\$##'); " +
+                "if [ -n \"\$b\" ]; then settings put secure enabled_accessibility_services \"\$b\"; else settings delete secure enabled_accessibility_services; fi; " +
                 "sleep 1; settings put secure enabled_accessibility_services \"\$a\"; settings put secure accessibility_enabled 1 ;; esac"
 
 
@@ -72,7 +74,12 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
 
     fun docThongTin(): Pair<ThongTinTv, String> {
         val gp = sh("getprop")
-        return ThongTinTv.tuGetprop(gp) to gp
+        var tv = ThongTinTv.tuGetprop(gp)
+        if (tv.serial.isBlank()) {
+            val aid = runCatching { sh("settings get secure android_id 2>/dev/null").trim() }.getOrDefault("")
+            if (aid.length >= 8 && aid != "null") tv = tv.copy(serial = aid)
+        }
+        return tv to gp
     }
 
     /** Máy đang nối có phải tivi / hộp tivi / máy chiếu không (laTiviTheoFeatures); lệnh lỗi thì coi như tivi. */
@@ -512,16 +519,24 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         // điện thoại biến mất), cài lại hỏng thì bật lại ngay (28/10/2026).
         val homeTat = if (!laHome) emptyList() else runCatching { sh("pm list packages -d") }.getOrDefault("").lines()
             .map { it.removePrefix("package:").trim() }.filter { it in HOME_GOC_BIET }
-        val gacMoi = homeTat.isNotEmpty() && gacToken == null
+        val coGacTruoc = gacToken != null && runCatching {
+            sh("[ \"\$(cat $GAC-token 2>/dev/null)\" = '$gacToken' ] && ps -A -o ARGS | grep -c '^sh $GAC.sh $gacToken'")
+                .trim().lines().lastOrNull()?.toIntOrNull()?.let { it > 0 } == true
+        }.getOrDefault(false)
+        if (!coGacTruoc) gacToken = null
+        val gacMoi = homeTat.isNotEmpty() && !coGacTruoc
         homeTat.forEach { gacThem(it) }
-        sh("pm uninstall $pkgHome")
-        val lai = runCatching { adb.caiApk(apk) }.getOrElse { "Failure ${it.message}" }
-        if (lai.contains("Success")) {
-            if (laHome) sh("cmd package set-home-activity --user 0 $cmpHome")
-            if (troNang.contains(pkgHome)) sh("settings put secure enabled_accessibility_services '$troNang'; settings put secure accessibility_enabled 1")
-        } else homeTat.forEach { runCatching { sh("pm enable $it") } }
-        if (gacMoi) boGac()
-        return lai
+        return try {
+            sh("pm uninstall $pkgHome")
+            val lai = runCatching { adb.caiApk(apk) }.getOrElse { "Failure ${it.message}" }
+            if (lai.contains("Success")) {
+                if (laHome) sh("cmd package set-home-activity --user 0 $cmpHome")
+                if (troNang.contains(pkgHome)) sh("settings put secure enabled_accessibility_services '$troNang'; settings put secure accessibility_enabled 1")
+            } else homeTat.forEach { runCatching { sh("pm enable $it") } }
+            lai
+        } finally {
+            if (gacMoi) boGac()
+        }
     }
 
     /** Home sạch trên tivi đúng là bản [apk] đi kèm app (so SHA-256 của file APK đã cài). */
@@ -881,7 +896,8 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
 
     private fun batDichVu(ten: String) {
         val svc = "$pkgHome/$NS_HOME.$ten"
-        sh("cmd appops set $pkgHome AUTO_START allow 2>/dev/null; s=\$(settings get secure enabled_accessibility_services); case \"\$s\" in *$ten*) settings put secure enabled_accessibility_services ''; settings put secure accessibility_enabled 0; sleep 1; settings put secure enabled_accessibility_services \"\$s\" ;; null|'') settings put secure enabled_accessibility_services $svc ;; *) settings put secure enabled_accessibility_services \"\$s:$svc\" ;; esac; settings put secure accessibility_enabled 1")
+        sh("cmd appops set $pkgHome AUTO_START allow 2>/dev/null; " + lenhBatLaiTroNang(svc) +
+            "; s=\$(settings get secure enabled_accessibility_services); case \"\$s\" in *$ten*) ;; null|'') settings put secure enabled_accessibility_services $svc ;; *) settings put secure enabled_accessibility_services \"\$s:$svc\" ;; esac; settings put secure accessibility_enabled 1")
     }
 
     /**
@@ -957,8 +973,10 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
 
     /** Tắt bật lại danh sách trợ năng nếu có dịch vụ của Home sạch (để dịch vụ phím đọc lại config.json). */
     private fun khoiDongLaiDichVuPhim() {
-        sh("s=\$(settings get secure enabled_accessibility_services); case \"\$s\" in *$pkgHome/*) settings put secure enabled_accessibility_services ''; " +
-            "settings put secure accessibility_enabled 0; sleep 1; settings put secure enabled_accessibility_services \"\$s\"; settings put secure accessibility_enabled 1 ;; esac")
+        sh("a=\$(settings get secure enabled_accessibility_services); case \"\$a\" in *$pkgHome/*) " +
+            "b=\$(echo \"\$a\" | sed -E -e 's#$pkgHome/[A-Za-z0-9_.\$]+##g' -e 's#::*#:#g' -e 's#^:##' -e 's#:\$##'); " +
+            "if [ -n \"\$b\" ]; then settings put secure enabled_accessibility_services \"\$b\"; else settings delete secure enabled_accessibility_services; fi; " +
+            "sleep 1; settings put secure enabled_accessibility_services \"\$a\"; settings put secure accessibility_enabled 1 ;; esac")
     }
 
     /** Dịch vụ phím của Home sạch (HomeKeyService / InputKeyService) đang được bật. */
@@ -1093,8 +1111,8 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         return cu
     }
 
-    /** Bỏ home_target: Home sạch lại tự mở chính nó (Khôi phục mà giữ Home sạch). */
-    fun boDichHome() { runCatching { suaCauHinh(mapOf("home_target" to null)) } }
+    /** Bỏ home_target và stock_home_redirect: Home sạch thôi mở đè lên Home gốc (Khôi phục mà giữ Home sạch). */
+    fun boDichHome() { runCatching { suaCauHinh(mapOf("home_target" to null, "stock_home_redirect" to null)) } }
 
     /**
      * Kết quả đặt Home ở màn Quản lý launcher: [mo] = gói nút Home mở khi thử; [daTat] = launcher đã tắt để nhường Home;
@@ -1294,7 +1312,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
 
     /** Dời hạn canh gác thêm GAC_GIAY tính từ bây giờ (giờ của tivi); chưa hẹn thì thôi. */
     fun giaHanGac() {
-        if (gacToken != null) runCatching { sh("echo \$((\$(date +%s) + $GAC_GIAY)) > $GAC-han") }
+        if (gacToken != null) runCatching { sh("echo \$((\$(date +%s) + $GAC_GIAY)) > $GAC-han.tmp && mv -f $GAC-han.tmp $GAC-han") }
     }
 
     /** Ghi [pkg] vào danh sách tivi sẽ tự bật lại; lần đầu thì đặt kịch bản canh gác. Gói đầu danh sách là Home gốc. */
@@ -1463,22 +1481,21 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         if (teleRemoteDaCai()) { bao(t("Gỡ Tele Remote…", "Removing Tele Remote…")); runCatching { goTeleRemote() } }
         if (iptvDaCai()) { bao(t("Gỡ app IPTV…", "Removing the IPTV app…")); runCatching { goIptv() } }
         if (boGoDaCai()) { bao(t("Gỡ bộ gõ tiếng Việt…", "Removing the Vietnamese typing helper…")); runCatching { goBoGo() } }
-        // TiviKit Launcher đang là Home cũng gỡ: Home được đặt lại ở trên (có sao lưu) hay ngay bên dưới (không sao lưu).
-        if (tklDaCai()) { bao(t("Gỡ TiviKit Launcher…", "Removing TiviKit Launcher…")); runCatching { goTklHet() } }
-        goAppPhuCu(bao)
-        if (goLauncher) HOME_SACH.forEach { p ->
-            if (sh("pm path $p").isNotBlank()) { bao(t("Gỡ Home sạch ($p)…", "Removing the clean Home ($p)…")); sh("pm uninstall $p") }
-        } else boDichHome()
-        // Home hệ thống của hãng: ưu tiên Home gốc app biết, rồi app hệ thống đầu tiên có màn HOME dùng được.
+        // Home hệ thống của hãng: tìm và đặt trước khi gỡ Home sạch / TiviKit Launcher để tivi không bao giờ mất hết Home.
         val heThong = sh("pm list packages -s").lines().map { it.trim().removePrefix("package:") }.toSet()
         val ung = sh("cmd package query-activities --brief -a android.intent.action.MAIN -c android.intent.category.HOME")
             .lines().map { it.trim() }.filter { it.contains('/') && !it.endsWith("FallbackHome") }
-            .filter { c -> val p = c.substringBefore('/'); p in heThong && p !in HOME_SACH && p !in KHONG_PHAI_HOME && !APP_XUAT_XUONG.containsMatchIn(p) }
+            .filter { c -> val p = c.substringBefore('/'); p in heThong && p !in HOME_SACH && p != TiviKitLauncher.GOI && p !in KHONG_PHAI_HOME && !APP_XUAT_XUONG.containsMatchIn(p) }
         val home = HOME_GOC_BIET.firstNotNullOfOrNull { g -> ung.firstOrNull { it.startsWith("$g/") } } ?: ung.firstOrNull()
         if (home != null) {
             bao(t("Đặt Home gốc: $home", "Setting the stock Home: $home"))
             sh("cmd package set-home-activity --user 0 $home")
         }
+        if (tklDaCai()) { bao(t("Gỡ TiviKit Launcher…", "Removing TiviKit Launcher…")); runCatching { goTklHet() } }
+        goAppPhuCu(bao)
+        if (goLauncher && home != null) HOME_SACH.forEach { p ->
+            if (sh("pm path $p").isNotBlank()) { bao(t("Gỡ Home sạch ($p)…", "Removing the clean Home ($p)…")); sh("pm uninstall $p") }
+        } else boDichHome()
         sh("input keyevent KEYCODE_HOME")
         return loi
     }
@@ -1507,14 +1524,14 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             if (goc.isNotBlank() && HOME_SACH.none { goc.startsWith("$it/") }) {
                 sh("cmd package set-home-activity --user 0 $goc")
             }
+            // Trả danh sách dịch vụ trợ năng như trước khi làm (app có thể đã bật HomeKeyService / InputKeyService).
+            val tc = sl.truyCapTruoc
+            if (tc.isBlank() || tc == "null") sh("settings delete secure enabled_accessibility_services")
+            else sh("settings put secure enabled_accessibility_services '$tc'")
             if (goLauncher) {
                 bao(t("Gỡ Home sạch…", "Removing the clean Home…"))
                 HOME_SACH.filter { it == PKG_HOME || it == pkgHome }.forEach { sh("pm uninstall $it") }
-                // Trả danh sách dịch vụ trợ năng như trước khi làm (app có thể đã bật HomeKeyService / InputKeyService).
-                val tc = sl.truyCapTruoc
-                if (tc.isBlank() || tc == "null") sh("settings delete secure enabled_accessibility_services")
-                else sh("settings put secure enabled_accessibility_services '$tc'")
-            } else boDichHome() // Home sạch ở lại: thôi mở launcher đã chọn ở Quản lý launcher thay chính nó.
+            } else boDichHome() // Home sạch ở lại: thôi mở đè lên Home gốc.
             sl.launcherDaCai = !goLauncher && sl.launcherDaCai
             sl.homeGocDaTat = ""
             sl.homeDaDoi = false
@@ -1533,10 +1550,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         }
         if (sl.dnsDaDoi) {
             bao(t("Trả DNS như cũ…", "Restoring DNS…"))
-            val mode = sl.dnsModeTruoc.takeIf { it.isNotBlank() && it != "null" } ?: "opportunistic"
-            sh("settings put global private_dns_mode $mode")
-            if (sl.dnsHostTruoc.isBlank() || sl.dnsHostTruoc == "null") sh("settings delete global private_dns_specifier")
-            else sh("settings put global private_dns_specifier ${sl.dnsHostTruoc}")
+            datDnsTho(sl.dnsModeTruoc, sl.dnsHostTruoc)
             sl.dnsDaDoi = false; luuSaoLuu(sl)
         }
         if (khoaDaCai()) { bao(t("Gỡ Khoá trẻ em…", "Removing the Kids lock…")); runCatching { tatKhoa(go = true) } }
@@ -2478,14 +2492,15 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             |while :; do
             |  sleep 5
             |  [ "${'$'}(cat ${'$'}G-token 2>/dev/null)" = "${'$'}1" ] || exit 0
-            |  [ "${'$'}(date +%s)" -ge "${'$'}(cat ${'$'}G-han 2>/dev/null || echo 0)" ] && break
+            |  han=${'$'}(cat ${'$'}G-han 2>/dev/null)
+            |  [ -n "${'$'}han" ] && [ "${'$'}(date +%s)" -ge "${'$'}han" ] && break
             |done
             |for p in ${'$'}(cat ${'$'}G-list); do pm enable --user 0 ${'$'}p; done
             |h=${'$'}(head -n 1 ${'$'}G-list)
             |[ -n "${'$'}h" ] && cmd package set-home-activity --user 0 ${'$'}(cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME ${'$'}h | tail -n 1)
             |input keyevent KEYCODE_HOME
             |echo "${'$'}(date) ${'$'}1 ${'$'}(cat ${'$'}G-list | tr '\n' ' ')" >> ${'$'}G.log
-            |rm -f ${'$'}G-token ${'$'}G-list ${'$'}G-han
+            |[ "${'$'}(cat ${'$'}G-token 2>/dev/null)" = "${'$'}1" ] && rm -f ${'$'}G-token ${'$'}G-list ${'$'}G-han ${'$'}G-han.tmp
             |""".trimMargin()
         /** Namespace Java của launcher: không đổi theo tên gói. */
         const val NS_HOME = "com.gathin.tvhome"
@@ -2510,7 +2525,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         const val HOME_QUERY = "cmd package resolve-activity --brief -a android.intent.action.MAIN -c android.intent.category.HOME"
         val HOME_GOC_BIET = listOf(
             "com.google.android.tvlauncher", "com.google.android.apps.tv.launcherx",
-            "com.google.android.leanbacklauncher", "com.mitv.tvhome",
+            "com.google.android.leanbacklauncher", "com.mitv.tvhome", "com.amazon.tv.launcher",
         )
         /** Nhận Home nhưng không phải màn Home dùng được. */
         private val KHONG_PHAI_HOME = setOf(SETUP, "com.android.tv.settings", "com.android.settings", "com.android.provision")

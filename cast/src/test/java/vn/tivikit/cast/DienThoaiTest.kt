@@ -71,10 +71,12 @@ class DienThoaiTest {
 
     @Test fun dieuKhien_khiChiCoMayBiChan() {
         var ds = DanhBa.noi(emptyList(), "a", "A", "", luc(9))
-        assertTrue(DanhBa.duocDieuKhien(ds, emptyList(), luc(9)))
+        assertFalse(DanhBa.duocDieuKhien(ds, emptyList(), luc(9)))
         assertFalse(DanhBa.duocDieuKhien(ds, listOf("a"), luc(9))) // chờ duyệt
         ds = DanhBa.lam(ds, "a", DanhBa.Lam.CHO_PHEP, luc(9))
         assertTrue(DanhBa.duocDieuKhien(ds, listOf("a"), luc(9)))
+        ds = DanhBa.noi(ds, "b", "B", "", luc(10))
+        assertFalse(DanhBa.duocDieuKhien(ds, listOf("a", "b"), luc(10))) // có máy chờ duyệt đang nối chung
     }
 
     @Test fun tenTuNhatKy_mayDaCastTruocBan20() {

@@ -133,7 +133,13 @@ class DongLenhTest {
 
     @Test fun saoLuuVaGiaTriCu() {
         assertEquals(listOf("a.b", "c.d"), DongLenh.goiTat("pm disable-user --user 0 a.b; cmd package disable-user c.d"))
+        assertEquals(listOf("a.b", "c.d"), DongLenh.goiTat("pm --user 0 disable-user --user=0 a.b; su --command='pm disable-user c.d'"))
         assertEquals(listOf("a.b"), DongLenh.goiTat("su -c 'pm disable-user --user 0 a.b'"))
+        assertTrue(DongLenh.kiemTra("eval \"reboot -p\"").any { it.ma == "tat-han" })
+        assertTrue(DongLenh.kiemTra("sh -ec 'svc wifi disable'").any { it.ma == "tat-wifi" })
+        assertEquals(listOf("rm-rong"), ma("rm -rf /sdcard/."))
+        assertEquals(listOf("rm-rong"), ma("rm -rf /sdcard/Download/.."))
+        assertEquals(listOf("he-thong"), ma("rm /system//app/a.apk"))
         // Tắt một thành phần (gói/lớp): gói vẫn chạy, không ghi.
         assertEquals(emptyList<String>(), DongLenh.goiTat("pm disable a.b/.Receiver"))
         assertEquals(emptyList<String>(), DongLenh.goiTat("for p in a.b; do pm disable-user \$p; done"))

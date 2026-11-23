@@ -22,6 +22,7 @@ class GoiYTest {
         val html = listOf("arm64-v8a", "armeabi-v7a", "x86", "x86_64").joinToString("\n") { "<a href=\"VLC-Android-3.7.1-$it.apk\">" }
         assertEquals("VLC-Android-3.7.1-armeabi-v7a.apk", GoiY.chonTrongThuMuc(html, vlc, "armeabi-v7a"))
         assertEquals("VLC-Android-3.7.1-x86.apk", GoiY.chonTrongThuMuc(html, vlc, "x86"))
+        assertEquals("VLC-Android-3.7.1-x86_64.apk", GoiY.chonTrongThuMuc(html, vlc, "x86_64"))
     }
 
     @Test fun github_chonTheoAbi() {

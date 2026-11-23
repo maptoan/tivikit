@@ -206,11 +206,13 @@ object GoiY {
      * File mới nhất khớp [loc] trong trang liệt kê thư mục, đúng [abi] — so với nhóm cuối của [loc] (tên ABI trong tên
      * file), không so "chứa": "x86" nằm trong "x86_64".
      */
-    fun chonTrongThuMuc(html: String, loc: Regex, abi: String): String? =
-        loc.findAll(html).filter { it.groupValues.last() == abi }.map { it.value }.distinct()
+    fun chonTrongThuMuc(html: String, loc: Regex, abi: String): String? {
+        val chuan = abi.replace('_', '-')
+        return loc.findAll(html).filter { it.groupValues.last().replace('_', '-') == chuan }.map { it.value }.distinct()
             .maxWithOrNull(compareBy<String, List<Int>>(Comparator { a, b ->
                 (0 until maxOf(a.size, b.size)).map { (a.getOrElse(it) { 0 }).compareTo(b.getOrElse(it) { 0 }) }.firstOrNull { it != 0 } ?: 0
             }) { ten -> Regex("""\d+(\.\d+)+""").find(ten)?.value?.split('.')?.map { it.toInt() } ?: emptyList() })
+    }
 
     private fun lay(url: String): String {
         val c = URL(url).openConnection() as HttpURLConnection
@@ -239,8 +241,9 @@ object GoiY {
         }
         Nguon.CHPlay -> error(t("${a.ten} cài từ CH Play của tivi.", "${a.ten} installs from the TV's Play Store."))
         is Nguon.ThuMuc -> {
-            val abi = chuanAbi(abiTv).firstOrNull { it in n.theoAbi } ?: error(t("${a.ten} không có bản cho chip của tivi này.", "${a.ten} has no build for this TV's chip."))
-            val thuMuc = n.theoAbi.getValue(abi)
+            val abi = chuanAbi(abiTv).firstOrNull { it in n.theoAbi || it.replace('-', '_') in n.theoAbi }
+                ?: error(t("${a.ten} không có bản cho chip của tivi này.", "${a.ten} has no build for this TV's chip."))
+            val thuMuc = n.theoAbi[abi] ?: n.theoAbi.getValue(abi.replace('-', '_'))
             val ten = chonTrongThuMuc(lay(thuMuc), n.loc, abi) ?: error(t("Không thấy file ${a.ten} trên máy chủ.", "Couldn't find ${a.ten} on the server."))
             BanMoi(thuMuc + ten, ten, phienBanTu(ten, null))
         }
@@ -263,7 +266,10 @@ object GoiY {
     /** Các số của phiên bản: "29.15" → [29, 15], "2024-11-21-release" → [2024, 11, 21]; không có số → null. */
     fun soPhienBan(s: String?): List<Int>? {
         if (s == null) return null
-        return Regex("""\d+(?:[._-]\d+)*""").find(s)?.value?.split('.', '_', '-')?.mapNotNull { it.toIntOrNull() }?.takeIf { it.isNotEmpty() }
+        val ds = Regex("""\d+(?:[._-]\d+)*""").find(s)?.value?.split('.', '_', '-')?.mapNotNull { it.toIntOrNull() }?.takeIf { it.isNotEmpty() } ?: return null
+        // Bỏ hậu tố ngày build kiểu 6.2.85-20241121.1805 nếu phía trước đã có ít nhất 2 cụm số phiên bản.
+        val cat = ds.indexOfFirst { it >= 19000101 }
+        return if (cat >= 2) ds.subList(0, cat) else ds
     }
 
     /** [moi] mới hơn [cu]? null = không so được (thiếu số). Số so lần lượt, thiếu coi như 0 (1.2 = 1.2.0). */

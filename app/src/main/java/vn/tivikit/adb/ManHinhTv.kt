@@ -109,7 +109,11 @@ class ManHinhTv(private val adb: KetNoiAdb) {
                 while (true) {
                     when (vao.readUnsignedByte()) {
                         GiaoThucScrcpy.TIN_ACK_CLIPBOARD -> choAck[vao.readLong()]?.countDown()
-                        GiaoThucScrcpy.TIN_CLIPBOARD -> boQua(vao.readInt(), buf)
+                        GiaoThucScrcpy.TIN_CLIPBOARD -> {
+                            val co = vao.readInt()
+                            if (co < 0 || co > 4 * 1024 * 1024) throw java.io.IOException("Cỡ tin không hợp lệ: $co")
+                            boQua(co, buf)
+                        }
                         GiaoThucScrcpy.TIN_UHID -> { vao.readUnsignedShort(); boQua(vao.readUnsignedShort(), buf) }
                         else -> break // tin lạ (máy chủ khác bản): không biết dài bao nhiêu để đọc tiếp
                     }
@@ -139,8 +143,9 @@ class ManHinhTv(private val adb: KetNoiAdb) {
          * giao diện (rời màn, app xuống nền) — ở đó Android ném NetworkOnMainThreadException, gói không đi, máy chủ scrcpy
          * trên tivi không biết để thoát (TX3: app xuống nền rồi lên lại thì còn hai máy chủ chạy song song).
          */
-        fun dongNen(vararg luong: AdbStream) {
-            Thread({ luong.forEach { runCatching { it.close() } } }, "scrcpy-dong").apply { isDaemon = true; start() }
+        fun dongNen(vararg luong: AdbStream?) {
+            if (luong.all { it == null }) return
+            Thread({ luong.forEach { runCatching { it?.close() } } }, "scrcpy-dong").apply { isDaemon = true; start() }
         }
     }
 
@@ -154,15 +159,20 @@ class ManHinhTv(private val adb: KetNoiAdb) {
         val mayChu = adb.openStream("exec:" + GiaoThucScrcpy.lenhChay(scid, canhLon, bitRate, fps))
         val nhatKy = StringBuffer()
         val doc = docNhatKy(mayChu, nhatKy)
+        var luongVideo: AdbStream? = null
+        var dk: AdbStream? = null
         try {
             val ten = GiaoThucScrcpy.tenSocket(scid)
-            val (luongVideo, vao) = choLuongDau(ten, doc, nhatKy)
-            val dk = adb.openStream("localabstract:$ten")
+            val (lv, vao) = choLuongDau(ten, doc, nhatKy)
+            luongVideo = lv
+            dk = adb.openStream("localabstract:$ten")
             val tenMay = ByteArray(GiaoThucScrcpy.CO_TEN_MAY).also { vao.readFully(it) }
             val codec = vao.readInt()
             if (codec != GiaoThucScrcpy.H264) throw IOException("codec không phải H.264 (0x%08x)".format(codec))
-            return Phien(GiaoThucScrcpy.docTenMay(tenMay), luongVideo, vao, dk, mayChu, nhatKy)
-        } catch (e: Exception) {
+            return Phien(GiaoThucScrcpy.docTenMay(tenMay), lv, vao, dk, mayChu, nhatKy)
+        } catch (e: Throwable) {
+            dongNen(luongVideo)
+            dongNen(dk)
             runCatching { mayChu.close() }
             throw if (e is IOException) IOException(lyDo(nhatKy, e.message ?: "lỗi"), e) else e
         }

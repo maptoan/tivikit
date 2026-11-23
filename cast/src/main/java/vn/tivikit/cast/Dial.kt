@@ -143,12 +143,12 @@ class Dial(
             val i = d.indexOf(':')
             if (i > 0) tieuDe[d.substring(0, i).trim().lowercase()] = d.substring(i + 1).trim()
         }
-        val dai = tieuDe["content-length"]?.toIntOrNull()?.coerceIn(0, 16_384) ?: 0
-        val than = ByteArray(dai)
-        var n = 0
-        while (n < dai) { val r = vao.read(than, n, dai - n); if (r < 0) break; n += r }
+        val doDai = tieuDe["content-length"]?.toIntOrNull()?.coerceIn(0, 16_384) ?: 0
+        val than = ByteArray(doDai)
+        var da = 0
+        while (da < doDai) { val r = vao.read(than, da, doDai - da); if (r <= 0) break; da += r }
         val ip = ipCua(k.localAddress) ?: ipMang() ?: return
-        val thanChu = String(than, 0, n, Charsets.UTF_8)
+        val thanChu = String(than, 0, da, Charsets.UTF_8)
         Log.i(NHAN, "HTTP ${phan[0]} ${phan[1]} từ ${k.inetAddress?.hostAddress} (${tieuDe["user-agent"].orEmpty().substringBefore(' ')})")
         val tl = traLoi(phan[0], phan[1].substringBefore('?'), thanChu, "http://$ip:$cong")
         k.getOutputStream().apply { write(tl); flush() }
@@ -346,7 +346,10 @@ class Dial(
     private fun ipNhanh(dich: InetAddress): String? {
         val bay = System.currentTimeMillis()
         ipDaBiet[dich]?.let { (ip, luc) -> if (bay - luc < 60_000) return ip }
-        return ipToi(dich)?.also { ipDaBiet[dich] = it to bay }
+        return ipToi(dich)?.also {
+            if (ipDaBiet.size > 64) ipDaBiet.clear()
+            ipDaBiet[dich] = it to bay
+        }
     }
 
     /** IP của tivi trên đường tới [dich] (nối UDP không gửi gói nào). */

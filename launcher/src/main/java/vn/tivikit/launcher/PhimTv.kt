@@ -25,7 +25,10 @@ val LocalKhoaChon = compositionLocalOf { false }
 fun Modifier.nutTv(onClick: () -> Unit, onGiu: (() -> Unit)? = null, onChon: (Boolean) -> Unit = {}): Modifier = composed {
     val p = remember { GiuPhim() }
     val khoa = LocalKhoaChon.current
-    onFocusChanged { onChon(it.isFocused) }
+    onFocusChanged {
+        if (!it.isFocused) { p.xuong = false; p.daGiu = false }
+        onChon(it.isFocused)
+    }
         .onPreviewKeyEvent { e ->
             val ok = e.key == Key.DirectionCenter || e.key == Key.Enter || e.key == Key.NumPadEnter
             when {

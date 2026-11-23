@@ -45,11 +45,13 @@ class GiuAdb(private val thuMuc: File, private val dangHoi: () -> Unit) {
 
     private fun vong() {
         var cho = CHO_DAU
+        var lanTuChoi = 0
         while (chay) {
             trangThai = TrangThai.DANG_NOI
             val p = PhienAdb(thuMuc)
             when (p.noi { trangThai = TrangThai.DANG_HOI; dangHoi() }) {
                 PhienAdb.KetQua.DA_NOI -> {
+                    lanTuChoi = 0
                     trangThai = TrangThai.DA_NOI
                     val luc = System.currentTimeMillis()
                     phien = p
@@ -63,7 +65,13 @@ class GiuAdb(private val thuMuc: File, private val dangHoi: () -> Unit) {
                 PhienAdb.KetQua.CHUA_CHO_PHEP -> {
                     trangThai = TrangThai.TU_CHOI
                     p.close()
-                    choNoiLai()
+                    if (lanTuChoi < 2) {
+                        lanTuChoi++
+                        nghi(20_000L)
+                    } else {
+                        lanTuChoi = 0
+                        choNoiLai()
+                    }
                     cho = CHO_DAU
                 }
                 PhienAdb.KetQua.KHONG_CO -> {

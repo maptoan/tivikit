@@ -25,8 +25,13 @@ class FileTrenTv(private val adb: KetNoiAdb) {
      */
     fun mo(duongDan: String, kieu: String): Boolean {
         require(duongDan.none { it in "\"'\$`\\" } && kieu.none { it in "\"'\$`\\ " }) { "duongDan" }
-        val id = Regex("""_id=(\d+)""").find(sh("content query --uri content://media/external/file --projection _id --where \"_data='$duongDan'\" 2>/dev/null"))
-            ?.groupValues?.get(1)
+        var id: String? = null
+        for (lan in 0..2) {
+            id = Regex("""_id=(\d+)""").find(sh("content query --uri content://media/external/file --projection _id --where \"_data='$duongDan'\" 2>/dev/null"))
+                ?.groupValues?.get(1)
+            if (id != null) break
+            if (lan < 2) Thread.sleep(300)
+        }
         val bang = when { kieu.startsWith("image/") -> "images/media"; kieu.startsWith("video/") -> "video/media"; kieu.startsWith("audio/") -> "audio/media"; else -> "file" }
         val diaChi = listOfNotNull(id?.let { "content://media/external/$bang/$it" }, "file://$duongDan")
         return diaChi.any { d ->
@@ -39,7 +44,7 @@ class FileTrenTv(private val adb: KetNoiAdb) {
 
         /** Bỏ ký tự làm hỏng lệnh shell / đường dẫn; giữ chữ có dấu. */
         fun tenAnToan(ten: String): String =
-            ten.replace(Regex("[\\u0000-\\u001f/\\\\\"'`$*?<>|:]"), "_").trim().trimStart('.').ifEmpty { "file" }.take(120)
+            ten.replace(Regex("[\\u0000-\\u001f/\\\\\"'`$*?<>|:%#&;]"), "_").trim().trimStart('.').ifEmpty { "file" }.take(120)
 
         /** "a.jpg" đã có thì "a (2).jpg", "a (3).jpg"… */
         fun tenKhongTrung(ten: String, coSan: Set<String>): String {

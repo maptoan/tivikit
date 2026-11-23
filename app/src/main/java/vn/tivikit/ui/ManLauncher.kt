@@ -139,7 +139,11 @@ private fun TuyChinhTkl(vm: PhienLamViec, ql: QuanLyLauncher, k: TiviKitLauncher
     }
     val chonAnh = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri -> if (uri != null) ql.chonNenDienThoai(uri) }
     ql.nenTklRieng?.let { b ->
-        val anh = remember(b) { runCatching { BitmapFactory.decodeByteArray(b, 0, b.size, BitmapFactory.Options().apply { inSampleSize = 4 })?.asImageBitmap() }.getOrNull() }
+        val anh = produceState<ImageBitmap?>(initialValue = null, b) {
+            value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                runCatching { BitmapFactory.decodeByteArray(b, 0, b.size, BitmapFactory.Options().apply { inSampleSize = 4 })?.asImageBitmap() }.getOrNull()
+            }
+        }.value
         if (anh != null) Image(anh, null, Modifier.fillMaxWidth().aspectRatio(16f / 9f).clip(RoundedCornerShape(12.dp)), contentScale = ContentScale.Crop)
     }
     NutPhu(t("Ảnh từ điện thoại", "Photo from the phone"), Icons.Rounded.AddPhotoAlternate, enabled = !vm.dangBan) {

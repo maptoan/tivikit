@@ -147,8 +147,13 @@ class TeleRemoteDichVu : AccessibilityService() {
 
     /** Nhắn [chu] cho các chủ tivi (báo tin); giữ máy thức một lúc cho kịp gửi khi tivi vừa tắt màn hình. */
     fun baoTin(chu: String, banPhim: org.json.JSONObject? = null) {
-        runCatching { getSystemService(PowerManager::class.java).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "tivikit:teleremote-bao").acquire(30_000) }
-        bot?.baoChu(chu, banPhim)
+        val wl = runCatching { getSystemService(PowerManager::class.java).newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "tivikit:teleremote-bao") }.getOrNull()
+        try {
+            runCatching { wl?.acquire(30_000L) }
+            bot?.baoChu(chu, banPhim)
+        } finally {
+            if (wl != null && wl.isHeld) runCatching { wl.release() }
+        }
     }
 
     override fun onAccessibilityEvent(e: AccessibilityEvent?) {
@@ -158,7 +163,7 @@ class TeleRemoteDichVu : AccessibilityService() {
 
     /** Ghi [p] là app đang hiện, chỉ khi là app có màn mở hay màn Home (bỏ hộp thoại hệ thống, bàn phím, thông báo nhỏ). */
     private fun ghiApp(p: String) {
-        if (p != packageName && laApp.getOrPut(p) { moApp(p) != null || p in home() }) appHien = p
+        if (p != packageName && (p == "vn.tivikit.khoa" || laApp.getOrPut(p) { moApp(p) != null || p in home() })) appHien = p
     }
 
     override fun onInterrupt() {}
@@ -303,11 +308,13 @@ class TeleRemoteDichVu : AccessibilityService() {
      * chụp được. Bỏ chữ in trước ảnh ([AnhTr.dauPng], Skyworth MediaTek). App có nội dung bảo vệ (phim bản quyền) thì ảnh đen.
      */
     fun chup(): ByteArray? {
+        if (goiDangMo() == "vn.tivikit.khoa") return null
         val png = adb?.lenhByte("screencap -p", 20_000) ?: return null
         val dau = AnhTr.dauPng(png).takeIf { it >= 0 && png.size - it > 100 } ?: return null
-        val anh = BitmapFactory.decodeByteArray(png, dau, png.size - dau) ?: return null
-        val nho = if (anh.width > 1280) Bitmap.createScaledBitmap(anh, 1280, anh.height * 1280 / anh.width, true) else anh
-        return ByteArrayOutputStream().also { nho.compress(Bitmap.CompressFormat.JPEG, 85, it) }.toByteArray()
+        val goc = BitmapFactory.decodeByteArray(png, dau, png.size - dau) ?: return null
+        val nho = if (goc.width > 1280) Bitmap.createScaledBitmap(goc, 1280, goc.height * 1280 / goc.width, true) else goc
+        if (nho !== goc) goc.recycle()
+        return ByteArrayOutputStream().also { nho.compress(Bitmap.CompressFormat.JPEG, 85, it); nho.recycle() }.toByteArray()
     }
 
     /** Tệp mới cho ảnh / video người dùng gửi (thư mục riêng của app); chỉ giữ hai tệp gần nhất. */
@@ -413,11 +420,14 @@ class TeleRemoteDichVu : AccessibilityService() {
 
     /** Quay màn hình tivi [giay] giây (screenrecord qua ADB, 720p, 2 Mbps), trả MP4; null nếu chưa nối ADB / không quay được. */
     fun quayManHinh(giay: Int): ByteArray? {
+        if (goiDangMo() == "vn.tivikit.khoa") return null
         val tep = File(thuMucChung() ?: return null, "quay.mp4")
         tep.delete()
         lenh("screenrecord --time-limit $giay --size 1280x720 --bit-rate 2000000 '${tep.absolutePath}'", (giay + 20) * 1000L) ?: return null
         return runCatching { tep.readBytes() }.getOrNull()?.takeIf { it.size > 1000 }.also { tep.delete() }
     }
+
+    fun quayPhim(giay: Int): ByteArray? = quayManHinh(giay)
 
     /**
      * Đặt [anh] (cắt giữa 16:9) làm ảnh nền TiviKit Launcher như TiviKit (content write anh-nen.jpg qua ADB, đọc lại cỡ ảnh

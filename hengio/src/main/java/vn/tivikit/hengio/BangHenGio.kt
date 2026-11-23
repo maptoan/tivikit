@@ -204,9 +204,11 @@ class BangHenGio : Activity() {
 
     private fun tatSau(phut: Int) {
         val m = MotLan(System.currentTimeMillis() + phut * 60_000L, Viec.TAT)
-        HenGio.themMotLan(this, m)?.let { bao(loiMotLan(it)); return }
-        bao(t("Tivi sẽ tắt lúc ", "The TV turns off at ") + Chu.gio(m.luc, zone) + t(" (sau ", " (in ") + Chu.phut(phut) + ").")
-        veChinh("ml-${m.id}")
+        quaMa(t("Hẹn việc một lần: ", "Set a one-off: ") + moTa(m, System.currentTimeMillis())) {
+            HenGio.themMotLan(this, m)?.let { bao(loiMotLan(it)); return@quaMa }
+            bao(t("Tivi sẽ tắt lúc ", "The TV turns off at ") + Chu.gio(m.luc, zone) + t(" (sau ", " (in ") + Chu.phut(phut) + ").")
+            veChinh("ml-${m.id}")
+        }
     }
 
     private fun loiMotLan(ma: String) = if (ma == "trung") t("Việc này đã hẹn rồi.", "That's already set.")
@@ -327,8 +329,7 @@ class BangHenGio : Activity() {
                 if (loi != null) bao(loiMotLan(loi))
                 else { bao(t("Đã hẹn: ", "Set: ") + moTa(m, System.currentTimeMillis()) + "."); veChinh("ml-${m.id}") }
             }
-            // Hẹn tắt tivi không cần mã bố mẹ.
-            if (m.loai == Viec.TAT) hen() else quaMa(t("Hẹn việc một lần: ", "Set a one-off: ") + moTa(m, System.currentTimeMillis()), hen)
+            quaMa(t("Hẹn việc một lần: ", "Set a one-off: ") + moTa(m, System.currentTimeMillis()), hen)
             return
         }
         val v = Viec(n.gio, n.phut, n.ngay, n.loai, goi, n.bat)

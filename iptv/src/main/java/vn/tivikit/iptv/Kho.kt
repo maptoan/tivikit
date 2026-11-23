@@ -1,6 +1,7 @@
 package vn.tivikit.iptv
 
 import android.content.Context
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
@@ -17,23 +18,25 @@ class Kho(ctx: Context) {
 
     var link: String
         get() = p.getString("link", null).orEmpty()
-        set(v) { p.edit().putString("link", v).remove("luc_tai").apply(); file.delete(); nho = null }
+        set(v) = synchronized(Kho::class.java) {
+            p.edit().putString("link", v).remove("luc_tai").apply()
+            file.delete()
+            nho = null
+        }
 
     /** Lúc tải danh sách gần nhất (ms), 0 = chưa tải. */
     val lucTai: Long get() = p.getLong("luc_tai", 0)
 
     /** Danh sách đã tải (đọc file một lần rồi nhớ). */
-    @Synchronized
-    fun daTai(): List<KenhIptv> {
+    fun daTai(): List<KenhIptv> = synchronized(Kho::class.java) {
         nho?.let { return it }
         val ds = runCatching { if (file.isFile) DanhSach.doc(file.readText()) else emptyList() }.getOrDefault(emptyList())
         nho = ds
-        return ds
+        ds
     }
 
     /** Tải lại danh sách theo link (chặn tới khi xong, tối đa vài chục giây); null nếu không tải được hay không có kênh nào. */
-    @Synchronized
-    fun taiLai(): List<KenhIptv>? {
+    fun taiLai(): List<KenhIptv>? = synchronized(Kho::class.java) {
         val l = link.takeIf { it.isNotEmpty() } ?: return null
         val chu = runCatching { tai(l) }.getOrNull() ?: return null
         val ds = DanhSach.doc(chu)
@@ -41,7 +44,7 @@ class Kho(ctx: Context) {
         runCatching { file.writeText(chu) }
         p.edit().putLong("luc_tai", System.currentTimeMillis()).apply()
         nho = ds
-        return ds
+        ds
     }
 
     /** Danh sách để mở kênh: bản đã tải nếu còn mới, không thì tải lại (lỗi mạng thì bản cũ). */
@@ -54,6 +57,7 @@ class Kho(ctx: Context) {
     companion object {
         /** Bản đã tải cũ hơn thế này thì mở kênh sẽ tải lại trước (2 giờ). */
         const val CU = 2 * 3_600_000L
+        private const val TOI_DA = 15 * 1024 * 1024
         @Volatile private var nho: List<KenhIptv>? = null
 
         /** Tải văn bản ở [url], đi theo chuyển hướng (cả http ↔ https, tối đa 6 lần), 10 giây mỗi bước. */
@@ -71,7 +75,20 @@ class Kho(ctx: Context) {
                         return@repeat
                     }
                     if (ma !in 200..299) error("HTTP $ma")
-                    return c.inputStream.use { it.readBytes() }.toString(Charsets.UTF_8)
+                    if (c.contentLengthLong > TOI_DA) error("qua lon")
+                    return c.inputStream.use { luong ->
+                        val ra = ByteArrayOutputStream()
+                        val dem = ByteArray(8192)
+                        var tong = 0
+                        while (true) {
+                            val doc = luong.read(dem)
+                            if (doc < 0) break
+                            tong += doc
+                            if (tong > TOI_DA) error("qua lon")
+                            ra.write(dem, 0, doc)
+                        }
+                        ra.toString(Charsets.UTF_8.name())
+                    }
                 } finally {
                     c.disconnect()
                 }

@@ -24,7 +24,8 @@ object KichBanKhoiPhuc {
         chu(t("Cần adb (Android platform-tools). Windows: bấm đúp file này. Mac / Linux: sh tên-file.bat",
             "Needs adb (Android platform-tools). Windows: double-click this file. Mac / Linux: sh file-name.bat"))
         chu(t("Tivi phải bật Gỡ lỗi USB. Sai IP thì sửa dòng adb connect bên dưới.", "USB debugging must be on. If the IP changed, edit the adb connect line below."))
-        dong += "adb connect ${sl.ip}:5555"
+        val dich = if (':' in sl.ip) sl.ip else "${sl.ip}:5555"
+        dong += "adb connect $dich"
         val goi = sl.daTatBoiApp.filter { TEN_GOI.matches(it) }
         if (goi.isNotEmpty()) chu(t("Bật lại ${goi.size} gói TiviKit đã tắt", "Re-enable the ${goi.size} packages TiviKit disabled"))
         goi.forEach { dong += "adb shell pm enable --user 0 $it" }

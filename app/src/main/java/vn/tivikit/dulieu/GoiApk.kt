@@ -40,7 +40,7 @@ object GoiApk {
     private fun tenFile(p: PhanApk) = p.muc.substringAfterLast('/').lowercase()
 
     fun abiCua(p: PhanApk): String? {
-        val ten = tenFile(p).removeSuffix(".apk")
+        val ten = tenFile(p).removeSuffix(".apk").replace('-', '_')
         return ABI.firstOrNull { a -> Regex("""(^|[._-])$a([._-]|$)""").containsMatchIn(ten) }
     }
 
@@ -104,8 +104,23 @@ object GoiApk {
         else docGoi(ctx, ten, f, abiTv, tam)
 
     private fun docGoi(ctx: Context, ten: String, f: File, abiTv: List<String>, tam: Boolean): FileApk {
-        val muc = runCatching { ZipFile(f).use { z -> z.entries().toList().filter { !it.isDirectory }.map { PhanApk(it.name, it.size) } } }
-            .getOrElse { error(t("\"$ten\" hỏng hoặc bị mã hoá, không mở được như file zip.", "\"$ten\" is damaged or encrypted and can't be opened as a zip.")) }
+        val muc = runCatching {
+            ZipFile(f).use { z ->
+                val buf = ByteArray(64 * 1024)
+                z.entries().toList().filter { !it.isDirectory }.map { e ->
+                    val co = if (e.size >= 0) e.size else z.getInputStream(e).use { ins ->
+                        var tong = 0L
+                        while (true) {
+                            val n = ins.read(buf)
+                            if (n < 0) break
+                            tong += n
+                        }
+                        tong
+                    }
+                    PhanApk(e.name, co)
+                }
+            }
+        }.getOrElse { error(t("\"$ten\" hỏng hoặc bị mã hoá, không mở được như file zip.", "\"$ten\" is damaged or encrypted and can't be opened as a zip.")) }
         val phan = chonPhan(muc, abiTv)
         if (phan.isEmpty()) error(t("Trong \"$ten\" không có file APK nào.", "There is no APK inside \"$ten\"."))
         // Gói .xapk của game có thể kèm dữ liệu OBB: chưa gửi được, chỉ báo cỡ để người dùng biết.

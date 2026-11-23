@@ -19,7 +19,15 @@ object XacThuc {
     class Sai(val conLan: Int) : KetQua
     class Cho(val ms: Long) : KetQua
 
-    fun choCon(kho: Kho, bay: Long = System.currentTimeMillis()): Long = (kho.chanDen - bay).coerceAtLeast(0)
+    fun choCon(kho: Kho, bay: Long = System.currentTimeMillis()): Long {
+        if (kho.chanDen - bay > 60 * 60_000L) kho.chanDen = bay + 30 * 60_000L
+        return (kho.chanDen - bay).coerceAtLeast(0)
+    }
+
+    fun conChanGiay(kho: Kho, bay: Long = System.currentTimeMillis()): Long {
+        if (kho.chanDen - bay > 60 * 60_000L) kho.chanDen = bay + 30 * 60_000L
+        return ((kho.chanDen - bay).coerceAtLeast(0) + 999) / 1000
+    }
 
     /** Thử [nhap], không đếm sai (màn khoá thử 6 số đầu, phòng khi đang gõ mã dự phòng 8 số). Đúng thì ghi mã đã dùng. */
     @Synchronized fun dung(kho: Kho, nhap: String, bay: Long = System.currentTimeMillis()): Boolean {
@@ -55,8 +63,22 @@ object XacThuc {
         return p
     }
 
+    fun batDauGo(kho: Kho, bay: Long = System.currentTimeMillis()) {
+        if (kho.henGo > 0 && bay - kho.henGo > 30L * 24 * 3600_000L) kho.henGo = bay
+        if (kho.maMo != null && kho.henGo == 0L) kho.henGo = bay
+    }
+
+    fun conGoGiay(kho: Kho, bay: Long = System.currentTimeMillis()): Long {
+        if (kho.henGo <= 0) return 0
+        if (bay - kho.henGo > 30L * 24 * 3600_000L) kho.henGo = bay
+        return ((kho.henGo + CHO_QUEN_MS - bay).coerceAtLeast(0) + 999) / 1000
+    }
+
     /** Đã quá [CHO_QUEN_MS] từ lúc TiviKit báo quên mã mà không ai nhập đúng mã để huỷ. */
-    fun goDuoc(kho: Kho, bay: Long = System.currentTimeMillis()): Boolean = kho.yeuCauGo in 1..(bay - CHO_QUEN_MS)
+    fun goDuoc(kho: Kho, bay: Long = System.currentTimeMillis()): Boolean {
+        if (kho.henGo > 0 && bay - kho.henGo > 30L * 24 * 3600_000L) kho.henGo = bay
+        return kho.yeuCauGo in 1..(bay - CHO_QUEN_MS)
+    }
 
     /** Được đổi cấu hình / mã không: tivi chưa có mã, có phiên còn hạn, hoặc quên mã đã quá 24 giờ. */
     fun duocDoi(kho: Kho, phien: String?, bay: Long = System.currentTimeMillis()): Boolean =

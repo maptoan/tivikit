@@ -24,6 +24,8 @@ class GoiApkTest {
         assertEquals("x86_64", GoiApk.abiCua(PhanApk("config.x86_64.apk", 1)))
         assertEquals("x86", GoiApk.abiCua(PhanApk("config.x86.apk", 1)))
         assertEquals("armeabi_v7a", GoiApk.abiCua(PhanApk("splits/base-armeabi_v7a.apk", 1)))
+        assertEquals("arm64_v8a", GoiApk.abiCua(PhanApk("split_config.arm64-v8a.apk", 1)))
+        assertEquals("armeabi_v7a", GoiApk.abiCua(PhanApk("config.armeabi-v7a.apk", 1)))
         assertEquals(null, GoiApk.abiCua(PhanApk("config.xhdpi.apk", 1)))
     }
 

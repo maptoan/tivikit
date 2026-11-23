@@ -15,10 +15,14 @@ class XacNhan : Activity() {
 
     override fun onCreate(b: Bundle?) {
         super.onCreate(b)
+        window.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
         val goi = callingPackage
         if (goi == null || packageManager.checkSignatures(goi, packageName) != PackageManager.SIGNATURE_MATCH) { tra(false); return }
-        // Dịch vụ khoá không chạy: khoá không có hiệu lực, không có gì để hỏi.
-        val dv = KhoaDichVu.dangChay ?: run { tra(true); return }
+        val dv = KhoaDichVu.dangChay
+        if (dv == null) {
+            if (Kho(this).daDat) { tra(false); return }
+            tra(true); return
+        }
         dv.xacNhanChoApp(intent.getStringExtra("viec").orEmpty().take(120)) { ok -> tra(ok) }
     }
 

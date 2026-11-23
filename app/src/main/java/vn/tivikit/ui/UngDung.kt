@@ -813,21 +813,25 @@ private fun XemTruocHome(vm: PhienLamViec) {
     val th = vm.themeChon
     val goc = vm.anhGocRieng
     // Bản nhỏ của ảnh gốc (rộng ~1280) cùng cỡ thật: kéo / phóng chỉ vẽ lại phần trong khung, không cắt lại ảnh.
-    val xemGoc = remember(goc) {
-        goc?.let { g ->
-            runCatching {
-                val bien = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
-                android.graphics.BitmapFactory.decodeByteArray(g, 0, g.size, bien)
-                val bm = android.graphics.BitmapFactory.decodeByteArray(g, 0, g.size, android.graphics.BitmapFactory.Options().apply { inSampleSize = maxOf(1, bien.outWidth / 1280) })
-                Triple(bm.asImageBitmap(), bien.outWidth, bien.outHeight)
-            }.getOrNull()
+    val xemGoc = produceState<Triple<androidx.compose.ui.graphics.ImageBitmap, Int, Int>?>(initialValue = null, goc) {
+        value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            goc?.let { g ->
+                runCatching {
+                    val bien = android.graphics.BitmapFactory.Options().apply { inJustDecodeBounds = true }
+                    android.graphics.BitmapFactory.decodeByteArray(g, 0, g.size, bien)
+                    val bm = android.graphics.BitmapFactory.decodeByteArray(g, 0, g.size, android.graphics.BitmapFactory.Options().apply { inSampleSize = maxOf(1, bien.outWidth / 1280) })
+                    Triple(bm.asImageBitmap(), bien.outWidth, bien.outHeight)
+                }.getOrNull()
+            }
         }
-    }
-    val anh = remember(th.id) {
-        runCatching {
-            (th.anhNen ?: th.anhXem)?.let { a -> ctx.assets.open(a).use { android.graphics.BitmapFactory.decodeStream(it, null, android.graphics.BitmapFactory.Options().apply { inSampleSize = 4 }) } }
-        }.getOrNull()?.asImageBitmap()
-    }
+    }.value
+    val anh = produceState<androidx.compose.ui.graphics.ImageBitmap?>(initialValue = null, th.id) {
+        value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            runCatching {
+                (th.anhNen ?: th.anhXem)?.let { a -> ctx.assets.open(a).use { android.graphics.BitmapFactory.decodeStream(it, null, android.graphics.BitmapFactory.Options().apply { inSampleSize = 4 }) } }
+            }.getOrNull()?.asImageBitmap()
+        }
+    }.value
     val canh = vm.dangCanhAnh && xemGoc != null
     val nhan = Nhan
     Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f).clip(RoundedCornerShape(16.dp)).background(Brush.linearGradient(th.mau.map { Color(it) }))
@@ -1191,11 +1195,13 @@ internal fun ChonChip(chu: String, chon: Boolean, onClick: () -> Unit) {
 @Composable
 private fun TheTheme(th: Theme, chon: Boolean, onClick: () -> Unit) {
     val ctx = LocalContext.current
-    val anh = remember(th.id) {
-        (th.anhNen ?: th.anhXem)?.let { a -> runCatching {
-            ctx.assets.open(a).use { android.graphics.BitmapFactory.decodeStream(it, null, android.graphics.BitmapFactory.Options().apply { inSampleSize = 8 }) }
-        }.getOrNull()?.asImageBitmap() }
-    }
+    val anh = produceState<androidx.compose.ui.graphics.ImageBitmap?>(initialValue = null, th.id) {
+        value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+            (th.anhNen ?: th.anhXem)?.let { a -> runCatching {
+                ctx.assets.open(a).use { android.graphics.BitmapFactory.decodeStream(it, null, android.graphics.BitmapFactory.Options().apply { inSampleSize = 8 }) }
+            }.getOrNull()?.asImageBitmap() }
+        }
+    }.value
     Column(Modifier.width(132.dp).clickable(onClick = onClick)) {
         Box(Modifier.fillMaxWidth().aspectRatio(16f / 9f).clip(RoundedCornerShape(12.dp))
             .background(Brush.linearGradient(th.mau.map { Color(it) }))
@@ -1440,9 +1446,11 @@ private fun ManHuongDan(vm: PhienLamViec) {
             }
         }
         itemsIndexed(HUONG_DAN) { i, b ->
-            val anh = remember(thuMuc, b.anh) {
-                runCatching { ctx.assets.open("huongdan/$thuMuc/${b.anh}.webp").use { android.graphics.BitmapFactory.decodeStream(it) }?.asImageBitmap() }.getOrNull()
-            }
+            val anh = produceState<androidx.compose.ui.graphics.ImageBitmap?>(initialValue = null, thuMuc, b.anh) {
+                value = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                    runCatching { ctx.assets.open("huongdan/$thuMuc/${b.anh}.webp").use { android.graphics.BitmapFactory.decodeStream(it) }?.asImageBitmap() }.getOrNull()
+                }
+            }.value
             Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(The1).padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {

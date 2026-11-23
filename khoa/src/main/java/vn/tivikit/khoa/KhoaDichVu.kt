@@ -337,12 +337,32 @@ class KhoaDichVu : AccessibilityService() {
     /** App đang ở trên cùng có cần che không (khi cả tivi không khoá): cần thì che lại, hỏi mã. */
     private fun kiemTraApp(c: CauHinh, bay: Calendar) {
         if (che == CheTivi || che == CheMaPh || che == CheXacNhan || bangPh.dangMo) return
-        val goi = appTren ?: return
+        val goi = appTren?.takeIf { it.isNotEmpty() } ?: return
         val moi: Che = baoVe(c, goi, lopTren, bay.timeInMillis)?.let { CheBaoVe(goi, it) }
             ?: KhoaApp.khoa(c, kho.hen, goi, bay, giayDung(kho, Luat.ngay(bay)), kho.moApp[goi] ?: 0)?.let { CheApp(goi, it) }
             ?: return // không cần che: lớp che app đang mở (nếu có) vẫn chờ nhập mã hay Back
         if (che != moi) hienKhoa(moi)
     }
+
+    private fun capNhatApp() {
+        if (appTren.isNullOrEmpty()) {
+            val g = runCatching { rootInActiveWindow?.packageName?.toString() }.getOrNull() ?: appTrenTuThongKe()
+            if (!g.isNullOrEmpty() && g != packageName && g != "android" && !laBoGo(g)) appTren = g
+        }
+        if (::kho.isInitialized) kho.cauHinh?.let { capNhatApp(it, Calendar.getInstance()) }
+    }
+
+    private fun appTrenTuThongKe(): String? = runCatching {
+        val bay = System.currentTimeMillis()
+        val ds = getSystemService(android.app.usage.UsageStatsManager::class.java).queryEvents(bay - 60 * 60_000L, bay)
+        val e = android.app.usage.UsageEvents.Event()
+        var kq: String? = null
+        while (ds.hasNextEvent()) {
+            ds.getNextEvent(e)
+            if (e.eventType == android.app.usage.UsageEvents.Event.MOVE_TO_FOREGROUND) e.packageName?.let { kq = it }
+        }
+        kq
+    }.getOrNull()
 
     /** Mỗi nhịp lúc cả tivi không khoá: app đang mở tới giờ khoá thì che; sắp khoá thì báo; app phát nền vừa bị khoá thì dừng phát. */
     private fun capNhatApp(c: CauHinh, bay: Calendar) {
@@ -361,7 +381,7 @@ class KhoaDichVu : AccessibilityService() {
             if (khoaNay && !ganNhatDaKhoa && g != appTren) dungPhat() // app phát nền (SmartTube chạy nền…) vừa tới giờ khoá
             ganNhatDaKhoa = khoaNay
         }
-        val g = appTren ?: return
+        val g = appTren?.takeIf { it.isNotEmpty() } ?: return
         if (che != null || !dangXem() || g == daBaoApp) return
         KhoaApp.sapKhoa(c, hen, g, bay, dung, moApp[g] ?: 0)?.let { phut ->
             bao(t("Còn $phut phút nữa ${tenApp(g)} sẽ nghỉ", "${tenApp(g)} rests in $phut min"), 15_000); daBaoApp = g
@@ -425,6 +445,7 @@ class KhoaDichVu : AccessibilityService() {
     private fun roiDi() {
         performGlobalAction(if ((che as? CheBaoVe)?.loai == BaoVe.ADB) GLOBAL_ACTION_BACK else GLOBAL_ACTION_HOME)
         anKhoa()
+        tay.postDelayed({ capNhatApp(); capNhat() }, 350)
     }
 
     /**
@@ -559,7 +580,7 @@ class KhoaDichVu : AccessibilityService() {
         if (ngay != ngayCho) { luuDem(); ngayCho = ngay }
         if (lop == null && dangXem()) {
             msCho += qua
-            appTren?.let { g -> KhoaApp.luatDem(kho.cauHinh, g).forEach { id -> msApp.merge(id, qua) { a, b -> a + b } } }
+            appTren?.takeIf { it.isNotEmpty() }?.let { g -> KhoaApp.luatDem(kho.cauHinh, g).forEach { id -> msApp.merge(id, qua) { a, b -> a + b } } }
         }
         if (msCho >= 60_000 || msApp.values.any { it >= 60_000 }) luuDem()
     }
@@ -620,9 +641,12 @@ class KhoaDichVu : AccessibilityService() {
         val cu = che
         if (lop == null && bangPh.dangMo) return // bảng phụ huynh đang mở: đóng bảng thì xét lại (sauBang)
         if (lop == null && !taoLop()) return
-        if (cu == CheTivi && moi != CheTivi) imTieng(false)
+        if (cu == CheTivi && moi != CheTivi && !(cu == CheTivi && (moi == CheMaPh || moi == CheXacNhan))) imTieng(false)
         if (cu is CheApp && moi !is CheApp) thaFocus()
-        if (cu != moi) { nhap = ""; choSai = false; chon = 4; tvBao.text = ""; veXin(""); vePin(); veChon() }
+        if (cu != moi) {
+            if (choSai && ::kho.isInitialized) { tay.removeCallbacks(saiCho); XacThuc.ghiSai(kho) }
+            nhap = ""; choSai = false; chon = 4; tvBao.text = ""; veXin(""); vePin(); veChon()
+        }
         if (cu == CheXacNhan && moi != CheXacNhan) traXacNhan(false)
         oPhim.getOrNull(O_PHU_HUYNH)?.visibility = if (moi == CheMaPh || moi == CheXacNhan) View.GONE else View.VISIBLE
         oPhim.getOrNull(O_XIN)?.visibility = if (moi == CheTivi && coTeleRemote()) View.VISIBLE else View.GONE
@@ -680,17 +704,20 @@ class KhoaDichVu : AccessibilityService() {
         val lp = WindowManager.LayoutParams(
             WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
             WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or WindowManager.LayoutParams.FLAG_FULLSCREEN,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN or WindowManager.LayoutParams.FLAG_FULLSCREEN or WindowManager.LayoutParams.FLAG_SECURE,
             PixelFormat.TRANSLUCENT)
         return runCatching { getSystemService(WindowManager::class.java).addView(nen, lp) }.onSuccess { lop = nen }.isSuccess
     }
 
     private fun anKhoa() {
+        if (choSai && ::kho.isInitialized) { tay.removeCallbacks(saiCho); XacThuc.ghiSai(kho) }
+        nhap = ""; choSai = false
         lop?.let { v -> runCatching { getSystemService(WindowManager::class.java).removeView(v) } }
-        if (che == CheTivi) imTieng(false)
+        if (che == CheTivi || (cheTruoc == CheTivi && (che == CheMaPh || che == CheXacNhan))) imTieng(false)
         if (che is CheApp) thaFocus()
         tay.removeCallbacks(anCheApp)
         lop = null; che = null; dangKhoa = false
+        appTren = ""; lopTren = ""
     }
 
     private fun imTieng(bat: Boolean) {

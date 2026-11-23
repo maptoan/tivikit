@@ -77,6 +77,7 @@ class ManCast : ManCoMa() {
         var ma by remember { mutableStateOf("") }
         var maLuc by remember { mutableLongStateOf(0L) }
         var lanLayMa by remember { mutableIntStateOf(0) }
+        var hienMa by remember { mutableStateOf(!PhuHuynh.can(this@ManCast) || daXacThuc) }
         var chon by remember { mutableStateOf<DienThoai?>(null) }
         var hoiHuy by remember { mutableStateOf(false) }
         var doiTen by remember { mutableStateOf(false) }
@@ -93,13 +94,15 @@ class ManCast : ManCoMa() {
                 dsMay = withContext(Dispatchers.IO) { kho.dienThoai }
                 dangNoi = may?.dangNoi ?: emptySet()
                 bay = System.currentTimeMillis()
+                if (!PhuHuynh.can(this@ManCast) || daXacThuc) hienMa = true
                 delay(1_000)
             }
         }
         // Mã TV sống chừng 5 phút: lấy mã mới mỗi 4,5 phút; chưa nối được YouTube (hay vừa huỷ mọi liên kết, đang đổi
-        // screen) thì thử lại sau 2 giây.
-        LaunchedEffect(lanLayMa) {
+        // screen) thì thử lại sau 2 giây. Đang bật Khoá trẻ em thì chỉ xin mã sau khi xác thực phụ huynh.
+        LaunchedEffect(lanLayMa, hienMa) {
             ma = ""
+            if (!hienMa) return@LaunchedEffect
             while (true) {
                 val m = withContext(Dispatchers.IO) { runCatching { CastDichVu.dangChay?.may?.xinMaTv() }.getOrNull() }
                 if (m != null) { ma = m; maLuc = System.currentTimeMillis(); delay(270_000) } else delay(2_000)
@@ -124,7 +127,9 @@ class ManCast : ManCoMa() {
                     }, 16.sp, Mau.phu, dong = 1)
                 }
                 Row(Modifier.weight(1f).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(20.dp)) {
-                    TheMa(Modifier.weight(1.4f).fillMaxHeight(), ma, maLuc, bay, ten, biChe, nhanCast)
+                    TheMa(Modifier.weight(1.4f).fillMaxHeight(), ma, maLuc, bay, ten, biChe, nhanCast, hienMa) {
+                        PhuHuynh.xacNhan(this@ManCast) { hienMa = true; lanLayMa++ }
+                    }
                     The(Modifier.weight(1f).fillMaxHeight()) {
                         Chu(t("Điện thoại đã cast", "Phones that cast"), 22.sp, dam = FontWeight.SemiBold)
                         if (sapXep.isEmpty()) Chu(t("Chưa có điện thoại nào cast lên tivi này. Máy lạ cast lần đầu thì tivi hỏi trước khi phát.",
@@ -167,15 +172,20 @@ class ManCast : ManCoMa() {
 
     /** Khung mã TV: mã chữ to, đếm ngược tới mã mới, cách nhập trên điện thoại. */
     @Composable
-    private fun TheMa(modifier: Modifier, ma: String, maLuc: Long, bay: Long, ten: String, biChe: Boolean, nhanCast: Boolean) = The(modifier) {
+    private fun TheMa(modifier: Modifier, ma: String, maLuc: Long, bay: Long, ten: String, biChe: Boolean, nhanCast: Boolean, hienMa: Boolean, xinHienMa: () -> Unit) = The(modifier) {
         Chu(t("Liên kết điện thoại", "Link a phone"), 22.sp, dam = FontWeight.SemiBold)
         Chu(t("Mã TV", "TV code"), 15.sp, Mau.mo)
-        // 12 số cỡ 46sp vừa khung trên màn 960dp (720p hay 1080p đều vậy).
-        Chu(if (ma.isEmpty()) t("Đang lấy mã…", "Getting a code…") else ma.chunked(3).joinToString(" "),
-            if (ma.isEmpty()) 30.sp else 46.sp, if (ma.isEmpty()) Mau.phu else Mau.chu, FontWeight.Bold, cachChu = 2.sp, dong = 1)
-        if (ma.isNotEmpty()) {
-            val con = ((maLuc + 300_000 - bay) / 1000).coerceAtLeast(0)
-            Chu(t("Mã dùng được thêm ", "Valid for another ") + "%d:%02d".format(con / 60, con % 60) + t(", tự đổi mã mới.", ", then a new one appears."), 14.sp, Mau.mo)
+        if (!hienMa) {
+            Chu("•••• •••• ••••", 46.sp, Mau.phu, FontWeight.Bold, cachChu = 2.sp, dong = 1)
+            Nut(t("Hiện mã ghép nối", "Show pairing code"), xinHienMa)
+        } else {
+            // 12 số cỡ 46sp vừa khung trên màn 960dp (720p hay 1080p đều vậy).
+            Chu(if (ma.isEmpty()) t("Đang lấy mã…", "Getting a code…") else ma.chunked(3).joinToString(" "),
+                if (ma.isEmpty()) 30.sp else 46.sp, if (ma.isEmpty()) Mau.phu else Mau.chu, FontWeight.Bold, cachChu = 2.sp, dong = 1)
+            if (ma.isNotEmpty()) {
+                val con = ((maLuc + 300_000 - bay) / 1000).coerceAtLeast(0)
+                Chu(t("Mã dùng được thêm ", "Valid for another ") + "%d:%02d".format(con / 60, con % 60) + t(", tự đổi mã mới.", ", then a new one appears."), 14.sp, Mau.mo)
+            }
         }
         Spacer(Modifier.height(4.dp))
         Chu(t("Trên điện thoại (iPhone hay Android): mở YouTube → nút Cast → Thêm thiết bị / Liên kết bằng mã TV → nhập mã trên. Liên kết một lần là điện thoại nhớ \"$ten\".",

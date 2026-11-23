@@ -23,13 +23,18 @@ object PhuHuynh {
     /** Khoá trẻ em đang chạy mà là bản cũ, chưa có màn xác nhận: không cho làm, nhắc cập nhật bằng TiviKit. */
     object KhoaCu : Can
 
-    fun can(ctx: Context, viec: String): Can {
-        val dangChay = runCatching { Settings.Secure.getString(ctx.contentResolver, "enabled_accessibility_services") }
+    fun can(ctx: Context): Boolean =
+        runCatching { Settings.Secure.getString(ctx.contentResolver, "enabled_accessibility_services") }
             .getOrNull()?.contains("$GOI/") == true
-        if (!dangChay) return KhongCan
+
+    fun can(ctx: Context, viec: String): Can {
+        if (!can(ctx)) return KhongCan
         val i = Intent().setClassName(GOI, LOP).putExtra("viec", viec)
         return if (runCatching { ctx.packageManager.resolveActivity(i, 0) }.getOrNull() != null) HoiMa(i) else KhoaCu
     }
+
+    fun xacNhan(act: ManCoMa, viec: String = t("hiện mã ghép nối", "show the pairing code"), lam: () -> Unit) =
+        act.canMa(viec, lam)
 }
 
 /** Màn của app Cast có việc cần mã bố mẹ: nhập đúng một lần thì 5 phút không hỏi lại (lúc màn còn mở). */
@@ -44,6 +49,7 @@ open class ManCoMa : ComponentActivity() {
 
     /** Đang chờ màn nhập mã bố mẹ trả lời. */
     protected val dangChoMa: Boolean get() = choMa != null
+    protected val daXacThuc: Boolean get() = SystemClock.elapsedRealtime() < moDen
 
     /** Làm [lam] sau khi có mã bố mẹ (nếu cần); [viec] hiện trên màn nhập mã. */
     fun canMa(viec: String, lam: () -> Unit) {

@@ -19,6 +19,11 @@ data class KenhIptv(
  */
 object DanhSach {
     private val THUOC_TINH = Regex("""([\w-]+)="([^"]*)"""")
+    private val RE_DAU = Regex("\\p{Mn}+")
+    private val RE_TU_THUA = Regex("\\b(kenh|truyen hinh|hd|fhd|uhd|4k)\\b")
+    private val RE_KY_TU = Regex("[^a-z0-9]")
+    private val RE_KY_TU_LA = Regex("[,'\"`\$\\\\=\\r\\n]")
+    private val RE_KHOANG_TRANG = Regex("\\s+")
 
     fun doc(chu: String): List<KenhIptv> {
         val ds = ArrayList<KenhIptv>()
@@ -84,8 +89,8 @@ object DanhSach {
      * FHD / UHD / 4K, chỉ giữ a-z 0-9, gộp tên khác ("QPVN HD" = "Quốc phòng Việt Nam").
      */
     fun khoa(ten: String): String {
-        val kd = Normalizer.normalize(ten.lowercase(), Normalizer.Form.NFD).replace(Regex("\\p{Mn}+"), "").replace('đ', 'd')
-        val k = kd.replace(Regex("\\b(kenh|truyen hinh|hd|fhd|uhd|4k)\\b"), " ").replace(Regex("[^a-z0-9]"), "")
+        val kd = Normalizer.normalize(ten.lowercase(), Normalizer.Form.NFD).replace(RE_DAU, "").replace('đ', 'd')
+        val k = kd.replace(RE_TU_THUA, " ").replace(RE_KY_TU, "")
         return BI_DANH[k] ?: k
     }
 
@@ -116,5 +121,5 @@ object DanhSach {
      * Tên kênh như TiviKit đặt cho ô (KenhNhanh.tenSach): bỏ dấu phẩy, nháy, ký tự shell, "=", xuống dòng; gộp khoảng trắng;
      * tối đa 30 ký tự.
      */
-    fun gon(s: String): String = s.replace(Regex("[,'\"`\$\\\\=\\r\\n]"), " ").trim().replace(Regex("\\s+"), " ").take(30)
+    fun gon(s: String): String = s.replace(RE_KY_TU_LA, " ").trim().replace(RE_KHOANG_TRANG, " ").take(30)
 }

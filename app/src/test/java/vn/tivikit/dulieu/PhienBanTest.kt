@@ -30,6 +30,8 @@ class PhienBanTest {
         assertNull(GoiY.moiHon(null, "1.0"))
         assertNull(GoiY.moiHon("1.0", ""))
         assertEquals(listOf(2024, 11, 21), GoiY.soPhienBan("2024-11-21-release"))
+        assertEquals(false, GoiY.moiHon("6.5.5", "6.5.5-20261009.2113"))
+        assertEquals(true, GoiY.moiHon("6.5.6", "6.5.5-20261009.2113"))
         assertTrue(GoiY.moiHon("21.2", "20.5")!!)
         assertFalse(GoiY.moiHon("0.191", "0.192")!!)
     }

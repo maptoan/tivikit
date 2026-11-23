@@ -12,7 +12,9 @@ import android.provider.Settings
 
 /** Tivi khởi động / app cập nhật: bật lại dịch vụ khoá nếu đang bật khoá, hẹn canh gác 15 phút một lần. */
 class KhoiDong : BroadcastReceiver() {
-    override fun onReceive(ctx: Context, i: Intent) {
+    override fun onReceive(ctx: Context, intent: Intent?) {
+        val a = intent?.action ?: return
+        if (a != Intent.ACTION_BOOT_COMPLETED && a != Intent.ACTION_MY_PACKAGE_REPLACED && a != "android.intent.action.QUICKBOOT_POWERON") return
         CanhGac.damBao(ctx)
         CanhGac.hen(ctx)
     }

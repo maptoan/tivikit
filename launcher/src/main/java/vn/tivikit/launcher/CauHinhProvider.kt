@@ -10,6 +10,7 @@ import android.os.Binder
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
+import android.os.HandlerThread
 import android.os.Looper
 import android.os.ParcelFileDescriptor
 import android.os.Process
@@ -109,12 +110,13 @@ class CauHinhProvider : ContentProvider() {
         val dich = fileCua(uri, goi) ?: throw FileNotFoundException(uri.toString())
         if (!mode.contains('w')) return ParcelFileDescriptor.open(dich, ParcelFileDescriptor.MODE_READ_ONLY)
         dich.parentFile?.mkdirs()
-        val tam = File(dich.path + ".tmp")
+        val tam = File("${dich.path}.${System.nanoTime()}.tmp")
         val toiDa = if (goi != null) 2L * 1024 * 1024 else 12L * 1024 * 1024
         val ghi = ParcelFileDescriptor.MODE_WRITE_ONLY or ParcelFileDescriptor.MODE_CREATE or ParcelFileDescriptor.MODE_TRUNCATE
-        return ParcelFileDescriptor.open(tam, ghi, Handler(Looper.getMainLooper())) { loi ->
-            if (loi == null && tam.length() in 1..toiDa && AnhNen.hopLe(tam) && tam.renameTo(dich)) daDoi(goi)
-            else tam.delete()
+        return ParcelFileDescriptor.open(tam, ghi, luongNen) { loi ->
+            if (loi == null && tam.length() in 1..toiDa && AnhNen.hopLe(tam) && tam.renameTo(dich)) {
+                Handler(Looper.getMainLooper()).post { daDoi(goi) }
+            } else tam.delete()
         }
     }
 
@@ -122,12 +124,14 @@ class CauHinhProvider : ContentProvider() {
     private fun moCau(mode: String): ParcelFileDescriptor {
         val dich = File(context!!.filesDir, CAU)
         if (!mode.contains('w')) return ParcelFileDescriptor.open(dich, ParcelFileDescriptor.MODE_READ_ONLY)
-        val tam = File(dich.path + ".tmp")
+        val tam = File("${dich.path}.${System.nanoTime()}.tmp")
         val ghi = ParcelFileDescriptor.MODE_WRITE_ONLY or ParcelFileDescriptor.MODE_CREATE or ParcelFileDescriptor.MODE_TRUNCATE
-        return ParcelFileDescriptor.open(tam, ghi, Handler(Looper.getMainLooper())) { loi ->
+        return ParcelFileDescriptor.open(tam, ghi, luongNen) { loi ->
             val ok = loi == null && tam.length() in 1..CAU_TOI_DA &&
                 runCatching { CauMoiNgay.tach(CauMoiNgay.giaiMa(tam.readBytes())).isNotEmpty() }.getOrDefault(false)
-            if (ok && tam.renameTo(dich)) CauHinh.lanDoi.value++ else tam.delete()
+            if (ok && tam.renameTo(dich)) {
+                Handler(Looper.getMainLooper()).post { CauHinh.lanDoi.value++ }
+            } else tam.delete()
         }
     }
 
@@ -152,6 +156,10 @@ class CauHinhProvider : ContentProvider() {
     }
 
     companion object {
+        private val luongNen: Handler by lazy {
+            HandlerThread("CauHinhProvider").apply { start() }.let { Handler(it.looper) }
+        }
+
         /** Bí danh có bộ lọc HOME (AndroidManifest.xml). */
         const val HOME = "vn.tivikit.launcher.Home"
         const val ANH_NEN = "anh-nen.jpg"

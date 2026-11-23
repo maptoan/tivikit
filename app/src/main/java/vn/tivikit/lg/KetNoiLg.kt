@@ -74,6 +74,7 @@ class KetNoiLg(val ip: String, socketFactory: SocketFactory?) {
         val kenh = Channel<WebOs.Tin>(Channel.UNLIMITED)
         cho[WebOs.ID_DANG_KY] = kenh
         try {
+            if (!song) { cho.remove(WebOs.ID_DANG_KY)?.close(); throw IOException(MAT_KET_NOI) }
             if (!ws.send(WebOs.dangKy(khoa))) throw IOException("Mất kết nối khi ghép đôi")
             return withTimeout(90_000) {
                 var k: String? = null
@@ -129,12 +130,14 @@ class KetNoiLg(val ip: String, socketFactory: SocketFactory?) {
         runCatching { chinh?.close(1000, null) }; chinh = null
         boCho()
         http.dispatcher.executorService.shutdown()
+        runCatching { http.connectionPool.evictAll() }
     }
 
     private suspend fun hoi(id: String, tin: String, ms: Long): WebOs.Tin {
         val kenh = Channel<WebOs.Tin>(1)
         cho[id] = kenh
         try {
+            if (!song) { cho.remove(id)?.close(); throw IOException(MAT_KET_NOI) }
             if (chinh?.send(tin) != true) throw IOException("Mất kết nối với tivi")
             return withTimeout(ms) { kenh.receive() }
         } finally { cho.remove(id) }

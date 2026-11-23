@@ -30,7 +30,7 @@ object TenVideo {
         thread(isDaemon = true) {
             try {
                 val kq = runCatching { tra(id) }.getOrNull()
-                if (kq == null) hong[id] = System.currentTimeMillis()
+                if (kq == null) { if (hong.size > 128) hong.clear(); hong[id] = System.currentTimeMillis() }
                 else { if (daBiet.size > 200) daBiet.clear(); daBiet[id] = kq }
             } finally {
                 dangTra.remove(id)

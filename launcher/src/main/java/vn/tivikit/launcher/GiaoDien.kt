@@ -191,7 +191,7 @@ private fun DongHo(tt: TrangThaiHome) {
     Box(Modifier.focusRequester(fr)
         .nutTv({ tt.lich = true }, onChon = { chon = it })
         .graphicsLayer { scaleX = to; scaleY = to; transformOrigin = TransformOrigin(0f, 0.5f) }) {
-        Box(Modifier.matchParentSize().graphicsLayer { alpha = hienKinh }
+        if (hienKinh > 0.001f) Box(Modifier.matchParentSize().graphicsLayer { alpha = hienKinh }
             .kinh(LocalNen.current, vien, toi = 0.06f, sang = 0.16f).border(2.dp, XanhChon, vien))
         Row(Modifier.padding(horizontal = 14.dp, vertical = 2.dp), verticalAlignment = Alignment.CenterVertically) {
             // Inter Light, số đều nhau (tnum): đồng hồ không xê dịch khi đổi phút.
@@ -399,8 +399,8 @@ private fun ODock(tt: TrangThaiHome, goi: String, dauDock: Boolean) {
     var chon by remember { mutableStateOf(false) }
     val doi = tt.dangDoi == goi
     val to by animateFloatAsState(if (chon) 1.12f else 1f, tween(150), label = "o")
-    if (dauDock) LaunchedEffect(tt.lanVeDau) { runCatching { fr.requestFocus() } }
-    LaunchedEffect(doi) { if (doi) runCatching { fr.requestFocus() } }
+    if (dauDock && tt.dangDoi == null) LaunchedEffect(tt.lanVeDau) { runCatching { fr.requestFocus() } }
+    if (doi) LaunchedEffect(app.goi, tt.dock.indexOf(app.goi)) { runCatching { fr.requestFocus() } }
     LaunchedEffect(tt.traChon, tt.thuVien) {
         if (tt.traChon == goi && !tt.thuVien) { runCatching { fr.requestFocus() }; tt.traChon = null }
     }
@@ -450,7 +450,7 @@ private fun NutTatCa(tt: TrangThaiHome) {
 private fun AnhO(tt: TrangThaiHome, app: AppTv, modifier: Modifier) {
     val a = tt.anh[app.goi]
     // Ảnh bị bỏ cho đỡ RAM (DieuKhien.gioiHanAnh) lúc ô còn hiện thì nạp lại.
-    LaunchedEffect(app.goi, app.capNhat, a == null) { tt.hd.canAnh(app.goi) }
+    LaunchedEffect(app.goi, app.capNhat) { if (tt.anh[app.goi]?.capNhat != app.capNhat) tt.hd.canAnh(app.goi) }
     val vien = RoundedCornerShape(10.dp)
     val banner = a?.banner
     if (banner != null) {

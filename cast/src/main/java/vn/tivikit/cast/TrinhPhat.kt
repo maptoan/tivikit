@@ -69,6 +69,7 @@ class TrinhPhat(private val ctx: Context) {
         override fun onPlaybackStateChanged(state: PlaybackState?) = doiTuPhien(state)
         override fun onSessionDestroyed() { theo = null }
     }
+    private val nghePhien = MediaSessionManager.OnActiveSessionsChangedListener { theoDoi() }
 
     var videoId: String? = null; private set
     private var ds: List<String> = emptyList()
@@ -89,8 +90,15 @@ class TrinhPhat(private val ctx: Context) {
     /** Theo dõi phiên media của SmartTube nếu tivi cho đọc (gọi một lần lúc bật). */
     fun batTheoDoi() = runCatching {
         ctx.getSystemService(MediaSessionManager::class.java)
-            .addOnActiveSessionsChangedListener({ theoDoi() }, ComponentName(ctx, NgheThongBao::class.java), tay)
+            .addOnActiveSessionsChangedListener(nghePhien, ComponentName(ctx, NgheThongBao::class.java), tay)
         theoDoi()
+    }
+
+    /** Gỡ theo dõi phiên media khi tắt dịch vụ. */
+    fun dong() {
+        runCatching { ctx.getSystemService(MediaSessionManager::class.java).removeOnActiveSessionsChangedListener(nghePhien) }
+        runCatching { theo?.unregisterCallback(goiLai) }
+        theo = null
     }
 
     private fun theoDoi() = tay.post {

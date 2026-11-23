@@ -119,11 +119,11 @@ object DanhBa {
     }
 
     /**
-     * Lệnh điều khiển (tạm dừng, tua, âm lượng…) không biết của máy nào: làm theo nếu có ít nhất một máy đang nối được
-     * phép cast, hay không biết máy nào đang nối (vừa bật lại). Chỉ toàn máy bị chặn / chờ duyệt đang nối thì bỏ qua.
+     * Lệnh điều khiển (tạm dừng, tua, âm lượng…) không biết của máy nào: chỉ làm theo khi có máy đang nối và mọi máy đang
+     * nối đều được phép cast. Có máy bị chặn / chờ duyệt đang nối hoặc không có máy nào đang nối thì bỏ qua.
      */
     fun duocDieuKhien(ds: List<DienThoai>, dangNoi: Collection<String>, bay: Long): Boolean =
-        dangNoi.isEmpty() || dangNoi.any { id -> ds.firstOrNull { it.id == id }?.xet(bay) == DienThoai.Xet.PHAT }
+        dangNoi.isNotEmpty() && dangNoi.all { id -> ds.firstOrNull { it.id == id }?.xet(bay) == DienThoai.Xet.PHAT }
 
     /**
      * Tên các máy đã từng cast trước bản có danh sách (nhật ký cũ ghi "điện thoại nối: <tên>"): lên bản mới, máy đó nối lần

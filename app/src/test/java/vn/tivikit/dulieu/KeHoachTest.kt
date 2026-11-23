@@ -105,7 +105,9 @@ class KeHoachTest {
         val tt = TrangThaiGoi(caiDat = emptySet(), daTat = emptySet(), coBieuTuong = emptySet(), homeHienTai = "", banPhim = emptySet())
         listOf("com.google.android.ext.services", "com.android.ext.shared", "com.google.android.modulemetadata",
             "com.google.android.overlay.modules.permissioncontroller", "com.google.android.permissioncontroller",
-            "com.google.android.packageinstaller", "com.android.providers.tv").forEach {
+            "com.google.android.packageinstaller", "com.android.providers.tv",
+            "com.amazon.tv.launcher", "com.amazon.firehomestarter", "com.amazon.tv.settings.v2",
+            "com.amazon.tv.nimh", "com.amazon.imp", "com.amazon.dcp", "com.amazon.ssm").forEach {
             assertTrue(it, KeHoach.laGoiCanGiu(it, tt))
         }
         assertFalse(KeHoach.laGoiCanGiu("com.google.android.feedback", tt))

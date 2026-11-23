@@ -529,15 +529,20 @@ object DongLenh {
             w = when {
                 GAN_BIEN.matches(dau) || dau in TU_KHOA_SH || ten in LENH_BOC -> w.drop(1)
                 dau in BO_QUA_CAU -> return ghi
+                ten == "eval" -> return cacLenh(w.drop(1).joinToString(" "), sau + 1) + ghi
                 ten == "nice" -> boTuyChon(w.drop(1), setOf("-n"))
                 ten == "timeout" -> boTuyChon(w.drop(1), setOf("-s", "-k")).drop(1)
                 ten == "env" -> w.drop(1).dropWhile { it.startsWith("-") || GAN_BIEN.matches(it) }
                 ten == "xargs" -> boTuyChon(w.drop(1), setOf("-n", "-I", "-L", "-P", "-d", "-s", "-E", "-a"))
-                ten in setOf("sh", "mksh", "bash", "su") -> {
-                    val i = w.indexOf("-c")
-                    if (i in 1 until w.size - 1) return cacLenh(w[i + 1], sau + 1) + ghi
+                ten in setOf("sh", "mksh", "bash", "ash", "su") -> {
+                    w.drop(1).firstOrNull { it.startsWith("--command=") }?.let {
+                        return cacLenh(it.removePrefix("--command="), sau + 1) + ghi
+                    }
+                    val i = w.indexOfFirst { it == "--command" || Regex("^-[a-zA-Z]*c$").matches(it) }
+                    if (i in 1 until w.size - 1) return cacLenh(w.subList(i + 1, w.size).joinToString(" "), sau + 1) + ghi
                     // su 0 lệnh / su root lệnh (su của Magisk, SuperSU nhận lệnh sau tên người dùng).
                     val con = if (ten == "su") w.drop(1).dropWhile { it == "0" || it == "root" || it.startsWith("-") } else emptyList()
+                    if (con.size == 1 && ' ' in con[0]) return cacLenh(con[0], sau + 1) + ghi
                     if (con.isNotEmpty()) con else break
                 }
                 else -> break
@@ -552,10 +557,15 @@ object DongLenh {
         return w.drop(i)
     }
 
-    /** Bỏ "--user N" (settings, pm). */
+    /** Bỏ "--user N" và "--user=N" (settings, pm). */
     private fun boUser(a: List<String>): List<String> {
-        val i = a.indexOf("--user")
-        return if (i < 0) a else a.take(i) + a.drop(i + 2)
+        var r = a.filterNot { it.startsWith("--user=") }
+        while (true) {
+            val i = r.indexOf("--user")
+            if (i < 0) break
+            r = r.take(i) + r.drop(i + 2)
+        }
+        return r
     }
 
     // ---------- Kiểm tra trước khi chạy ----------
@@ -692,8 +702,9 @@ object DongLenh {
     }
 
     private fun xetPm(a: List<String>, canGiu: (String) -> Boolean, them: (CanhBao) -> Unit) {
-        val lenh = a.getOrNull(0) ?: return
-        val goi = goiTrong(a.drop(1))
+        val b = boUser(a)
+        val lenh = b.firstOrNull { !it.startsWith("-") } ?: return
+        val goi = goiTrong(b.filter { it != lenh })
         fun loi() = goi.map { it.substringBefore('/') }.filter { canGiu(it) }.forEach { p ->
             them(CanhBao("goi-loi:$p", MucDo.NGUY_HIEM,
                 "$p là gói tivi cần để chạy (màn Home, Cài đặt, bàn phím, lõi Android…). Tắt, gỡ hay xoá dữ liệu nó có thể làm mất màn hình chính, treo ở logo khi khởi động, mất cả ADB.",
@@ -710,7 +721,7 @@ object DongLenh {
                 loi(); tiviKit()
             }
             "uninstall" -> {
-                them(if ("--user" in a) CB_PM_GO_USER else CB_PM_GO)
+                them(if (a.any { it == "--user" || it.startsWith("--user=") }) CB_PM_GO_USER else CB_PM_GO)
                 loi(); tiviKit()
             }
             "clear" -> { them(CB_PM_XOA); loi() }
@@ -785,18 +796,35 @@ object DongLenh {
     private val SUA_TUONG_LUA = setOf("-F", "-A", "-I", "-D", "-P", "-X", "--flush", "--append", "--insert", "--delete", "--policy")
     private val PHIM_NGU = setOf("KEYCODE_POWER", "POWER", "26", "KEYCODE_SLEEP", "SLEEP", "223", "KEYCODE_SOFT_SLEEP", "276")
 
+    private fun chuanDuongDan(raw: String): String {
+        val gop = raw.trim().replace(Regex("/+"), "/")
+        if (!gop.startsWith("/")) return gop.trimEnd('/')
+        val out = ArrayList<String>()
+        for (seg in gop.split('/')) {
+            when (seg) {
+                "", "." -> {}
+                ".." -> if (out.isNotEmpty()) out.removeAt(out.lastIndex)
+                else -> out.add(seg)
+            }
+        }
+        return "/" + out.joinToString("/")
+    }
+
     /** Phân vùng hệ thống: chỉ máy root mới ghi được, ghi sai là hỏng khởi động. */
     private val DUONG_HE_THONG = listOf("/system", "/vendor", "/product", "/odm", "/oem", "/apex", "/boot", "/dev/block", "/system_ext", "/persist", "/firmware", "/metadata", "/cache/recovery")
-    private fun laDuongHeThong(p: String) = DUONG_HE_THONG.any { p == it || p.startsWith("$it/") }
+    private fun laDuongHeThong(p: String): Boolean {
+        val s = chuanDuongDan(p)
+        return DUONG_HE_THONG.any { s == it || s.startsWith("$it/") }
+    }
 
-    private val DUONG_RONG = setOf("", "/sdcard", "/storage", "/storage/emulated", "/storage/emulated/0", "/storage/self/primary", "/mnt", "/mnt/sdcard",
+    private val DUONG_RONG = setOf("", "/", "/sdcard", "/storage", "/storage/emulated", "/storage/emulated/0", "/storage/self/primary", "/mnt", "/mnt/sdcard",
         "/data", "/data/media", "/data/media/0", "/data/data", "/data/app", "/data/local", "/data/local/tmp")
     private val GOC_BO_NHO = listOf("/sdcard/", "/storage/emulated/0/", "/storage/self/primary/", "/mnt/sdcard/", "/data/media/0/")
     private val THU_MUC_CHUNG = setOf("Download", "DCIM", "Pictures", "Movies", "Music", "Documents", "Android", "Podcasts", "Alarms", "Notifications", "Ringtones", "Recordings")
 
     /** Đường dẫn xoá là mất hàng loạt: bộ nhớ trong, thư mục chung (Download, ảnh…), dữ liệu app, ., ~, biến, hay * ngay trong các chỗ đó. */
     private fun laDuongRong(p: String): Boolean {
-        val s = p.trimEnd('/')
+        val s = chuanDuongDan(p)
         if ('*' in s || '?' in s) {
             if ('/' !in s) return true
             val thu = s.substringBeforeLast('/')

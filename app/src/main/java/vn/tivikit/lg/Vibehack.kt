@@ -53,7 +53,7 @@ object Vibehack {
         val url = "https://raw.githubusercontent.com/hoangvya19/lg-tv-webos-vibehack/$COMMIT/install.sh"
         return "{ curl -fsSL $url -o $SCRIPT_TAM && " +
             "sed -i -e 's#^BRANCH=\"main\"#BRANCH=\"$COMMIT\"#' -e 's#releases/latest/download#releases/download/$BAN#' $SCRIPT_TAM && " +
-            "sh $SCRIPT_TAM ${ts.joinToString(" ") { trich(it) }}; kq=\$?; rm -f $SCRIPT_TAM; exit \$kq; } 2>&1"
+            "sh $SCRIPT_TAM ${ts.joinToString(" ") { trich(it) }}; kq=\$?; rm -f $SCRIPT_TAM $NEN_TAM; exit \$kq; } 2>&1"
     }
 
     /** Bọc nháy đơn cho shell. */

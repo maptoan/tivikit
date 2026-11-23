@@ -13,6 +13,7 @@ import java.util.Locale
 class PhuHuynh : Activity() {
     override fun onCreate(b: Bundle?) {
         super.onCreate(b)
+        window.addFlags(android.view.WindowManager.LayoutParams.FLAG_SECURE)
         val dv = KhoaDichVu.dangChay
         if (dv != null) dv.moBangPhuHuynh()
         else Toast.makeText(this, if (Locale.getDefault().language == "vi") "Khoá trẻ em chưa bật trên tivi này: bật bằng TiviKit trên điện thoại."

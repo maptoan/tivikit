@@ -52,9 +52,24 @@ object SaoLuuApp {
         return NoiDung(saoLuu.size, ds?.length() ?: 0, coKhoa, luc)
     }
 
+    private fun docGioiHan(z: ZipFile, e: ZipEntry, toiDa: Int = 5 * 1024 * 1024): ByteArray =
+        z.getInputStream(e).use { ins ->
+            val out = java.io.ByteArrayOutputStream()
+            val buf = ByteArray(8192)
+            var tong = 0
+            while (true) {
+                val n = ins.read(buf)
+                if (n < 0) break
+                tong += n
+                require(tong <= toiDa) { "tep trong ban sao luu qua lon" }
+                out.write(buf, 0, n)
+            }
+            out.toByteArray()
+        }
+
     /** Mục lục của file [f], chưa ghi gì; không phải bản sao lưu TiviKit thì lỗi. */
     fun xem(f: File): NoiDung = ZipFile(f).use { z ->
-        val m = z.getEntry("manifest.json")?.let { JSONObject(z.getInputStream(it).readBytes().toString(Charsets.UTF_8)) }
+        val m = z.getEntry("manifest.json")?.let { JSONObject(docGioiHan(z, it, 256 * 1024).toString(Charsets.UTF_8)) }
         require(m != null && m.optString("loai") == LOAI) { "khong phai ban sao luu TiviKit" }
         NoiDung(m.optInt("soSaoLuu"), m.optInt("soBoCai"), KHOA_ADB.all { z.getEntry(it) != null }, m.optLong("luc"))
     }
@@ -63,13 +78,13 @@ object SaoLuuApp {
     fun nhap(f: File, goc: File, dungKhoa: Boolean): KetQuaNhap {
         xem(f)
         ZipFile(f).use { z ->
-            fun doc(ten: String) = z.getEntry(ten)?.let { z.getInputStream(it).readBytes() }
+            fun doc(ten: String, toiDa: Int = 5 * 1024 * 1024) = z.getEntry(ten)?.let { docGioiHan(z, it, toiDa) }
 
             // Bản sao lưu từng tivi: chưa có thì thêm, có rồi thì gộp.
             val thuMucSl = File(goc, "sao-luu").apply { mkdirs() }
             var slMoi = 0; var slGop = 0
             z.entries().asSequence().filter { !it.isDirectory && it.name.startsWith("sao-luu/") }.forEach { e ->
-                val b = runCatching { BanSaoLuu.tuJson(JSONObject(z.getInputStream(e).readBytes().toString(Charsets.UTF_8))) }.getOrNull() ?: return@forEach
+                val b = runCatching { BanSaoLuu.tuJson(JSONObject(docGioiHan(z, e).toString(Charsets.UTF_8))) }.getOrNull() ?: return@forEach
                 if (!TEN_AN_TOAN.matches("${b.khoa}.json")) return@forEach
                 val dich = File(thuMucSl, "${b.khoa}.json")
                 val coSan = runCatching { BanSaoLuu.tuJson(JSONObject(dich.readText())) }.getOrNull()
@@ -96,10 +111,16 @@ object SaoLuuApp {
             }
 
             val caiDat = doc("cai-dat.json")?.let { runCatching { JSONObject(it.toString(Charsets.UTF_8)) }.getOrNull() }
-            val khoa = KHOA_ADB.map { doc(it) }
-            val nhapKhoa = dungKhoa && khoa.all { it != null && it.isNotEmpty() }
-            if (nhapKhoa) KHOA_ADB.forEachIndexed { i, ten -> File(goc, ten).apply { parentFile?.mkdirs() }.writeBytes(khoa[i]!!) }
-            return KetQuaNhap(slMoi, slGop, boMoi, boTrung, caiDat, nhapKhoa)
+            val khoa = KHOA_ADB.map { runCatching { doc(it, 64 * 1024) }.getOrNull() }
+            val khoaHopLe = dungKhoa && khoa.all { it != null && it.isNotEmpty() } && (
+                (khoa[0]!!.size < 64 && khoa[1]!!.size < 64) || runCatching {
+                    java.security.KeyFactory.getInstance("RSA").generatePrivate(java.security.spec.PKCS8EncodedKeySpec(khoa[0]!!))
+                    java.security.cert.CertificateFactory.getInstance("X.509").generateCertificate(khoa[1]!!.inputStream())
+                    true
+                }.getOrDefault(false)
+            )
+            if (khoaHopLe) KHOA_ADB.forEachIndexed { i, ten -> File(goc, ten).apply { parentFile?.mkdirs() }.writeBytes(khoa[i]!!) }
+            return KetQuaNhap(slMoi, slGop, boMoi, boTrung, caiDat, khoaHopLe)
         }
     }
 

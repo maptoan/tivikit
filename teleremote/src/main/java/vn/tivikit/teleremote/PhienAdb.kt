@@ -193,7 +193,10 @@ class PhienAdb(private val thuMuc: File, private val may: String = "127.0.0.1", 
 
     private fun nhan(l: Luong, du: ByteArray) {
         if (l.dong == null) {
-            synchronized(l) { l.chu.write(du) }
+            synchronized(l) {
+                val con = CHU_TOI_DA - l.chu.size()
+                if (con > 0) l.chu.write(du, 0, minOf(du.size, con))
+            }
             return
         }
         for (b in du) {
@@ -233,6 +236,7 @@ class PhienAdb(private val thuMuc: File, private val may: String = "127.0.0.1", 
         /** Bản giao thức bỏ qua tổng kiểm (Android 9+); gói nào cũng ghi tổng kiểm nên adbd cũ hơn vẫn nhận. */
         private const val PHIEN_BAN = 0x01000001
         private const val TAI_TOI_DA = 256 * 1024
+        private const val CHU_TOI_DA = 4 * 1024 * 1024
         private const val TOKEN = 1
         private const val CHU_KY = 2
         private const val KHOA_CONG_KHAI = 3

@@ -34,7 +34,13 @@ class BoGo : InputMethodService() {
             var kq = "khong-o-nhap"
             val xong = CountDownLatch(1)
             Handler(Looper.getMainLooper()).post {
-                try { if (bg.coONhap) kq = if (bg.dua(chu, thay)) "ok" else "khong-go-duoc" } finally { bg.traBanPhimCu(cu); xong.countDown() }
+                try {
+                    if (bg.coONhap) kq = if (bg.dua(chu, thay)) "ok" else "khong-go-duoc"
+                } finally {
+                    bg.tay.removeCallbacksAndMessages(null)
+                    bg.traBanPhimCu(cu)
+                    xong.countDown()
+                }
             }
             xong.await(5, TimeUnit.SECONDS)
             return kq

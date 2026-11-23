@@ -70,7 +70,7 @@ class DuLieu(val mau: List<MauTv>, val thongKe: Map<String, ThongKeGoi>) {
         val tieuChi = listOf(
             tv.device to 4, tv.productName to 4, tv.buildProduct to 2, tv.model to 3,
         ).filter { (v, _) -> v.length >= 3 && v.lowercase() !in TU_CHUNG }
-        val hang = tv.brand.lowercase()
+        val hang = tenHangChuan(tv.brand)
         return mau.map { m ->
             val dau = m.header.lines().take(8).joinToString("\n").lowercase()
             var diem = 0
@@ -93,22 +93,34 @@ class DuLieu(val mau: List<MauTv>, val thongKe: Map<String, ThongKeGoi>) {
      * trùng nguyên chữ nên bỏ sót. Chỉ để GỢI Ý cho người dùng chọn, không tự chọn. Tối đa 3, trừ mẫu trong [bo].
      */
     fun ganGiong(tv: ThongTinTv, bo: Set<String> = emptySet()): List<MauTv> {
-        val hang = tv.brand.lowercase().take(4)
-        if (hang.length < 3) return emptyList()
+        val hang = tenHangChuan(tv.brand).take(4)
+        if (hang.length < 2) return emptyList()
         val cuaTv = listOf(tv.device, tv.model, tv.productName).flatMap(::maMay).toSet()
         if (cuaTv.isEmpty()) return emptyList()
-        return mau.filter { it.id.startsWith(hang) && it.id !in bo }.map { m ->
+        val tienTo = if (hang.length < 3) "$hang-" else hang
+        return mau.filter { it.id.startsWith(tienTo) && it.id !in bo }.map { m ->
             val cuaMau = maMay(m.header.lines().take(8).joinToString(" "))
             m to cuaTv.count { a -> cuaMau.any { b -> a != b && kotlin.math.abs(a.length - b.length) <= 2 && (a.startsWith(b) || b.startsWith(a)) } }
         }.filter { it.second > 0 }.sortedByDescending { it.second }.take(3).map { it.first }
     }
 }
 
+private fun tenHangChuan(brand: String): String = when (val b = brand.trim().lowercase()) {
+    "mi", "redmi", "poco" -> "xiaomi"
+    "bravia" -> "sony"
+    else -> b
+}
+
 /** Chữ giống mã máy: chữ + số, ≥ 3 ký tự, có ít nhất một số (vu3, 55x85j, mosr4). */
 private fun maMay(s: String): List<String> =
     s.lowercase().split(Regex("[^a-z0-9]+")).filter { it.length >= 3 && it.any(Char::isDigit) && it !in TU_CHUNG }
 
-private val TU_CHUNG = setOf("smart tv", "android tv", "google tv", "tv", "atv", "mt5867", "mt9221", "full_", "generic")
+private val TU_CHUNG = setOf(
+    "smart tv", "android tv", "google tv", "tv", "atv", "gtv",
+    "mt5867", "mt9221", "mt5889", "mt9602", "mt9612", "rtd2851",
+    "full_", "generic", "bravia_atv2", "bravia_atv3", "bravia_vh1", "bravia_vh2", "bravia_vh21",
+    "beyondtv", "beyondtv4", "realtekatv", "amlogic", "cvte",
+)
 
 /** Những gì đọc được từ getprop. */
 data class ThongTinTv(
@@ -129,6 +141,8 @@ data class ThongTinTv(
     val khoaLuu: String get() = (serial.ifBlank { "$model-$device" }).replace(Regex("[^A-Za-z0-9._-]"), "_")
 
     companion object {
+        private val SERIAL_GIA = setOf("unknown", "default", "null", "0123456789abcdef", "0000000000000000")
+
         /** Bảng khoá → giá trị từ đầu ra getprop ("[ro.product.model]: [MiTV-MOOQ1]"). */
         fun bangGetprop(text: String): Map<String, String> =
             Regex("""\[([^\]]+)\]: \[([^\]]*)\]""").findAll(text).associate { it.groupValues[1] to it.groupValues[2] }
@@ -136,6 +150,7 @@ data class ThongTinTv(
         fun tuGetprop(text: String): ThongTinTv {
             val p = bangGetprop(text)
             fun g(vararg k: String) = k.firstNotNullOfOrNull { p[it]?.takeIf { v -> v.isNotBlank() } } ?: ""
+            val ser = g("ro.serialno", "ro.boot.serialno").takeUnless { it.lowercase() in SERIAL_GIA } ?: ""
             return ThongTinTv(
                 brand = g("ro.product.brand", "ro.product.vendor.brand", "ro.product.system.brand"),
                 manufacturer = g("ro.product.manufacturer", "ro.product.vendor.manufacturer"),
@@ -145,7 +160,7 @@ data class ThongTinTv(
                 buildProduct = g("ro.build.product"),
                 android = g("ro.build.version.release"),
                 sdk = g("ro.build.version.sdk").toIntOrNull() ?: 0,
-                serial = g("ro.serialno", "ro.boot.serialno"),
+                serial = ser,
                 adbSecure = g("ro.adb.secure"),
             )
         }

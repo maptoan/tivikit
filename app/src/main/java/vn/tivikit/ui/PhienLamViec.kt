@@ -1035,6 +1035,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     /** Tivi của lần nối trước (khoaLuu): khác thì quenTiviTruoc. */
     private var tiviTruoc: String? = null
     @Volatile private var phanTramCu = -1
+    @Volatile private var nhanTienDoCu = ""
 
     /** Màn Cài app: đọc lại app trên tivi để ô gợi ý biết app nào đã cài (Cập nhật / Mở thay cho Thêm / CH Play). */
     fun moCaiApk() = chay(t("Đang đọc app trên tivi…", "Reading the TV's apps…")) {
@@ -1103,8 +1104,18 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         val loiDoc = mutableListOf<String>()
         uris.forEachIndexed { i, uri ->
             val viec = t("Đang đọc file ${i + 1}/${uris.size}…", "Reading file ${i + 1}/${uris.size}…")
-            phanTramCu = -1
-            val f = runCatching { io { GoiApk.doc(ctx, uri, abi) { p -> baoTienDo(viec, p) } } }
+            var ptCu = -1
+            val f = runCatching {
+                io {
+                    GoiApk.doc(ctx, uri, abi) { p ->
+                        val pt = (p * 100).toInt().coerceIn(0, 100)
+                        if (pt != ptCu) {
+                            ptCu = pt
+                            baoTienDo(viec, p)
+                        }
+                    }
+                }
+            }
             f.onFailure { loiDoc += it.message ?: it.javaClass.simpleName }
             f.onSuccess { fa -> themVaoDs(fa) }
         }
@@ -1144,7 +1155,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
 
     /** Tải [url] về bộ nhớ đệm (hiện %), đọc thành FileApk theo ABI của tivi đang nối. */
     internal suspend fun taiVe(url: String, viec: String, ten: String? = null): FileApk {
-        thongBao = viec; phanTramCu = -1
+        thongBao = viec; phanTramCu = -1; nhanTienDoCu = ""
         val batDau = System.nanoTime()
         val f = io {
             vn.tivikit.dulieu.TaiLink.tai(ctx, url) { da, tong ->
@@ -1200,7 +1211,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         }
         a.trangThai = TrangThaiCai.DANG_CAI
         val viec = t("Đang gửi ${a.ten} lên tivi…", "Sending ${a.ten} to the TV…")
-        thongBao = viec; phanTramCu = -1
+        thongBao = viec; phanTramCu = -1; nhanTienDoCu = ""
         return try {
             if (goTruoc && tt != null) {
                 thongBao = t("Đang gỡ bản cũ của ${a.ten} trên tivi…", "Removing the old ${a.ten} from the TV…")
@@ -1241,12 +1252,13 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         }
     }
 
-    /** Gọi từ luồng IO: chỉ đẩy lên giao diện khi số phần trăm đổi. */
-    private fun baoTienDo(viec: String, p: Float, a: AppCai? = null, them: String = "") {
+    /** Gọi từ luồng IO: chỉ đẩy lên giao diện khi số phần trăm hoặc nhãn đổi. */
+    private fun baoTienDo(nhan: String, p: Float, a: AppCai? = null, them: String = "") {
         val pt = (p * 100).toInt().coerceIn(0, 100)
-        if (pt == phanTramCu) return
+        if (pt == phanTramCu && nhan == nhanTienDoCu) return
         phanTramCu = pt
-        viewModelScope.launch(Dispatchers.Main) { a?.tienDo = p.coerceIn(0f, 1f); thongBao = "$viec $pt%$them" }
+        nhanTienDoCu = nhan
+        viewModelScope.launch(Dispatchers.Main) { a?.tienDo = p.coerceIn(0f, 1f); thongBao = "$nhan $pt%$them" }
     }
 
     /** " · 3,2 MB/s · còn 20 giây", từ giây thứ 2 (trước đó số còn nhảy lung tung); người dùng thấy và báo lại được tốc độ thật. */
@@ -1900,7 +1912,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         io { tv.tatAdb() }
         runCatching { io { adb.disconnect() } }
         val host = ip
-        val conMo = io { Thread.sleep(2500); moCong(host, 5555, 1500) }
+        kotlinx.coroutines.delay(2500)
+        val conMo = io { moCong(host, 5555, 1500) }
         loi = if (conMo) t("Cổng 5555 vẫn mở. Vào Tuỳ chọn nhà phát triển trên tivi, tắt Gỡ lỗi USB / Gỡ lỗi qua mạng rồi khởi động lại tivi.", "Port 5555 is still open. In Developer options on the TV, turn off USB / Network debugging and reboot.")
         else ""
         thongBao = ""

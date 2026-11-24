@@ -67,7 +67,7 @@ foreach ($p in $pkgs) {
 | `com.amazon.device.rdmapplication` | Điều khiển mắt hồng ngoại IR Blaster | **Không điều khiển được** máy chiếu, soundbar và amply bằng giọng nói/remote. |
 | `com.amazon.alta.h2clientservice` | Dịch vụ microphone Alexa trường xa | **Mất tính năng** gọi "Alexa" rảnh tay trên thân Cube. |
 | `com.amazon.cloud9` | Trình duyệt web Amazon Silk Browser | **Mất trình duyệt** Silk tích hợp của hãng. |
-| `com.amazon.tv.launcher` | Giao diện Fire TV Home gốc | Cần giữ khi chưa cài launcher thay thế; TiviKit dùng cơ chế mở đè. |
+| `com.amazon.tv.launcher` | Giao diện Fire TV Home gốc | Cần giữ khi chưa cài launcher thay thế; MTVkit dùng cơ chế mở đè. |
 | `com.amazon.firehomestarter` | Trình giám sát nút Home phần cứng | Mất phản hồi nút Home trên remote Fire TV. |
 | `com.amazon.tv.settings.v2` | Trình Cài đặt màn hình TV | Không thể truy cập menu Cài đặt Wi-Fi, Hiển thị và Âm thanh. |
 | `com.amazon.tv.nimh` | Dịch vụ điều khiển mạng và thiết bị | Ảnh hưởng đến khả năng duy trì kết nối mạng ổn định. |
@@ -87,4 +87,4 @@ foreach ($p in $pkgs) {
 # Đặt lại Home mặc định về Fire TV Launcher
 adb shell "cmd package set-home-activity --user 0 com.amazon.tv.launcher/.ui.HomeActivity_vNext"
 ```
-Hoặc sử dụng tính năng **Khôi phục một chạm** trực tiếp trên ứng dụng TiviKit.
+Hoặc sử dụng tính năng **Khôi phục một chạm** trực tiếp trên ứng dụng MTVkit.

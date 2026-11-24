@@ -20,7 +20,7 @@ Dự án cung cấp bộ tài liệu hoàn chỉnh hỗ trợ người dùng, k�
 
 1. [**Hướng dẫn Cài đặt & Triển khai (HUONG_DAN_CAI_DAT.md)**](HUONG_DAN_CAI_DAT.md): Hướng dẫn chi tiết cách build, cấu hình keystore release, CI/CD GitHub Actions và 3 mô hình triển khai thực tế trên Android TV / Fire TV Cube.
 2. [**Kiến trúc Hệ thống & Module (docs/KIEN_TRUC_HE_THONG.md)**](docs/KIEN_TRUC_HE_THONG.md): Phân tích chi tiết kiến trúc tổng thể, mô hình IPC, các giao thức kết nối mạng và trách nhiệm của 11 module Gradle.
-3. [**Báo cáo Rà soát, Vá lỗi & Tối ưu hoá (docs/TOI_UU_VA_VA_LOI.md)**](docs/TOI_UU_VA_VA_LOI.md): Tổng kết chi tiết kỹ thuật 4 giai đoạn vá lỗi và nâng cấp hiệu năng trên 73 file mã nguồn.
+3. [**Báo cáo Rà soát, Vá lỗi & Tối ưu hoá (docs/TOI_UU_VA_VA_LOI.md)**](docs/TOI_UU_VA_VA_LOI.md): Tổng kết chi tiết kỹ thuật 5 giai đoạn vá lỗi, tối ưu hiệu năng và gia cố bảo mật chiều sâu trên cả 11 module Gradle.
 4. [**Danh mục Gói & An toàn Phần cứng (docs/DANH_SACH_GOI_TV.md)**](docs/DANH_SACH_GOI_TV.md): Bảng phân loại ứng dụng debloat an toàn, cấu hình Mức 1 cho Amazon Fire TV Cube 2nd Gen (bảo toàn micro Alexa, loa Bluetooth, mắt IR máy chiếu, trình duyệt Silk).
 5. [**Danh sách Kịch bản Thử trên TV Thật (docs/THU-TREN-TIVI.md)**](docs/THU-TREN-TIVI.md): Bảng kiểm tra checklist thực tế từng tính năng trước khi phát hành.
 6. [**Hướng dẫn Đóng góp Phát triển (docs/CONTRIBUTING.md)**](docs/CONTRIBUTING.md): Quy chuẩn lập trình Kotlin, phong cách đặt tên tiếng Việt thuần tuý và quy trình gửi Pull Request.
@@ -233,17 +233,17 @@ scripts/dung-tivikit-launcher.sh  # TiviKit Launcher → tivikit-launcher.apk
 
 ### Kiểm tra bản cài
 
-Mọi bản trên [Releases](https://github.com/Circling5714/tivikit/releases) đều ký bằng cùng một chứng chỉ (`CN=CleanTV Rebuild, O=Local, C=VN`), dấu SHA-256:
+Mọi bản trên [Releases](https://github.com/maptoan/tivikit/releases) đều ký bằng cùng một chứng chỉ (`CN=MTVkit, OU=AndroidTV, O=MTVkit, L=VN, ST=VN, C=VN`), dấu SHA-256:
 
 ```text
-ec4c282ecefa87e7e959d44de052ccb047a8164c383ff39341d910d85af6f653
+d61202648ef473769fe6f976c611db69bb7770a1190c016f1a194d899b7a372b
 ```
 
 ```bash
-apksigner verify --print-certs TiviKit-1.1.0.apk    # phải ra đúng dấu trên
+apksigner verify --print-certs MTVkit-1.27.0.apk    # phải ra đúng dấu trên
 ```
 
-TiviKit (`vn.tivikit`) là app riêng: cài song song được với CleanTV và không cài đè lên CleanTV (khác gói, khác khoá ký).
+MTVkit (`vn.tivikit`) là app riêng: cài song song được với CleanTV và không cài đè lên CleanTV (khác gói, khác khoá ký).
 
 ### Quyền riêng tư
 
@@ -277,7 +277,7 @@ TiviKit (`vn.tivikit`) là app riêng: cài song song được với CleanTV và
 ### Liên hệ và ủng hộ
 
 - **Nhóm Telegram:** [t.me/tivikit](https://t.me/tivikit): hỏi đáp, góp ý tính năng, báo tivi nào chạy được hay không.
-- **Báo lỗi:** [GitHub Issues](https://github.com/Circling5714/tivikit/issues). Trong app: Góp ý / báo lỗi → Báo lỗi trên GitHub, app điền sẵn bản TiviKit, điện thoại, tivi đang nối và lỗi vừa gặp để bạn xem lại rồi gửi.
+- **Báo lỗi:** [GitHub Issues](https://github.com/maptoan/tivikit/issues). Trong app: Góp ý / báo lỗi → Báo lỗi trên GitHub, app điền sẵn bản MTVkit, điện thoại, tivi đang nối và lỗi vừa gặp để bạn xem lại rồi gửi.
 - **Ủng hộ tác giả:** TiviKit miễn phí, không quảng cáo. Thấy hữu ích thì bạn có thể mời tác giả một ly cà phê:
 
   | Ngân hàng | Số tài khoản | Chủ tài khoản | Nội dung |
@@ -473,17 +473,17 @@ JDK 17 + Android SDK (compileSdk 35). Build the helper apps with `scripts/dung-k
 
 ### Verify an install
 
-Every APK on [Releases](https://github.com/Circling5714/tivikit/releases) is signed with one certificate (`CN=CleanTV Rebuild`), SHA-256
-`ec4c282ecefa87e7e959d44de052ccb047a8164c383ff39341d910d85af6f653` (`apksigner verify --print-certs`). TiviKit (`vn.tivikit`) installs alongside CleanTV and can't update over it.
+Every APK on [Releases](https://github.com/maptoan/tivikit/releases) is signed with one certificate (`CN=MTVkit`), SHA-256
+`d61202648ef473769fe6f976c611db69bb7770a1190c016f1a194d899b7a372b` (`apksigner verify --print-certs`). MTVkit (`vn.tivikit`) installs alongside CleanTV and can't update over it.
 
 ### Privacy
 
-No usage data: CleanTV's anonymous counter, "send package list" button and website links are switched off at build time (`GUI_SO_LIEU`, `LIEN_KET_VGS`). Bug reports and sharing a TV list with CleanYourTV only open a filled-in GitHub page in your browser; you review it and send it yourself. The phone only goes online to update TiviKit itself (it asks GitHub Releases about every 12 hours and when opened, downloads the new APK and checks its SHA-256 before installing), to download apps you pick (GitHub, VideoLAN, Kodi or your own link), to check installed apps for updates (GitHub), to look up weather places outside Vietnam (Open-Meteo's geocoding, only the text you typed) and when you pick TV channel tiles (the channel list and pictures from VTVgo, channel pictures from FPT Play). Control goes straight from the phone to the TV on your home network. On the TV, the clean Home and TiviKit Launcher get weather from Open-Meteo (only the coordinates of the place you chose; TiviKit Launcher every 30 minutes while its Home is showing), ad-blocking DNS sends lookups to the provider you choose, Map Voice asks YouTube's search page for the first video (only the words you said, when a request plays at once) and keeps only the last 15 requests on the TV, Tele Remote asks Telegram's servers (api.telegram.org) for commands, so messages with the bot (including TV status) go through Telegram while the token and the list of people stay on the TV, and a rooted LG TV downloads the Vibehack installer from GitHub when you install it.
+No usage data: CleanTV's anonymous counter, "send package list" button and website links are switched off at build time (`GUI_SO_LIEU`, `LIEN_KET_VGS`). Bug reports and sharing a TV list with CleanYourTV only open a filled-in GitHub page in your browser; you review it and send it yourself. The phone only goes online to update MTVkit itself (it asks GitHub Releases about every 12 hours and when opened, downloads the new APK and checks its SHA-256 before installing), to download apps you pick (GitHub, VideoLAN, Kodi or your own link), to check installed apps for updates (GitHub), to look up weather places outside Vietnam (Open-Meteo's geocoding, only the text you typed) and when you pick TV channel tiles (the channel list and pictures from VTVgo, channel pictures from FPT Play). Control goes straight from the phone to the TV on your home network. On the TV, the clean Home and MTVkit Launcher get weather from Open-Meteo (only the coordinates of the place you chose; MTVkit Launcher every 30 minutes while its Home is showing), ad-blocking DNS sends lookups to the provider you choose, Map Voice asks YouTube's search page for the first video (only the words you said, when a request plays at once) and keeps only the last 15 requests on the TV, Tele Remote asks Telegram's servers (api.telegram.org) for commands, so messages with the bot (including TV status) go through Telegram while the token and the list of people stay on the TV, and a rooted LG TV downloads the Vibehack installer from GitHub when you install it.
 
 ### Contact and support
 
 - **Telegram group:** [t.me/tivikit](https://t.me/tivikit) for questions, ideas and which TVs work.
-- **Bug reports:** [GitHub Issues](https://github.com/Circling5714/tivikit/issues). In the app, Feedback / report a bug → Report a bug on GitHub fills in the TiviKit version, phone, connected TV and last error for you to review before sending.
+- **Bug reports:** [GitHub Issues](https://github.com/maptoan/tivikit/issues). In the app, Feedback / report a bug → Report a bug on GitHub fills in the MTVkit version, phone, connected TV and last error for you to review before sending.
 - **Support the author:** TiviKit is free and ad-free. To buy the author a coffee, bank transfer in Vietnam: MB Bank, account `070991988888`, CAO MINH THI, message "Ung ho TiviKit" (in the app: home screen → Support the author, with copy buttons).
 - ⚠️ **Share your list with CleanYourTV:** once a cleaned TV has run fine for a few days, home screen → Share your list with CleanYourTV. The app writes `debloat.txt` and `tv.json` in the format of [CleanYourTV](https://github.com/Gathin23/cleanyourtv)'s `examples/` from the packages it disabled (re-checked against the TV when it is connected, leaving out packages that came back and apps you installed) and opens their "My TV" issue form filled in. Without GitHub, copy it or share it to the Telegram group. TiviKit pulls new lists in weekly.
 

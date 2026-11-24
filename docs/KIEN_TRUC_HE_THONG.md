@@ -1,12 +1,12 @@
-# Kiến trúc Hệ thống & Phân tích Module TiviKit
+# Kiến trúc Hệ thống & Phân tích Module MTVkit
 
-Tài liệu này mô tả chi tiết kiến trúc tổng thể, mô hình giao tiếp liên tiến trình (IPC), các giao thức mạng và trách nhiệm của từng module trong dự án **TiviKit**.
+Tài liệu này mô tả chi tiết kiến trúc tổng thể, mô hình giao tiếp liên tiến trình (IPC), các giao thức mạng và trách nhiệm của từng module trong dự án **MTVkit**.
 
 ---
 
 ## 1. Mô hình Kiến trúc Tổng thể
 
-TiviKit được thiết kế theo kiến trúc **Bộ điều khiển Trung tâm (Controller)** kết hợp **Dịch vụ Tiện ích Nhúng (Embedded Helpers)**:
+MTVkit được thiết kế theo kiến trúc **Bộ điều khiển Trung tâm (Controller)** kết hợp **Dịch vụ Tiện ích Nhúng (Embedded Helpers)**:
 
 ```mermaid
 flowchart TD
@@ -15,7 +15,7 @@ flowchart TD
         UI["Giao diện Jetpack Compose\n(Quản lý TV, Launcher, Remote, Khoá)"]
         AdbEngine["ADB Engine\n(libadb-android + Conscrypt TLS 1.3)"]
         ScrcpyClient["Scrcpy Client\n(H.264 Video Decoder + Touch Stream)"]
-        LGClient["LG Client\n(WebSocket SSAP 3000 + SSH Root)"]
+        LGClient["LG Client\n(WebSocket SSAP 3000/3001 TOFU + SSH TOFU)"]
         App --> UI
         UI --> AdbEngine
         UI --> ScrcpyClient
@@ -31,7 +31,7 @@ flowchart TD
         Adblister["adbd (Daemon hệ thống Android)"]
         
         subgraph Helpers ["Các module tiện ích độc lập (Cài từ assets)"]
-            Launcher[":launcher (TiviKit Launcher 1.5)\nKính mờ, D-pad, MediaSession"]
+            Launcher[":launcher (MTVkit Launcher 1.5)\nKính mờ, D-pad, MediaSession"]
             HomeSach["tvhome.apk (Home sạch CleanYourTV)"]
             Khoa[":khoa (Khoá trẻ em)\nOverlay FLAG_SECURE, OTP RFC 6238"]
             HenGio[":hengio (Hẹn giờ & Auto Reboot)"]
@@ -66,11 +66,11 @@ flowchart TD
 - **Nhiệm vụ chính:**
   - Giao diện người dùng trên điện thoại hoặc TV Box (thích ứng màn hình cảm ứng lẫn D-pad TV).
   - Quản lý vòng đời kết nối ADB qua TCP (`libadb-android`) và Wireless Debugging (ghép đôi TLS mã 6 số qua `AdbKeyPair` tạo bằng Bouncy Castle).
-  - Quản lý dữ liệu mẫu thiết bị (`app/src/main/assets/du-lieu.json` với hơn 450 mẫu TV).
+  - Quản lý dữ liệu mẫu thiết bị (`app/src/main/assets/du-lieu.json` với **513 mẫu TV** đồng bộ từ CleanYourTV).
   - Điều khiển màn hình thời gian thực qua kênh Scrcpy (nhúng `scrcpy-server.jar v5.0.1`).
   - Hỗ trợ điều khiển TV LG webOS qua giao thức WebSocket SSAP và SSH root tự động cài LG TV Vibehack.
 
-### 2.2. Module `:launcher` (TiviKit Launcher 1.5)
+### 2.2. Module `:launcher` (MTVkit Launcher 1.5)
 - **Tên gói:** `vn.tivikit.launcher`
 - **Nhiệm vụ chính:**
   - Giao diện Home màn hình lớn chuẩn TV (Leanback / TV Focus API).
@@ -131,6 +131,20 @@ flowchart TD
 - **Wireless Debugging (Mã ghép đôi 6 số):** Dành cho Google TV đời mới (Android 11+). App sử dụng `AdbKeyPair` tạo khoá RSA-2048 động kết hợp giao thức mDNS để tự động quét cổng ngẫu nhiên và hoàn tất bắt tay TLS.
 
 ### 3.2. Cơ chế Canh gác (Watchdog) Bảo vệ TV
-Khi người dùng thay đổi Launcher mặc định, TiviKit tự động thiết lập một tiến trình giám sát nền (`watchdog`) trong 3 phút trên TV:
+Khi người dùng thay đổi Launcher mặc định, MTVkit tự động thiết lập một tiến trình giám sát nền (`watchdog`) trong 3 phút trên TV:
 1. Ghi hạn bảo vệ vào `/data/local/tmp/tivikit-gac-han`.
 2. Nếu sau 3 phút điện thoại mất kết nối, hết pin hoặc TV gặp sự cố crash, tiến trình watchdog sẽ tự động khôi phục Launcher gốc của nhà sản xuất, đảm bảo TV không bao giờ bị rơi vào tình trạng màn hình đen hoặc mất launcher.
+
+### 3.3. Kiến trúc Bảo mật Chiều sâu (5 lớp Defense-in-Depth)
+1. **Cách ly IPC & Quyền chữ ký số nội bộ (`vn.tivikit.permission.NOI_BO`):**
+   - Toàn bộ 9 `ContentProvider` ở các module phụ chỉ nhận lời gọi từ `SHELL_UID`, `root` hoặc chính UID của app.
+   - Các Activity điều phối nội bộ (`XacNhan`, `KhoaNgay`, `MoTuDong`, `PhatKenh`) đều bảo vệ bằng quyền `signature` dùng chung chứng chỉ MTVkit, kèm kiểm tra `launchedFromPackage` trên Android 14+.
+2. **Bảo vệ luồng tải & Cập nhật OTA (`CapNhat.kt`, `TaiLink`):**
+   - Tự cập nhật MTVkit kiểm tra `https://`, kích thước byte chính xác, mã băm SHA-256 và khớp chữ ký số trước khi cài.
+   - `TaiLink` bắt buộc `https://` cho kho gợi ý `GoiY`, cấm tuyệt đối chuyển hướng hạ cấp `HTTPS → HTTP`, chặn DNS rebinding nội bộ và giới hạn dung lượng tải tối đa 1,5 GB.
+3. **Chống SSRF nội bộ trên M3U & Map Voice:**
+   - Lọc bỏ địa chỉ loopback (`127.0.0.0/8`, `::1`, dạng số nguyên/hex), `localhost`, link-local (`169.254.0.0/16`) và giao thức ngoài `http/https` khi đọc danh sách kênh M3U và khi kiểm tra luồng sống (vẫn hỗ trợ máy chủ NAS / `udpxy` mạng LAN gia đình).
+4. **Ghim chứng chỉ lần đầu (TOFU) cho TV LG webOS:**
+   - Lưu và đối chiếu dấu vân tay SHA-256 của chứng chỉ TLS cổng 3001 (`KetNoiLg.kt`) và khóa máy chủ SSH cổng 22 (`SshLg.kt`) trước khi gửi mật khẩu root.
+5. **Mã hoá dữ liệu nhạy cảm bằng phần cứng (`MaHoaKho.kt`):**
+   - Mã hoá hạt giống TOTP Khoá trẻ em, Bot Token Telegram, `client-key` và mật khẩu SSH TV LG bằng **AES-256-GCM qua `AndroidKeyStore`** (IV ngẫu nhiên 12 byte, tự động nâng cấp từ dữ liệu cũ và duy trì `android:allowBackup="false"` trên toàn bộ 11 module).

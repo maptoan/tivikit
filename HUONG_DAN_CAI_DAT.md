@@ -1,16 +1,16 @@
-# Hướng dẫn Đóng gói và Triển khai TiviKit trên thực tế
+# Hướng dẫn Đóng gói và Triển khai MTVkit trên thực tế
 
-Tài liệu này hướng dẫn chi tiết quy trình xây dựng (build), đóng gói (package) và triển khai (deploy) ứng dụng **TiviKit** trên các thiết bị Android TV, Google TV và TV Box (đặc biệt là Amazon Fire TV Cube, Mi Box, Tanix, Skyworth, Sony, TCL...).
+Tài liệu này hướng dẫn chi tiết quy trình xây dựng (build), đóng gói (package) và triển khai (deploy) ứng dụng **MTVkit** trên các thiết bị Android TV, Google TV và TV Box (đặc biệt là Amazon Fire TV Cube, Mi Box, Tanix, Skyworth, Sony, TCL...).
 
 ---
 
-## 1. Tổng quan Kiến trúc TiviKit
+## 1. Tổng quan Kiến trúc MTVkit
 
-TiviKit hoạt động theo mô hình **điều khiển trung tâm (Controller)** kết hợp **hệ sinh thái tiện ích nhúng (Embedded Helpers)**:
+MTVkit hoạt động theo mô hình **điều khiển trung tâm (Controller)** kết hợp **hệ sinh thái tiện ích nhúng (Embedded Helpers)**:
 - **Ứng dụng chính (`vn.tivikit`):** Cài đặt trên điện thoại Android (hoặc chạy trực tiếp trên TV Box), đóng vai trò trung tâm điều khiển, quét mạng, gửi lệnh ADB và quản lý trạng thái.
-- **Các tiện ích phụ (Assets):** Nằm sẵn trong thư mục `app/src/main/assets/` bên trong APK chính. Khi người dùng kích hoạt tính năng tương ứng, TiviKit sẽ tự động đẩy (push) và cài đặt các module này lên TV qua ADB mà không bắt người dùng phải cài thủ công từng file:
-  - `tivikit-launcher.apk` (`vn.tivikit.launcher`): Giao diện Home kính mờ TiviKit Launcher 1.5.
-  - `tvhome.apk` & `tvhome-xiaomi.apk` (`com.gathin.tvhome` / `com.ts.launcher`): Home sạch CleanYourTV được tối ưu/vá lỗi.
+- **Các tiện ích phụ (Assets):** Nằm sẵn trong thư mục `app/src/main/assets/` bên trong APK chính. Khi người dùng kích hoạt tính năng tương ứng, MTVkit sẽ tự động đẩy (push) và cài đặt các module này lên TV qua ADB mà không bắt người dùng phải cài thủ công từng file:
+  - `tivikit-launcher.apk` (`vn.tivikit.launcher`): Giao diện Home kính mờ MTVkit Launcher 1.5.
+  - `tvhome.apk` & `tvhome-xiaomi.apk` (`com.gathin.tvhome` / `com.ts.launcher`): Home sạch CleanYourTV được tối ưu/vá lỗi và ký đồng bộ bằng khoá MTVkit.
   - `khoa.apk` (`vn.tivikit.khoa`): Dịch vụ Khóa trẻ em OTP 6 số, khóa theo giờ và theo ứng dụng.
   - `hengio.apk` (`vn.tivikit.hengio`): Dịch vụ Hẹn giờ bật/tắt và Tự động khởi động lại (Auto Reboot).
   - `cast.apk` (`vn.tivikit.cast`): Trình nhận tín hiệu Cast SmartTube (DIAL receiver cho YouTube di động).
@@ -32,16 +32,16 @@ TiviKit hoạt động theo mô hình **điều khiển trung tâm (Controller)*
 - **Git** và môi trường dòng lệnh bash/PowerShell.
 
 ### 2.2. Thiết lập khoá ký Release (`keystore`)
-Để APK có thể cài đặt và cập nhật đè (update) giữa các phiên bản mà không bị xung đột chữ ký:
-1. Tạo file keystore (nếu chưa có):
+Để APK có thể cài đặt và cập nhật đè (update) giữa các phiên bản (đặc biệt là cho phép quyền chữ ký số nội bộ `vn.tivikit.permission.NOI_BO` hoạt động đồng bộ giữa app chính và các tiện ích trên TV):
+1. Tạo file keystore PKCS12 (nếu tự build cục bộ):
    ```bash
-   keytool -genkeypair -v -keystore tv-sach.keystore -alias tivikit -keyalg RSA -keysize 2048 -validity 10000
+   keytool -genkeypair -v -keystore mtvkit.p12 -storetype PKCS12 -alias mtvkit -keyalg RSA -keysize 2048 -validity 10000
    ```
 2. Tạo file `ky.properties` tại thư mục gốc của dự án:
    ```properties
-   storeFile=tv-sach.keystore
+   storeFile=mtvkit.p12
    storePassword=mat_khau_keystore_cua_ban
-   keyAlias=tivikit
+   keyAlias=mtvkit
    keyPassword=mat_khau_alias_cua_ban
    ```
    *(Nếu không tạo `ky.properties`, Gradle sẽ tự động fallback sang ký bằng khoá `debug` mặc định của Android SDK).*
@@ -79,55 +79,58 @@ scripts/dung-tren-tv.sh
 ./gradlew :trentv:assembleRelease; Copy-Item trentv/build/outputs/apk/release/trentv-release.apk app/src/main/assets/tren-tv.jar
 ```
 
-#### Bước 2: Build APK chính của TiviKit
+#### Bước 2: Build APK chính của MTVkit
 Chạy lệnh biên dịch ứng dụng chính:
 ```bash
 ./gradlew :app:assembleRelease
 ```
 File APK hoàn chỉnh sẽ được tạo tại:
-`app/build/outputs/apk/release/app-release.apk` (đổi tên thành `TiviKit.apk` để phát hành).
+`app/build/outputs/apk/release/app-release.apk` (đổi tên thành `MTVkit-<phiên_bản>.apk` để phát hành).
 
 ### 2.4. Tự động hoá qua GitHub Actions CI/CD
-Kho chứa đã tích hợp sẵn workflow tại `.github/workflows/phat-hanh.yml`:
-1. Thiết lập các Secret trong repo GitHub (Settings -> Secrets -> Environments -> `phat-hanh`):
-   - `KHOA_KY_BASE64`: Nội dung file keystore mã hoá base64.
-   - `MAT_KHAU_KHO`: Mật khẩu keystore.
-   - `TEN_KHOA`: Alias của key.
-   - `MAT_KHAU_KHOA`: Mật khẩu của key.
-2. Vào **Actions** -> Chọn **Phát hành** -> Bấm **Run workflow**. Hệ thống sẽ tự động chạy toàn bộ unit tests, build các app phụ, build app chính, ký số và phát hành bản Release trên GitHub kèm file `.sha256` và `cap-nhat.json`.
+Kho chứa `maptoan/tivikit` đã tích hợp sẵn hai workflow tự động hoá khép kín:
+1. **Phát hành (`.github/workflows/phat-hanh.yml`):**
+   - Sử dụng bộ GitHub Repository Secrets:
+     - `KHOA_KY_BASE64`: Nội dung file keystore PKCS12 cố định mã hoá base64.
+     - `MAT_KHAU_KHO`: Mật khẩu keystore.
+     - `TEN_KHOA`: Alias của key (`mtvkit`).
+     - `MAT_KHAU_KHOA`: Mật khẩu của key.
+   - Khi chạy **Actions → Phát hành → Run workflow**, hệ thống tự động chạy unit test trên cả 11 module, build toàn bộ app phụ, ký lại `tvhome.apk` & `tvhome-xiaomi.apk` bằng `apksigner` cho khớp khoá MTVkit, đối chiếu dấu SHA-256 chứng chỉ (`d61202648ef473769fe6f976c611db69bb7770a1190c016f1a194d899b7a372b`), đóng gói `MTVkit-<phiên_bản>.apk`, `.sha256` và `cap-nhat.json` lên GitHub Releases.
+2. **Tự động cập nhật mẫu TV (`.github/workflows/cap-nhat-mau.yml`):**
+   - Chạy định kỳ mỗi thứ Hai hằng tuần để đồng bộ dữ liệu mẫu TV mới nhất từ `Gathin23/cleanyourtv` (sử dụng `PAT_WORKFLOW` hoặc `github.token` để tự kích hoạt phát hành khi chỉ đổi danh sách mẫu TV).
 
 ---
 
 ## 3. Hướng dẫn Triển khai trên thực tế
 
-### Mô hình 1: Cài TiviKit lên điện thoại Android điều khiển TV (Khuyên dùng)
+### Mô hình 1: Cài MTVkit lên điện thoại Android điều khiển TV (Khuyên dùng)
 Đây là phương án chuẩn mực và thuận tiện nhất:
 
 1. **Chuẩn bị trên TV Box (hoặc Amazon Fire TV Cube):**
    - Vào **Cài đặt (Settings)** -> **Thiết bị của tôi (My Fire TV / Device)** -> **Tuỳ chọn cho nhà phát triển (Developer Options)**.
    - Bật **ADB Debugging** = `ON`.
    - Kết nối TV Box và điện thoại Android vào **cùng một mạng Wi-Fi** (hoặc cùng dải mạng LAN).
-2. **Cài TiviKit lên điện thoại Android:**
-   - Chép file `TiviKit.apk` sang điện thoại và tiến hành cài đặt.
+2. **Cài MTVkit lên điện thoại Android:**
+   - Tải và cài đặt `MTVkit-<phiên_bản>.apk` trên điện thoại (hoặc nhận cập nhật tự động từ GitHub Releases).
 3. **Kết nối điện thoại với TV:**
-   - Mở app TiviKit trên điện thoại.
+   - Mở app MTVkit trên điện thoại.
    - Nhập địa chỉ IP của TV (ví dụ: `192.168.11.70:5555`) hoặc bấm Quét để tự dò tìm.
    - **Lưu ý quan trọng trên TV:** Màn hình TV sẽ hiển thị pop-up hỏi: *"Allow USB debugging?"* -> Dùng remote tích chọn **"Always allow from this computer"** rồi bấm **OK / Allow**.
 4. **Vận hành các chức năng:**
    - **Tối ưu & Dọn rác:** Chuyển qua tab Dọn dẹp -> Chọn gói Mức 1 an toàn -> Bấm Dọn dẹp.
-   - **Cài đặt Launcher:** Vào tab *Quản lý launcher* -> Chọn *TiviKit Launcher* -> Bấm Cài đặt & Đặt làm Home.
-   - **Tiện ích:** Bật các thẻ *Cast SmartTube*, *Map Voice*, *Tele Remote* tuỳ theo nhu cầu; TiviKit sẽ tự động cài các gói phụ tương ứng lên TV.
+   - **Cài đặt Launcher:** Vào tab *Quản lý launcher* -> Chọn *MTVkit Launcher* -> Bấm Cài đặt & Đặt làm Home.
+   - **Tiện ích:** Bật các thẻ *Cast SmartTube*, *Map Voice*, *Tele Remote* tuỳ theo nhu cầu; MTVkit sẽ tự động cài các gói phụ tương ứng lên TV.
 
 ---
 
-### Mô hình 2: Cài trực tiếp TiviKit lên TV Box (Chế độ Standalone)
+### Mô hình 2: Cài trực tiếp MTVkit lên TV Box (Chế độ Standalone)
 Dành cho người muốn TV Box tự chạy độc lập mà không cần qua điện thoại:
 
 1. Cài đặt trực tiếp file APK chính vào TV Box qua USB hoặc qua lệnh ADB từ máy tính:
    ```powershell
-   adb -s 192.168.11.70:5555 install -r TiviKit.apk
+   adb -s 192.168.11.70:5555 install -r MTVkit-1.27.0.apk
    ```
-2. Mở ứng dụng TiviKit ngay trên màn hình TV (dùng chuột bay hoặc bàn rê).
+2. Mở ứng dụng MTVkit ngay trên màn hình TV (dùng chuột bay hoặc bàn rê).
 3. App sẽ tự kết nối vào chính nó thông qua địa chỉ nội bộ: `127.0.0.1:5555`.
 4. Màn hình TV sẽ hiện pop-up xác thực ADB cho `127.0.0.1` -> Chọn **"Luôn cho phép"** và bấm **OK**.
 

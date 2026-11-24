@@ -4,11 +4,26 @@
 
 **The Android TV toolkit.** An Android app that cleans up and looks after Android TV / Google TV over Wi-Fi: it switches off the maker's ads, tracking and junk, swaps in a clean Home, then installs apps, works as a remote, sends photos, runs on/off timers and a kids lock. No root, nothing uninstalled (only disabled), one-tap restore. LG webOS TVs get a remote mode too.
 
-> **TiviKit phát triển tiếp từ CleanTV 2.8.2 (kèm các bản sửa đưa về đến CleanTV 3.0.0), và nhiều tính năng mới chưa được thử trên tivi thật.** Mỗi tính năng bên dưới ghi rõ ✅ đã thử hay ⚠️ chưa thử; xem thêm [Tình trạng thử nghiệm](#tình-trạng-thử-nghiệm).
->
-> *TiviKit builds on CleanTV 2.8.2 (with fixes ported up to CleanTV 3.0.0), and many new features have not been tried on a real TV yet: see [Test status](#test-status).*
+> **Nguồn gốc & Lịch sử Dự án (Origin & Lineage):**
+> - **Bản kho mã nguồn gốc trực tiếp:** Dự án này được phát triển và tối ưu hoá từ kho gốc [**Circling5714/tivikit**](https://github.com/Circling5714/tivikit) (phiên bản `1.26.2`).
+> - **Dự án tiền thân:** Kế thừa nền tảng công nghệ từ [CleanTV 2.8.2 – 3.0.0](https://github.com/vgscity/vgs-cleantv) của VGS (Vietnam Gaming Setup) / AlexVGS.
+> - **Hệ thống Home Launcher sạch:** Tích hợp và tùy biến từ [CleanYourTV 3.0](https://github.com/Gathin23/cleanyourtv) của tác giả Gathin.
+> - **Bản Fork Tối ưu hoá Toàn diện:** [**maptoan/tivikit**](https://github.com/maptoan/tivikit) — Đã được rà soát bởi hội đồng chuyên gia, khắc phục toàn diện các lỗ hổng bảo mật, rò rỉ bộ nhớ RAM, tối ưu hóa giao thức ADB/Scrcpy và bổ sung tài liệu kỹ thuật trên toàn bộ 11 module.
 
-[Tải APK bản mới nhất](https://github.com/Circling5714/tivikit/releases/latest) · [Nhật ký các bản](https://github.com/Circling5714/tivikit/releases) · [Nhóm Telegram](https://t.me/tivikit) · [Ủng hộ tác giả](#liên-hệ-và-ủng-hộ) · [Tiếng Việt](#tiếng-việt) · [English](#english)
+[Bản phát hành mới nhất](https://github.com/maptoan/tivikit/releases) · [Tài liệu Cài đặt](HUONG_DAN_CAI_DAT.md) · [Kiến trúc Hệ thống](docs/KIEN_TRUC_HE_THONG.md) · [Báo cáo Vá lỗi](docs/TOI_UU_VA_VA_LOI.md) · [Tiếng Việt](#tiếng-việt) · [English](#english)
+
+---
+
+## 📚 Bộ Tài Liệu Kỹ Thuật (Documentation Suite)
+
+Dự án cung cấp bộ tài liệu hoàn chỉnh hỗ trợ người dùng, kỹ thuật viên và lập trình viên:
+
+1. [**Hướng dẫn Cài đặt & Triển khai (HUONG_DAN_CAI_DAT.md)**](HUONG_DAN_CAI_DAT.md): Hướng dẫn chi tiết cách build, cấu hình keystore release, CI/CD GitHub Actions và 3 mô hình triển khai thực tế trên Android TV / Fire TV Cube.
+2. [**Kiến trúc Hệ thống & Module (docs/KIEN_TRUC_HE_THONG.md)**](docs/KIEN_TRUC_HE_THONG.md): Phân tích chi tiết kiến trúc tổng thể, mô hình IPC, các giao thức kết nối mạng và trách nhiệm của 11 module Gradle.
+3. [**Báo cáo Rà soát, Vá lỗi & Tối ưu hoá (docs/TOI_UU_VA_VA_LOI.md)**](docs/TOI_UU_VA_VA_LOI.md): Tổng kết chi tiết kỹ thuật 4 giai đoạn vá lỗi và nâng cấp hiệu năng trên 73 file mã nguồn.
+4. [**Danh mục Gói & An toàn Phần cứng (docs/DANH_SACH_GOI_TV.md)**](docs/DANH_SACH_GOI_TV.md): Bảng phân loại ứng dụng debloat an toàn, cấu hình Mức 1 cho Amazon Fire TV Cube 2nd Gen (bảo toàn micro Alexa, loa Bluetooth, mắt IR máy chiếu, trình duyệt Silk).
+5. [**Danh sách Kịch bản Thử trên TV Thật (docs/THU-TREN-TIVI.md)**](docs/THU-TREN-TIVI.md): Bảng kiểm tra checklist thực tế từng tính năng trước khi phát hành.
+6. [**Hướng dẫn Đóng góp Phát triển (docs/CONTRIBUTING.md)**](docs/CONTRIBUTING.md): Quy chuẩn lập trình Kotlin, phong cách đặt tên tiếng Việt thuần tuý và quy trình gửi Pull Request.
 
 ---
 

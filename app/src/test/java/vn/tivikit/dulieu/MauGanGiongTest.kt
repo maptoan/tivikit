@@ -30,8 +30,8 @@ class MauGanGiongTest {
         assertTrue(du.ganGiong(tv("Sony", "BRAVIA VU3", "BRAVIA_VU3_4K"), setOf("sony-bravia-vu31")).none { it.id == "sony-bravia-vu31" })
 
     @Test fun tenHangPhuVaSerialGia() {
-        val dx = DuLieu(listOf(MauTv("xiaomi-mi-tv-p1", "Xiaomi Mi TV P1", "Xiaomi Mi TV P1 (device croods)", emptyList())), emptyMap())
-        assertEquals(listOf("xiaomi-mi-tv-p1"), dx.ganGiong(tv("Redmi", "Redmi Smart TV", "croods_pro")).map { it.id })
+        val dx = DuLieu(listOf(MauTv("xiaomi-mi-tv-p1", "Xiaomi Mi TV P1", "Xiaomi Mi TV P1 (model L55M7)", emptyList())), emptyMap())
+        assertEquals(listOf("xiaomi-mi-tv-p1"), dx.ganGiong(tv("Redmi", "Redmi Smart TV L55M7A", "croods")).map { it.id })
         assertEquals("", ThongTinTv.tuGetprop("[ro.serialno]: [0123456789ABCDEF]\n[ro.product.model]: [TV]").serial)
         assertEquals("G0911X03948600UD", ThongTinTv.tuGetprop("[ro.serialno]: [G0911X03948600UD]").serial)
     }

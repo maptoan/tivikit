@@ -1010,7 +1010,11 @@ object DongLenh {
             c.ten == "pm" -> c.doi
             c.ten == "cmd" && c.doi.getOrNull(0) == "package" -> c.doi.drop(1)
             else -> null
-        }?.takeIf { it.isNotEmpty() }?.let { it[0] to it.drop(1) }
+        }?.let { raw ->
+            val b = boUser(raw)
+            val sub = b.firstOrNull { !it.startsWith("-") } ?: return@let null
+            sub to raw.filter { it != sub }
+        }
     }
 
     private fun goiCua(lenh: String, dung: (String, List<String>) -> Boolean): List<String> =
@@ -1023,7 +1027,7 @@ object DongLenh {
     fun goiBat(lenh: String): List<String> = goiCua(lenh) { l, _ -> l == "enable" }
 
     /** Gói [lenh] gỡ khỏi người dùng (pm uninstall --user): Khôi phục không cài lại được, báo cách cài lại. */
-    fun goiGo(lenh: String): List<String> = goiCua(lenh) { l, a -> l == "uninstall" && "--user" in a }
+    fun goiGo(lenh: String): List<String> = goiCua(lenh) { l, a -> l == "uninstall" && a.any { it == "--user" || it.startsWith("--user=") } }
 
     /** Cài đặt [lenh] ghi / xoá (settings put|delete <bảng> <khoá>): in giá trị cũ ra trước khi chạy. */
     fun caiDatDoi(lenh: String): List<Pair<String, String>> = cacLenh(lenh).mapNotNull { c ->

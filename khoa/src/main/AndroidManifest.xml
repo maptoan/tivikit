@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+    <permission android:name="vn.tivikit.permission.NOI_BO" android:protectionLevel="signature" />
+    <uses-permission android:name="vn.tivikit.permission.NOI_BO" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- TiviKit cấp qua ADB (pm grant) để app tự bật lại dịch vụ khoá nếu bị tắt trong Cài đặt. -->
     <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" tools:ignore="ProtectedPermissions" />
@@ -33,12 +35,14 @@
         <activity
             android:name=".XacNhan"
             android:exported="true"
+            android:permission="vn.tivikit.permission.NOI_BO"
             android:excludeFromRecents="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <!-- Khoá trẻ em ngay từ menu ⏻ của TiviKit Launcher (KhoaNgay): chỉ nhận app ký cùng khoá. -->
         <activity
             android:name=".KhoaNgay"
             android:exported="true"
+            android:permission="vn.tivikit.permission.NOI_BO"
             android:excludeFromRecents="true"
             android:noHistory="true"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />

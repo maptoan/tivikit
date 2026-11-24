@@ -24,6 +24,34 @@ object DanhSach {
     private val RE_KY_TU = Regex("[^a-z0-9]")
     private val RE_KY_TU_LA = Regex("[,'\"`\$\\\\=\\r\\n]")
     private val RE_KHOANG_TRANG = Regex("\\s+")
+    private val RE_IP_THO = Regex("""^(?:0x[0-9a-fA-F]+|\d+)(?:\.(?:0x[0-9a-fA-F]+|\d+)){0,3}$""")
+
+    /** Chặn địa chỉ loopback (127.0.0.1, ::1), 0.0.0.0, link-local (169.254.x.x, fe80::) và multicast (chống SSRF nội bộ trên tivi). */
+    fun diaChiHopLe(dc: java.net.InetAddress): Boolean {
+        if (dc.isLoopbackAddress || dc.isAnyLocalAddress || dc.isLinkLocalAddress || dc.isMulticastAddress) return false
+        val b = dc.address
+        if (b.size == 4) {
+            val d0 = b[0].toInt() and 0xFF; val d1 = b[1].toInt() and 0xFF
+            if (d0 == 0 || d0 == 127 || (d0 == 169 && d1 == 254)) return false
+        }
+        return true
+    }
+
+    /** Link http(s) hợp lệ và không trỏ vào localhost / loopback / link-local (vẫn cho phép NAS mạng nhà 192.168.x.x). */
+    fun linkHopLe(url: String): Boolean {
+        val s = url.trim()
+        if (s.isEmpty() || s.any { it.isWhitespace() || it.code < 0x20 }) return false
+        val u = runCatching { java.net.URL(s) }.getOrNull() ?: return false
+        val gt = u.protocol.lowercase()
+        if (gt != "http" && gt != "https") return false
+        val host = u.host?.trim()?.trim('[', ']')?.lowercase().orEmpty()
+        if (host.isEmpty() || host == "localhost" || host.endsWith(".localhost")) return false
+        if (':' in host || RE_IP_THO.matches(host)) {
+            val dc = runCatching { java.net.InetAddress.getByName(host) }.getOrNull() ?: return false
+            if (!diaChiHopLe(dc)) return false
+        }
+        return true
+    }
 
     fun doc(chu: String): List<KenhIptv> {
         val ds = ArrayList<KenhIptv>()
@@ -46,7 +74,8 @@ object DanhSach {
                 }
                 dong.isEmpty() || dong.startsWith("#") -> {}
                 dau != null -> {
-                    ds += voiLink(dau, dong)
+                    val muc = voiLink(dau, dong)
+                    if (linkHopLe(muc.link)) ds += muc
                     dau = null
                 }
             }

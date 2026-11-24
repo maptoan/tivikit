@@ -60,9 +60,17 @@ class Kho(ctx: Context) {
         private const val TOI_DA = 15 * 1024 * 1024
         @Volatile private var nho: List<KenhIptv>? = null
 
+        private fun kiemTraKetNoi(url: String) {
+            if (!DanhSach.linkHopLe(url)) error("link khong an toan")
+            val host = URL(url).host.trim('[', ']')
+            val ds = runCatching { java.net.InetAddress.getAllByName(host) }.getOrNull().orEmpty()
+            if (ds.isEmpty() || ds.any { !DanhSach.diaChiHopLe(it) }) error("dia chi noi bo")
+        }
+
         /** Tải văn bản ở [url], đi theo chuyển hướng (cả http ↔ https, tối đa 6 lần), 10 giây mỗi bước. */
         fun tai(url: String): String {
-            var u = url
+            var u = url.trim()
+            kiemTraKetNoi(u)
             repeat(6) {
                 val c = URL(u).openConnection() as HttpURLConnection
                 try {
@@ -72,6 +80,7 @@ class Kho(ctx: Context) {
                     val ma = c.responseCode
                     if (ma in 300..399) {
                         u = URL(URL(u), c.getHeaderField("Location") ?: error("chuyen huong rong")).toString()
+                        kiemTraKetNoi(u)
                         return@repeat
                     }
                     if (ma !in 200..299) error("HTTP $ma")

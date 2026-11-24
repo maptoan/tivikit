@@ -26,11 +26,11 @@ import subprocess
 import sys
 
 GOC = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-KHO = os.environ.get("GITHUB_REPOSITORY") or "Circling5714/tivikit"
+KHO = os.environ.get("GITHUB_REPOSITORY") or "maptoan/tivikit"
 FILE_BAN = os.path.join(GOC, "version.properties")
 RA = os.path.join(GOC, "dist")
 # Chứng chỉ ký của TiviKit (README, Kiểm tra bản cài); workflow cũng chặn APK ký sai khoá.
-DAU_CHUNG_CHI = "ec4c282ecefa87e7e959d44de052ccb047a8164c383ff39341d910d85af6f653"
+DAU_CHUNG_CHI = "d61202648ef473769fe6f976c611db69bb7770a1190c016f1a194d899b7a372b"
 # Nhật ký trong app (banner, thông báo) chỉ chừng này dòng; đầy đủ ở GitHub Release.
 DONG_TRONG_APP = 12
 # Tự phát hành không ai duyệt (26/10/2026) chỉ khi thứ vào APK không đổi ngoài dữ liệu mẫu tivi. Mấy file này không vào APK:

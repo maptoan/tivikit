@@ -28,7 +28,7 @@ class CauHinhProvider : ContentProvider() {
         when (method) {
             "dat" -> {
                 val link = j.optString("link").trim()
-                if (!LINK.matches(link)) return kq.apply { putString("loi", "link sai") }
+                if (!LINK.matches(link) || !DanhSach.linkHopLe(link)) return kq.apply { putString("loi", "link sai") }
                 if (link != kho.link) kho.link = link
                 kq.putString("ok", "1")
             }

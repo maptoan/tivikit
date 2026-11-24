@@ -208,7 +208,7 @@ class BoCaiMau(private val vm: PhienLamViec) {
                         val khoa = "${g.id}|${abi.firstOrNull()}"
                         daTai[khoa] ?: run {
                             vm.thongBao = t("Đang tải ${g.ten}…", "Downloading ${g.ten}…")
-                            vm.io { TaiLink.tai(vm.ctx, GoiY.timLink(g, abi)) }.also { daTai[khoa] = it }
+                            vm.io { TaiLink.tai(vm.ctx, GoiY.timLink(g, abi), batBuocHttps = true) }.also { daTai[khoa] = it }
                         }
                     } catch (e: CancellationException) { throw e } catch (e: Throwable) {
                         ghi("${m.ten}: " + t("không tải được (${e.message})", "couldn't download (${e.message})")); continue

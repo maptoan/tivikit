@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <permission android:name="vn.tivikit.permission.NOI_BO" android:protectionLevel="signature" />
+    <uses-permission android:name="vn.tivikit.permission.NOI_BO" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <!-- Báo thức đúng giờ: Android 12 cần SCHEDULE_EXACT_ALARM, từ Android 13 app hẹn giờ dùng USE_EXACT_ALARM. -->

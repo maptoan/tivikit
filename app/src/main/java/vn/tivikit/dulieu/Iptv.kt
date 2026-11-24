@@ -65,9 +65,17 @@ object Iptv {
         return Kenh(ten, tt["tvg-id"].orEmpty(), tt["group-title"].orEmpty(), tt["tvg-logo"].orEmpty())
     }
 
+    private fun kiemTraKetNoi(url: String) {
+        if (!TaiLink.urlHopLe(url)) error("link không an toàn")
+        val host = URL(url).host.trim('[', ']')
+        val ds = runCatching { java.net.InetAddress.getAllByName(host) }.getOrNull().orEmpty()
+        if (ds.isEmpty() || ds.any { !TaiLink.diaChiHopLe(it) }) error("địa chỉ nội bộ không an toàn")
+    }
+
     /** Tải danh sách ở [url] (gọi trên luồng IO), đi theo chuyển hướng (link rút gọn → file thật, cả http ↔ https), tối đa 8 MB. */
     fun tai(url: String): String {
-        var u = url
+        var u = url.trim()
+        kiemTraKetNoi(u)
         repeat(6) {
             val c = URL(u).openConnection() as HttpURLConnection
             try {
@@ -77,6 +85,7 @@ object Iptv {
                 val ma = c.responseCode
                 if (ma in 300..399) {
                     u = URL(URL(u), c.getHeaderField("Location") ?: error("chuyển hướng rỗng")).toString()
+                    kiemTraKetNoi(u)
                     return@repeat
                 }
                 if (ma !in 200..299) error("HTTP $ma")
@@ -98,7 +107,7 @@ object Iptv {
 
     /** Lệnh đặt link danh sách cho app phụ (chữ ngoài ASCII thành \uXXXX như TiviKitLauncher.chiAscii). */
     fun lenhDat(link: String): String {
-        require(LINK.matches(link)) { "link" }
+        require(LINK.matches(link) && TaiLink.urlHopLe(link)) { "link" }
         return "content call --uri content://$GOI --method dat --arg '" + TiviKitLauncher.chiAscii(JSONObject().put("link", link).toString()) + "'"
     }
 

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <permission android:name="vn.tivikit.permission.NOI_BO" android:protectionLevel="signature" />
+    <uses-permission android:name="vn.tivikit.permission.NOI_BO" />
     <!-- Thời tiết từ Open-Meteo cho nơi TiviKit gửi. -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />

@@ -1150,15 +1150,15 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         damBaoKetNoi()
         val abi = layAbi()
         val url = io { vn.tivikit.dulieu.GoiY.timLink(g, abi) }
-        themVaoDs(taiVe(url, t("Đang tải ${g.ten}…", "Downloading ${g.ten}…"), g.ten))
+        themVaoDs(taiVe(url, t("Đang tải ${g.ten}…", "Downloading ${g.ten}…"), g.ten, batBuocHttps = true))
     }
 
     /** Tải [url] về bộ nhớ đệm (hiện %), đọc thành FileApk theo ABI của tivi đang nối. */
-    internal suspend fun taiVe(url: String, viec: String, ten: String? = null): FileApk {
+    internal suspend fun taiVe(url: String, viec: String, ten: String? = null, batBuocHttps: Boolean = false): FileApk {
         thongBao = viec; phanTramCu = -1; nhanTienDoCu = ""
         val batDau = System.nanoTime()
         val f = io {
-            vn.tivikit.dulieu.TaiLink.tai(ctx, url) { da, tong ->
+            vn.tivikit.dulieu.TaiLink.tai(ctx, url, batBuocHttps = batBuocHttps) { da, tong ->
                 if (tong > 0) baoTienDo(viec, da.toFloat() / tong, them = tocDo(da, tong, batDau))
             }
         }

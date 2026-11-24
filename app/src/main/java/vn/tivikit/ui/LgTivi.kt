@@ -21,9 +21,12 @@ import org.json.JSONArray
 import org.json.JSONObject
 import vn.tivikit.adb.DoMang
 import vn.tivikit.dulieu.AnhNen
+import vn.tivikit.dulieu.MaHoaKho
 import vn.tivikit.lg.KetNoiLg
+import vn.tivikit.lg.LgChungChiDoiException
 import vn.tivikit.lg.LgLoiException
 import vn.tivikit.lg.LgTuChoiException
+import vn.tivikit.lg.SshKhoaDoiException
 import vn.tivikit.lg.SshLg
 import vn.tivikit.lg.SshSaiMatKhauException
 import vn.tivikit.lg.Vibehack
@@ -40,7 +43,7 @@ import java.net.InetAddress
  * kết nối ADB của tivi Android.
  */
 class LgTivi(private val vm: PhienLamViec) {
-    data class TiviLg(val ip: String, val ten: String, val khoa: String, val mac: String, val luc: Long)
+    data class TiviLg(val ip: String, val ten: String, val khoa: String, val mac: String, val luc: Long, val dauTls: String = "")
 
     private val prefs = vm.ctx.getSharedPreferences("tvsach", Context.MODE_PRIVATE)
     var dsTivi by mutableStateOf(nap())
@@ -79,18 +82,35 @@ class LgTivi(private val vm: PhienLamViec) {
     // ---------- Tivi đã ghép đôi ----------
 
     private fun nap(): List<TiviLg> = runCatching {
-        val a = JSONArray(prefs.getString("lg_tivi", null) ?: "[]")
-        (0 until a.length()).map { i -> a.getJSONObject(i).let { o -> TiviLg(o.getString("ip"), o.optString("ten"), o.optString("khoa"), o.optString("mac"), o.optLong("luc")) } }
+        val raw = prefs.getString("lg_tivi", null) ?: "[]"
+        val a = JSONArray(raw)
+        var canNangCap = false
+        val ds = (0 until a.length()).map { i ->
+            val o = a.getJSONObject(i)
+            val khoaTho = o.optString("khoa")
+            if (khoaTho.isNotEmpty() && !khoaTho.startsWith(MaHoaKho.TIEN_TO)) canNangCap = true
+            TiviLg(o.getString("ip"), o.optString("ten"), MaHoaKho.moChuoi(khoaTho, KHOA_MA_HOA), o.optString("mac"), o.optLong("luc"), o.optString("dauTls"))
+        }
+        if (canNangCap) ghiDs(ds)
+        ds
     }.getOrDefault(emptyList())
 
-    private fun luu(ds: List<TiviLg>) {
-        dsTivi = ds.take(6)
-        prefs.edit().putString("lg_tivi", JSONArray(dsTivi.map {
-            JSONObject().put("ip", it.ip).put("ten", it.ten).put("khoa", it.khoa).put("mac", it.mac).put("luc", it.luc)
+    private fun ghiDs(ds: List<TiviLg>) {
+        prefs.edit().putString("lg_tivi", JSONArray(ds.map {
+            JSONObject().put("ip", it.ip).put("ten", it.ten).put("khoa", MaHoaKho.bocChuoi(it.khoa, KHOA_MA_HOA))
+                .put("mac", it.mac).put("luc", it.luc).put("dauTls", it.dauTls)
         }).toString()).apply()
     }
 
-    fun quen(tv: TiviLg) = luu(dsTivi.filter { it.ip != tv.ip })
+    private fun luu(ds: List<TiviLg>) {
+        dsTivi = ds.take(6)
+        ghiDs(dsTivi)
+    }
+
+    fun quen(tv: TiviLg) {
+        prefs.edit().remove("lg_ssh_${tv.ip}").remove("lg_ssh_hk_${tv.ip}").apply()
+        luu(dsTivi.filter { it.ip != tv.ip })
+    }
 
     // ---------- Tìm, nối ----------
 
@@ -132,11 +152,15 @@ class LgTivi(private val vm: PhienLamViec) {
         ket?.dong(); ket = null; dangNoi = null
         if (ip.isBlank()) error(t("Nhập địa chỉ IP của tivi.", "Enter the TV's IP address."))
         val cu = dsTivi.firstOrNull { it.ip == ip }
-        val k = KetNoiLg(ip, vm.mangDo(ip)?.socketFactory)
+        val k = KetNoiLg(ip, vm.mangDo(ip)?.socketFactory, cu?.dauTls)
         val khoa = try {
             k.noi(cu?.khoa?.takeIf { it.isNotBlank() }) {
                 vm.thongBao = t("Nhìn lên tivi: bấm Cho phép (Allow / Đồng ý) để MTVkit điều khiển tivi.", "Look at the TV: press Allow so MTVkit can control it.")
             }
+        } catch (e: LgChungChiDoiException) {
+            k.dong()
+            error(t("Chứng chỉ bảo mật của tivi LG ở $ip đã thay đổi (nghi ngờ giả mạo trên mạng). Nếu anh vừa đặt lại tivi, hãy bấm Quên tivi rồi ghép đôi lại.",
+                "The security certificate of the LG TV at $ip changed (possible network spoofing). If you reset the TV, tap Forget TV and pair again."))
         } catch (e: LgTuChoiException) {
             k.dong()
             error(t("Tivi không cho phép kết nối (bấm Từ chối hoặc hết giờ hộp hỏi). Bấm Kết nối lại rồi chọn Cho phép trên tivi.",
@@ -152,7 +176,7 @@ class LgTivi(private val vm: PhienLamViec) {
         phienBan = listOfNotNull(pm?.optString("product_name")?.takeIf { it.isNotBlank() },
             pm?.let { "${it.optString("major_ver")}.${it.optString("minor_ver")}" }?.takeIf { it.length > 1 }).joinToString(" · ")
         val ten = he?.optString("modelName")?.takeIf { it.isNotBlank() }?.let { "LG $it" } ?: cu?.ten?.takeIf { it.isNotBlank() } ?: "LG webOS"
-        val tv = TiviLg(ip, ten, khoa, mac ?: cu?.mac.orEmpty(), System.currentTimeMillis())
+        val tv = TiviLg(ip, ten, khoa, mac ?: cu?.mac.orEmpty(), System.currentTimeMillis(), k.dauChungChi ?: cu?.dauTls.orEmpty())
         luu(listOf(tv) + dsTivi.filter { it.ip != ip })
         dangNoi = tv
     }
@@ -286,8 +310,14 @@ class LgTivi(private val vm: PhienLamViec) {
     /** Chữ script cài in ra (đã bỏ mã màu), mới nhất ở cuối. */
     val nhatKy = mutableStateListOf<String>()
 
-    /** Mật khẩu root SSH của tivi [ip]: mặc định của Homebrew Channel là alpine. */
-    private fun matKhau(ip: String) = prefs.getString("lg_ssh_$ip", null) ?: "alpine"
+    /** Mật khẩu root SSH của tivi [ip] (mã hoá AES-GCM qua AndroidKeyStore): mặc định của Homebrew Channel là alpine. */
+    private fun matKhau(ip: String) = MaHoaKho.docChuoi(prefs, "lg_ssh_$ip", KHOA_MA_HOA)?.takeIf { it.isNotEmpty() } ?: "alpine"
+
+    private fun taoSsh(ip: String, sf: javax.net.SocketFactory?): SshLg = SshLg(
+        ip, matKhau(ip), sf,
+        dauKhoaDaLuu = prefs.getString("lg_ssh_hk_$ip", null),
+        ghiDauKhoa = { dau -> prefs.edit().putString("lg_ssh_hk_$ip", dau).apply() },
+    )
 
     /**
      * Tự nhận ra tivi đã root: Homebrew Channel có trong danh sách app, cổng 22 chào bằng SSH (dropbear của Homebrew
@@ -308,9 +338,14 @@ class LgTivi(private val vm: PhienLamViec) {
                 telnetMo = vm.io { DoMang.doCong(ip, 23, 1500, mang) == DoMang.Cong.MO }
                 val chao = vm.io { SshLg.dongDau(ip, SshLg.CONG, 2500, mang?.socketFactory) }
                 root = if (!Vibehack.laSsh(chao)) { if (coHomebrew) Root.HOMEBREW_CHUA_SSH else Root.CHUA_ROOT } else {
-                    val kq = runCatching { vm.io { SshLg(ip, matKhau(ip), mang?.socketFactory).kiemTra() } }
+                    val kq = runCatching { vm.io { taoSsh(ip, mang?.socketFactory).kiemTra() } }
                     val k = kq.getOrNull()
                     when {
+                        kq.exceptionOrNull() is SshKhoaDoiException -> {
+                            bao(t("Khoá SSH của tivi LG đã thay đổi bất thường. Hãy bấm Quên tivi rồi ghép đôi lại nếu vừa cài lại SSH.",
+                                "The LG TV's SSH host key changed unexpectedly. Tap Forget TV and pair again if you reinstalled SSH."), true)
+                            Root.CHUA_ROOT
+                        }
                         kq.exceptionOrNull() is SshSaiMatKhauException -> Root.SAI_MAT_KHAU
                         k == null -> if (coHomebrew) Root.HOMEBREW_CHUA_SSH else Root.CHUA_ROOT
                         k.laRoot -> { coVibehack = coVibehack || k.coVibehack; coInputHook = coInputHook || k.coInputHook; Root.DA_ROOT }
@@ -321,10 +356,10 @@ class LgTivi(private val vm: PhienLamViec) {
         }
     }
 
-    /** Mật khẩu root khác mặc định: lưu cho tivi này rồi kiểm tra lại. */
+    /** Mật khẩu root khác mặc định: lưu mã hoá cho tivi này rồi kiểm tra lại. */
     fun datMatKhau(mk: String) {
         val tv = dangNoi ?: return
-        prefs.edit().putString("lg_ssh_${tv.ip}", mk).apply()
+        MaHoaKho.ghiChuoi(prefs, "lg_ssh_${tv.ip}", mk, KHOA_MA_HOA)
         kiemTraRoot()
     }
 
@@ -353,7 +388,7 @@ class LgTivi(private val vm: PhienLamViec) {
         val tv = dangNoi ?: return
         vm.viewModelScope.launch {
             // Tivi tắt ngay nên phiên SSH rớt giữa chừng: lỗi ở đây là bình thường.
-            vm.io { runCatching { SshLg(tv.ip, matKhau(tv.ip), vm.mangDo(tv.ip)?.socketFactory).chay("(sleep 1; reboot) >/dev/null 2>&1 &", 10) } }
+            vm.io { runCatching { taoSsh(tv.ip, vm.mangDo(tv.ip)?.socketFactory).chay("(sleep 1; reboot) >/dev/null 2>&1 &", 10) } }
             ngat()
             bao(t("Tivi đang khởi động lại. Chờ tivi lên (khoảng 1 phút) rồi bấm Nối lại.", "The TV is restarting. Wait about a minute, then tap Reconnect."))
         }
@@ -364,7 +399,10 @@ class LgTivi(private val vm: PhienLamViec) {
         val tv = dangNoi ?: error(t("Chưa nối tivi LG.", "No LG TV connected."))
         nhatKy.clear(); bao("")
         val (ma, ra) = try {
-            vm.io { khoi(SshLg(tv.ip, matKhau(tv.ip), vm.mangDo(tv.ip)?.socketFactory)) }
+            vm.io { khoi(taoSsh(tv.ip, vm.mangDo(tv.ip)?.socketFactory)) }
+        } catch (e: SshKhoaDoiException) {
+            error(t("Khoá máy chủ SSH của tivi LG đã thay đổi (nghi ngờ giả mạo trên mạng). Hãy bấm Quên tivi rồi ghép đôi lại nếu vừa cài lại SSH.",
+                "The LG TV's SSH host key changed (possible network spoofing). Tap Forget TV and pair again if you reinstalled SSH."))
         } catch (e: SshSaiMatKhauException) {
             root = Root.SAI_MAT_KHAU
             error(t("Sai mật khẩu SSH root của tivi.", "Wrong root SSH password for the TV."))
@@ -414,4 +452,8 @@ class LgTivi(private val vm: PhienLamViec) {
     }
 
     private fun bao(chu: String, loi: Boolean = false) { bao = chu; baoLoi = loi }
+
+    private companion object {
+        const val KHOA_MA_HOA = "mtvkit_lg_v1"
+    }
 }

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <permission android:name="vn.tivikit.permission.NOI_BO" android:protectionLevel="signature" />
+    <uses-permission android:name="vn.tivikit.permission.NOI_BO" />
     <!-- Hỏi Telegram (api.telegram.org) và nối ADB của chính tivi ở 127.0.0.1:5555. -->
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Mở kênh / app thì sáng màn hình (tivi đang ở màn bảo vệ); Android 14+ cần TURN_SCREEN_ON, TiviKit cấp qua ADB. -->

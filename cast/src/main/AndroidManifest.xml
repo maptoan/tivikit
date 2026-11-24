@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <permission android:name="vn.tivikit.permission.NOI_BO" android:protectionLevel="signature" />
+    <uses-permission android:name="vn.tivikit.permission.NOI_BO" />
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Mở video thì bật màn hình (tắt màn bảo vệ, tivi đang chờ thì bật); Android 14+ cần TURN_SCREEN_ON, TiviKit cấp qua ADB. -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />

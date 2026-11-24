@@ -110,4 +110,25 @@ class DanhSachTest {
         assertFalse(CauHinhProvider.LINK.matches("https://example.test/a';reboot"))
         assertFalse(CauHinhProvider.LINK.matches("file:///sdcard/a.m3u"))
     }
+
+    @Test fun ssrf_chanDiaChiNoiBoChoPhepNasNha() {
+        assertFalse(DanhSach.linkHopLe("http://127.0.0.1:8008/ssdp/device-desc.xml"))
+        assertFalse(DanhSach.linkHopLe("http://localhost:5555/stream"))
+        assertFalse(DanhSach.linkHopLe("http://[::1]:8080/a.m3u8"))
+        assertFalse(DanhSach.linkHopLe("http://169.254.169.254/latest/meta-data"))
+        assertFalse(DanhSach.linkHopLe("file:///data/data/vn.tivikit.iptv/shared_prefs/iptv.xml"))
+        assertTrue(DanhSach.linkHopLe("http://192.168.1.50:4022/udp/239.1.1.1:1234"))
+        assertTrue(DanhSach.linkHopLe("https://example.test/live/vtv1.m3u8"))
+
+        val ds = DanhSach.doc("""
+            #EXTM3U
+            #EXTINF:-1,Kênh Giả Mạo Localhost
+            http://127.0.0.1:5555/shell
+            #EXTINF:-1,Kênh Đọc File
+            file:///etc/hosts
+            #EXTINF:-1,Kênh Hợp Lệ
+            http://192.168.1.50:4022/vtv1.ts
+        """.trimIndent())
+        assertEquals(listOf("Kênh Hợp Lệ"), ds.map { it.ten })
+    }
 }

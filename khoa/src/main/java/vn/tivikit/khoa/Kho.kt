@@ -12,10 +12,14 @@ class Kho(ctx: Context) {
     var chanDen: Long get() = p.getLong("chan_den", 0); set(v) = p.edit().putLong("chan_den", v).apply()
     /** Đã phải chờ mấy lần liền vì sai mã (lần chờ sau lâu hơn); nhập đúng thì về 0. */
     var lanCho: Int get() = p.getInt("lan_cho", 0); set(v) = p.edit().putInt("lan_cho", v).apply()
-    /** Mã mở khoá (28/10/2026): mã gốc OTP + mã dự phòng; null = chưa cài, tivi không khoá. App không cho sao lưu dữ liệu. */
-    var maMo: MaMo? get() = MaMo.doc(p.getString("ma_mo", null)); set(v) = p.edit().putString("ma_mo", v?.json()).apply()
+    /** Mã mở khoá (28/10/2026): mã gốc OTP + mã dự phòng, mã hoá AES-GCM qua AndroidKeyStore; null = chưa cài, tivi không khoá. */
+    var maMo: MaMo?
+        get() = MaMo.doc(MaHoaKho.docChuoi(p, "ma_mo", TEN_KHOA))
+        set(v) = MaHoaKho.ghiChuoi(p, "ma_mo", v?.json(), TEN_KHOA)
     /** Phiên của MTVkit (dạng băm) và hạn của nó, xem XacThuc. */
-    var phien: String? get() = p.getString("phien", null); set(v) = p.edit().putString("phien", v).apply()
+    var phien: String?
+        get() = MaHoaKho.docChuoi(p, "phien", TEN_KHOA)
+        set(v) = MaHoaKho.ghiChuoi(p, "phien", v, TEN_KHOA)
     var phienHet: Long get() = p.getLong("phien_het", 0); set(v) = p.edit().putLong("phien_het", v).apply()
     /** Bố mẹ khoá tivi ngay (KhoaNgay, menu ⏻ của MTVkit Launcher): khoá tới khi nhập mã, kể cả khi tivi khởi động lại. */
     var khoaTay: Boolean get() = p.getBoolean("khoa_tay", false); set(v) = p.edit().putBoolean("khoa_tay", v).apply()
@@ -23,6 +27,10 @@ class Kho(ctx: Context) {
     var yeuCauGo: Long get() = p.getLong("yeu_cau_go", 0); set(v) = p.edit().putLong("yeu_cau_go", v).apply()
     var henGo: Long get() = yeuCauGo; set(v) { yeuCauGo = v }
     val cauHinh: CauHinh? get() = Luat.docJson(json)?.copy(coMa = p.contains("ma_mo"))
+
+    companion object {
+        private const val TEN_KHOA = "mtvkit_khoa_v1"
+    }
     val daDat: Boolean get() = cauHinh?.let { it.bat && it.coMa } == true
 
     /**

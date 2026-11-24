@@ -14,6 +14,13 @@ import android.os.Bundle
 class MoTuDong : Activity() {
     override fun onCreate(b: Bundle?) {
         super.onCreate(b)
+        if (android.os.Build.VERSION.SDK_INT >= 34) {
+            val goi = launchedFromPackage
+            if (goi != null && goi != "android" && goi != "com.android.shell" &&
+                packageManager.checkSignatures(goi, packageName) != PackageManager.SIGNATURE_MATCH) {
+                finish(); return
+            }
+        }
         val ten = intent.getStringExtra(TEN)?.trim()?.take(40).orEmpty()
         val nguon = TuChonNguon.tuJson(intent.getStringExtra(NGUON))
         val coDinh = intent.getBooleanExtra(CO_DINH, false)

@@ -237,7 +237,9 @@ object GoiY {
             val tep = rel.getJSONArray("assets")
             val ds = (0 until tep.length()).map { tep.getJSONObject(it) }
             val ten = chonTep(n, ds.map { it.getString("name") }, abiTv) ?: error(t("${a.ten} không có bản cho chip của tivi này.", "${a.ten} has no build for this TV's chip."))
-            BanMoi(ds.first { it.getString("name") == ten }.getString("browser_download_url"), ten, phienBanTu(ten, rel.optString("tag_name")))
+            val link = ds.first { it.getString("name") == ten }.getString("browser_download_url")
+            require(TaiLink.urlHopLe(link, batBuocHttps = true, chanMangNoiBo = true)) { "Link tải ${a.ten} không an toàn." }
+            BanMoi(link, ten, phienBanTu(ten, rel.optString("tag_name")))
         }
         Nguon.CHPlay -> error(t("${a.ten} cài từ CH Play của tivi.", "${a.ten} installs from the TV's Play Store."))
         is Nguon.ThuMuc -> {
@@ -245,7 +247,9 @@ object GoiY {
                 ?: error(t("${a.ten} không có bản cho chip của tivi này.", "${a.ten} has no build for this TV's chip."))
             val thuMuc = n.theoAbi[abi] ?: n.theoAbi.getValue(abi.replace('-', '_'))
             val ten = chonTrongThuMuc(lay(thuMuc), n.loc, abi) ?: error(t("Không thấy file ${a.ten} trên máy chủ.", "Couldn't find ${a.ten} on the server."))
-            BanMoi(thuMuc + ten, ten, phienBanTu(ten, null))
+            val link = thuMuc + ten
+            require(TaiLink.urlHopLe(link, batBuocHttps = true, chanMangNoiBo = true)) { "Link tải ${a.ten} không an toàn." }
+            BanMoi(link, ten, phienBanTu(ten, null))
         }
     }
 
@@ -284,8 +288,12 @@ object GoiY {
     }
 }
 
-/** Tải APK từ một đường link (25/10/2026): theo chuyển hướng, đặt đúng đuôi để GoiApk.tuFile nhận. */
+/** Tải APK từ một đường link (25/10/2026): theo chuyển hướng an toàn, đặt đúng đuôi để GoiApk.tuFile nhận. */
 object TaiLink {
+    /** Dung lượng tải tối đa cho một gói APK / bundle (1,5 GB) để tránh tràn bộ nhớ điện thoại. */
+    const val TOI_DA_TAI = 1536L * 1024 * 1024
+    private val RE_IP_THO = Regex("""^(?:0x[0-9a-fA-F]+|\d+)(?:\.(?:0x[0-9a-fA-F]+|\d+)){0,3}$""")
+
     /** Tên file từ Content-Disposition (filename* / filename) hoặc đoạn cuối của đường dẫn. */
     fun tenFile(url: String, cd: String?): String {
         cd?.let { h ->
@@ -295,29 +303,100 @@ object TaiLink {
         return URLDecoder.decode(url.substringBefore('?').substringBefore('#').trimEnd('/').substringAfterLast('/'), "UTF-8").ifBlank { "app.apk" }
     }
 
+    /** Kiểm tra địa chỉ IP không phải loopback (127.0.0.1, ::1), link-local (169.254.x.x), 0.0.0.0, multicast (và LAN nếu [chanMangNoiBo]). */
+    fun diaChiHopLe(dc: java.net.InetAddress, chanMangNoiBo: Boolean = false): Boolean {
+        if (dc.isLoopbackAddress || dc.isAnyLocalAddress || dc.isLinkLocalAddress || dc.isMulticastAddress) return false
+        val b = dc.address
+        // IPv4-mapped IPv6 (::ffff:127.0.0.1) hoặc dải 127.0.0.0/8, 0.0.0.0/8, 169.254.0.0/16.
+        if (b.size == 4) {
+            val d0 = b[0].toInt() and 0xFF; val d1 = b[1].toInt() and 0xFF
+            if (d0 == 0 || d0 == 127 || (d0 == 169 && d1 == 254)) return false
+        }
+        if (chanMangNoiBo && dc.isSiteLocalAddress) return false
+        return true
+    }
+
+    /** Kiểm tra cú pháp URL và địa chỉ IP tĩnh (không phân giải DNS). */
+    fun urlHopLe(url: String, batBuocHttps: Boolean = false, chanMangNoiBo: Boolean = false): Boolean {
+        val s = url.trim()
+        if (s.isEmpty() || s.any { it.isWhitespace() || it.code < 0x20 }) return false
+        val u = runCatching { URL(s) }.getOrNull() ?: return false
+        val giaoThuc = u.protocol.lowercase()
+        if (batBuocHttps && giaoThuc != "https") return false
+        if (giaoThuc != "http" && giaoThuc != "https") return false
+        val host = u.host?.trim()?.trim('[', ']')?.lowercase().orEmpty()
+        if (host.isEmpty() || host == "localhost" || host.endsWith(".localhost")) return false
+        if (':' in host || RE_IP_THO.matches(host)) {
+            val dc = runCatching { java.net.InetAddress.getByName(host) }.getOrNull() ?: return false
+            if (!diaChiHopLe(dc, chanMangNoiBo)) return false
+        }
+        return true
+    }
+
+    /** Giải quyết URL chuyển hướng và chặn hạ cấp HTTPS → HTTP hoặc nhảy vào địa chỉ nội bộ. */
+    fun buocChuyenHuong(tuUrl: String, location: String?, batBuocHttps: Boolean = false, chanMangNoiBo: Boolean = false): String {
+        val loc = location?.trim()?.takeIf { it.isNotEmpty() } ?: error(t("Chuyển hướng không có địa chỉ.", "Redirect missing Location."))
+        val moi = runCatching { URL(URL(tuUrl), loc).toString() }.getOrElse { error(t("Địa chỉ chuyển hướng không hợp lệ.", "Invalid redirect URL.")) }
+        val canHttps = batBuocHttps || tuUrl.startsWith("https://", ignoreCase = true)
+        if (canHttps && !moi.startsWith("https://", ignoreCase = true)) {
+            error(t("Chặn chuyển hướng hạ cấp không an toàn (HTTPS → HTTP).", "Blocked unsafe protocol downgrade redirect (HTTPS → HTTP)."))
+        }
+        if (!urlHopLe(moi, batBuocHttps = canHttps, chanMangNoiBo = chanMangNoiBo)) {
+            error(t("Địa chỉ tải không an toàn hoặc không hợp lệ.", "Unsafe or invalid download URL."))
+        }
+        return moi
+    }
+
+    private fun kiemTraKetNoi(url: String, batBuocHttps: Boolean, chanMangNoiBo: Boolean) {
+        if (!urlHopLe(url, batBuocHttps = batBuocHttps, chanMangNoiBo = chanMangNoiBo)) {
+            error(t("Đường link tải không hợp lệ hoặc không an toàn.", "Invalid or unsafe download link."))
+        }
+        val host = URL(url).host.trim('[', ']')
+        val ds = runCatching { java.net.InetAddress.getAllByName(host) }.getOrNull().orEmpty()
+        if (ds.isEmpty() || ds.any { !diaChiHopLe(it, chanMangNoiBo) }) {
+            error(t("Máy chủ tải trỏ về địa chỉ nội bộ không an toàn.", "Download host resolves to an unsafe local address."))
+        }
+    }
+
     /**
      * Tải [url] vào bộ nhớ đệm, trả về file đã có đuôi đúng (.apk / .apks / .xapk / .apkm). Link không ghi đuôi thì nhìn
      * bên trong: có AndroidManifest.xml là .apk, chứa nhiều .apk là .apks; không phải thì báo lỗi.
      */
-    fun tai(ctx: Context, url: String, tienDo: (Long, Long) -> Unit = { _, _ -> }): File {
+    fun tai(ctx: Context, url: String, batBuocHttps: Boolean = false, tienDo: (Long, Long) -> Unit = { _, _ -> }): File {
         var u = url.trim()
+        val chanLan = batBuocHttps
+        kiemTraKetNoi(u, batBuocHttps = batBuocHttps, chanMangNoiBo = chanLan)
         repeat(8) {
             val c = URL(u).openConnection() as HttpURLConnection
-            c.instanceFollowRedirects = false // tự theo để đi được cả http → https và sang tên miền khác
+            c.instanceFollowRedirects = false // tự theo để kiểm tra an toàn từng bước chuyển hướng
             c.connectTimeout = 15000; c.readTimeout = 30000
             c.setRequestProperty("User-Agent", "MTVkit")
             try {
                 val ma = c.responseCode
-                if (ma in 300..399) { u = URL(URL(u), c.getHeaderField("Location") ?: error("Chuyển hướng không có địa chỉ")).toString(); return@repeat }
+                if (ma in 300..399) {
+                    u = buocChuyenHuong(u, c.getHeaderField("Location"), batBuocHttps = batBuocHttps, chanMangNoiBo = chanLan)
+                    kiemTraKetNoi(u, batBuocHttps = batBuocHttps || u.startsWith("https://", ignoreCase = true), chanMangNoiBo = chanLan)
+                    return@repeat
+                }
                 if (ma != 200) error(t("Máy chủ trả lỗi $ma.", "Server error $ma."))
                 val ten = tenFile(u, c.getHeaderField("Content-Disposition"))
                 val tong = c.contentLengthLong
+                if (tong > TOI_DA_TAI) error(t("File tải quá lớn (vượt 1,5 GB).", "Download file too large (over 1.5 GB)."))
                 val tam = File(GoiApk.thuMuc(ctx), "${System.nanoTime()}.tai")
-                c.inputStream.use { vao ->
-                    tam.outputStream().use { ra ->
-                        val buf = ByteArray(64 * 1024); var da = 0L
-                        while (true) { val n = vao.read(buf); if (n < 0) break; ra.write(buf, 0, n); da += n; tienDo(da, tong) }
+                try {
+                    c.inputStream.use { vao ->
+                        tam.outputStream().use { ra ->
+                            val buf = ByteArray(64 * 1024); var da = 0L
+                            while (true) {
+                                val n = vao.read(buf); if (n < 0) break
+                                da += n
+                                if (da > TOI_DA_TAI) error(t("File tải quá lớn (vượt 1,5 GB).", "Download file too large (over 1.5 GB)."))
+                                ra.write(buf, 0, n); tienDo(da, tong)
+                            }
+                        }
                     }
+                } catch (e: Throwable) {
+                    tam.delete(); throw e
                 }
                 return datDuoi(tam, ten)
             } finally { c.disconnect() }

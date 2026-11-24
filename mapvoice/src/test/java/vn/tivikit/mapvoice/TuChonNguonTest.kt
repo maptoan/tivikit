@@ -181,4 +181,14 @@ class TuChonNguonTest {
         assertFalse(doc.doiNguon)
         assertTrue(CauHinh.tuJson("""{"appKenh":"auto"}""")!!.doiNguon)
     }
+
+    @Test fun linkAnToan_chanLoopbackVaLinkLocal() {
+        assertFalse(TuChon.linkAnToan("http://127.0.0.1:8008/ssdp"))
+        assertFalse(TuChon.linkAnToan("http://localhost:5555/"))
+        assertFalse(TuChon.linkAnToan("http://[::1]/a.m3u8"))
+        assertFalse(TuChon.linkAnToan("http://169.254.169.254/"))
+        assertFalse(TuChon.linkAnToan("file:///sdcard/a.mp4"))
+        assertTrue(TuChon.linkAnToan("https://live.example.org/vtv1.m3u8"))
+        assertTrue(TuChon.linkAnToan("http://192.168.1.10:4022/vtv1"))
+    }
 }

@@ -12,6 +12,8 @@ import okhttp3.WebSocket
 import okhttp3.WebSocketListener
 import org.json.JSONObject
 import java.io.IOException
+import java.security.MessageDigest
+import java.security.cert.CertificateException
 import java.security.cert.X509Certificate
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
@@ -20,9 +22,13 @@ import javax.net.SocketFactory
 import javax.net.ssl.SSLContext
 import javax.net.ssl.X509TrustManager
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 /** Tivi từ chối ghép đôi (bấm Từ chối, hoặc hết giờ hộp hỏi). */
 class LgTuChoiException(chu: String) : IOException(chu)
+
+/** Chứng chỉ TLS của tivi LG khác với lần ghép đôi trước (nghi ngờ giả mạo MITM trên mạng LAN). */
+class LgChungChiDoiException(chu: String) : IOException(chu)
 
 /** Tivi trả lỗi cho một yêu cầu; [khongCo] = tivi không có lệnh đó ("404 no such service or method"). */
 class LgLoiException(chu: String) : IOException(chu) {
@@ -31,19 +37,28 @@ class LgLoiException(chu: String) : IOException(chu) {
 
 /**
  * Một kết nối tới tivi LG [ip] (xem WebOs): kênh chính SSAP cho yêu cầu / trả lời, kênh phím cho nút remote. Thử
- * ws://ip:3000 trước, tivi từ chối thì wss://ip:3001 — chứng chỉ của tivi là tự ký nên chấp nhận như aiowebostv (chỉ nói
- * chuyện trong mạng nhà). [socketFactory]: socket của mạng Wi-Fi (Wi-Fi "không có Internet" thì Android lấy 4G làm mặc định).
+ * ws://ip:3000 trước, tivi từ chối thì wss://ip:3001 — chứng chỉ tự ký của tivi được ghim dấu vân tay SHA-256 ở lần đầu
+ * (TOFU) để chống giả mạo về sau. [socketFactory]: socket của mạng Wi-Fi (Wi-Fi "không có Internet" thì Android lấy 4G làm mặc định).
  */
-class KetNoiLg(val ip: String, socketFactory: SocketFactory?) {
-    private val tinHet = object : X509TrustManager {
+class KetNoiLg(val ip: String, socketFactory: SocketFactory?, private val dauChungChiDaLuu: String? = null) {
+    /** Dấu vân tay SHA-256 của chứng chỉ TLS tivi LG đã dùng trong phiên này (để lưu ghim TOFU). */
+    @Volatile var dauChungChi: String? = dauChungChiDaLuu?.takeIf { it.isNotBlank() }
+        private set
+
+    private val tinTofu = object : X509TrustManager {
         override fun checkClientTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
-        override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {}
+        override fun checkServerTrusted(chain: Array<out X509Certificate>?, authType: String?) {
+            if (chain.isNullOrEmpty()) throw CertificateException("Thiếu chứng chỉ TLS từ tivi LG")
+            val dau = bamSha256(chain[0].encoded)
+            if (!khopTofu(dauChungChiDaLuu, dau)) throw CertificateException(CHUNG_CHI_DOI)
+            dauChungChi = dau
+        }
         override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
     }
     private val http: OkHttpClient = OkHttpClient.Builder()
         .apply { if (socketFactory != null) socketFactory(socketFactory) }
-        .sslSocketFactory(SSLContext.getInstance("TLS").apply { init(null, arrayOf(tinHet), null) }.socketFactory, tinHet)
-        .hostnameVerifier { _, _ -> true }
+        .sslSocketFactory(SSLContext.getInstance("TLS").apply { init(null, arrayOf(tinTofu), null) }.socketFactory, tinTofu)
+        .hostnameVerifier { host, _ -> host.equals(ip, ignoreCase = true) }
         .connectTimeout(4, TimeUnit.SECONDS)
         // Chỉ áp cho lúc bắt tay WebSocket (tivi nhận kết nối mà không trả lời); sau đó OkHttp bỏ hạn đọc, ping lo việc canh.
         .readTimeout(10, TimeUnit.SECONDS)
@@ -143,7 +158,7 @@ class KetNoiLg(val ip: String, socketFactory: SocketFactory?) {
         } finally { cho.remove(id) }
     }
 
-    /** Mở một WebSocket; không mở được thì null. */
+    /** Mở một WebSocket; không mở được thì null, riêng lỗi lệch chứng chỉ TOFU thì ném thẳng để báo người dùng. */
     private suspend fun mo(url: String): WebSocket? = suspendCancellableCoroutine { c ->
         val ws = http.newWebSocket(Request.Builder().url(url).build(), object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) { if (c.isActive) c.resume(webSocket) }
@@ -152,7 +167,11 @@ class KetNoiLg(val ip: String, socketFactory: SocketFactory?) {
                 cho[t.id]?.trySend(t)
             }
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                if (c.isActive) c.resume(null) else rot(webSocket)
+                val lechChungChi = generateSequence(t) { it.cause }.any { it.message?.contains(CHUNG_CHI_DOI) == true }
+                if (c.isActive) {
+                    if (lechChungChi) c.resumeWithException(LgChungChiDoiException(CHUNG_CHI_DOI))
+                    else c.resume(null)
+                } else rot(webSocket)
             }
             override fun onClosed(webSocket: WebSocket, code: Int, reason: String) = rot(webSocket)
         })
@@ -169,7 +188,15 @@ class KetNoiLg(val ip: String, socketFactory: SocketFactory?) {
         cho.values.forEach { it.trySend(WebOs.Tin("", "error", null, MAT_KET_NOI)) }
     }
 
-    private companion object {
-        const val MAT_KET_NOI = "Mất kết nối với tivi"
+    companion object {
+        private const val MAT_KET_NOI = "Mất kết nối với tivi"
+        const val CHUNG_CHI_DOI = "Chứng chỉ TLS của tivi LG đã thay đổi"
+
+        fun bamSha256(duLieu: ByteArray): String =
+            MessageDigest.getInstance("SHA-256").digest(duLieu).joinToString("") { "%02x".format(it) }
+
+        /** Khớp TOFU: lần đầu ([daLuu] trống) thì cho qua để ghim; các lần sau phải khớp dấu vân tay SHA-256. */
+        fun khopTofu(daLuu: String?, moi: String): Boolean =
+            moi.isNotBlank() && (daLuu.isNullOrBlank() || daLuu.equals(moi, ignoreCase = true))
     }
 }

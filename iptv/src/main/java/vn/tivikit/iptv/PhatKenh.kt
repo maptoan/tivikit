@@ -58,6 +58,13 @@ class PhatKenh : Activity() {
 
     override fun onCreate(b: Bundle?) {
         super.onCreate(b)
+        if (Build.VERSION.SDK_INT >= 34) {
+            val goi = launchedFromPackage
+            if (goi != null && goi != "android" && goi != "com.android.shell" &&
+                packageManager.checkSignatures(goi, packageName) != android.content.pm.PackageManager.SIGNATURE_MATCH) {
+                finish(); return
+            }
+        }
         kho = Kho(this)
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
         val goc = FrameLayout(this).apply { setBackgroundColor(Color.BLACK) }
@@ -107,6 +114,7 @@ class PhatKenh : Activity() {
     }
 
     private fun phat(k: KenhIptv, kieuKhac: Boolean = false) {
+        if (!DanhSach.linkHopLe(k.link)) { hien(getString(R.string.loi_phat, k.ten), giu = true); return }
         if (k != kenh) { doiKieu = false; daTaiMoi = false; daPhat = false; thuLai = 0 }
         kenh = k
         doiKieu = doiKieu || kieuKhac

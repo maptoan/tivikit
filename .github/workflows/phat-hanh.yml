@@ -97,7 +97,7 @@ jobs:
           APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -n 1)
           doc() { sed -n "s/^$1=//p" ky.properties | tr -d '\r'; }
           for f in app/src/main/assets/tvhome.apk app/src/main/assets/tvhome-xiaomi.apk; do
-            if ! "$APKSIGNER" verify --print-certs "$f" 2>/dev/null | grep -q "SHA-256 digest: 6a02f271f97c014901bf059f1c6263ed0fc2880cec67121efcd0794935b676c6"; then
+            if ! "$APKSIGNER" verify --print-certs "$f" 2>/dev/null | grep -q "SHA-256 digest: d61202648ef473769fe6f976c611db69bb7770a1190c016f1a194d899b7a372b"; then
               "$APKSIGNER" sign --ks "$(doc storeFile)" --ks-pass "pass:$(doc storePassword)" \
                 --ks-key-alias "$(doc keyAlias)" --key-pass "pass:$(doc keyPassword)" "$f"
             fi
@@ -111,10 +111,10 @@ jobs:
           APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -n 1)
           "$APKSIGNER" verify --print-certs app/build/outputs/apk/release/app-release.apk | tee "$RUNNER_TEMP/ky.txt"
           if [ -n "${{ secrets.KHOA_KY_BASE64 }}" ]; then
-            grep -q "SHA-256 digest: 6a02f271f97c014901bf059f1c6263ed0fc2880cec67121efcd0794935b676c6" "$RUNNER_TEMP/ky.txt" \
+            grep -q "SHA-256 digest: d61202648ef473769fe6f976c611db69bb7770a1190c016f1a194d899b7a372b" "$RUNNER_TEMP/ky.txt" \
               || { echo "APK không ký bằng khoá MTVkit cố định: máy đã cài sẽ không cập nhật được, dừng."; exit 1; }
             for f in app/src/main/assets/tvhome.apk app/src/main/assets/tvhome-xiaomi.apk; do
-              "$APKSIGNER" verify --print-certs "$f" | grep -q "SHA-256 digest: 6a02f271f97c014901bf059f1c6263ed0fc2880cec67121efcd0794935b676c6" \
+              "$APKSIGNER" verify --print-certs "$f" | grep -q "SHA-256 digest: d61202648ef473769fe6f976c611db69bb7770a1190c016f1a194d899b7a372b" \
                 || { echo "$f không ký bằng khoá MTVkit cố định, dừng."; exit 1; }
             done
           else

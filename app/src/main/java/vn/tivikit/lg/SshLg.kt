@@ -14,13 +14,33 @@ import javax.net.SocketFactory
 /** Sai mật khẩu root khi đăng nhập SSH. */
 class SshSaiMatKhauException : java.io.IOException("Sai mật khẩu SSH")
 
+/** Khoá máy chủ SSH của tivi LG khác với lần kết nối trước (nghi ngờ giả mạo MITM trên mạng LAN). */
+class SshKhoaDoiException : java.io.IOException("Khoá máy chủ SSH của tivi LG đã thay đổi")
+
 /**
  * SSH root vào tivi LG đã root (Homebrew Channel bật SSH Server: dropbear cổng 22, mặc định root / alpine), chỉ cho việc
- * cần root (Vibehack). Mỗi việc một phiên: nối, chạy, đóng. [mang]: socket của mạng Wi-Fi (xem KetNoiLg).
+ * cần root (Vibehack). Mỗi việc một phiên: nối, chạy, đóng. Ghim khoá máy chủ ở lần nối đầu (TOFU) trước khi gửi mật khẩu.
  */
-class SshLg(private val ip: String, private val matKhau: String, private val mang: SocketFactory?) {
+class SshLg(
+    private val ip: String,
+    private val matKhau: String,
+    private val mang: SocketFactory?,
+    private val dauKhoaDaLuu: String? = null,
+    private val ghiDauKhoa: (String) -> Unit = {},
+) {
     companion object {
         const val CONG = 22
+
+        /** Kiểm tra khoá máy chủ theo cơ chế TOFU: chưa có thì ghim SHA-256 và cho qua; đã có thì bắt buộc khớp. */
+        fun kiemTraTofu(daLuu: String?, khoaMoi: ByteArray, ghiMoi: (String) -> Unit = {}): Boolean {
+            if (khoaMoi.isEmpty()) return false
+            val moi = KetNoiLg.bamSha256(khoaMoi)
+            if (daLuu.isNullOrBlank()) {
+                ghiMoi(moi)
+                return true
+            }
+            return daLuu.equals(moi, ignoreCase = true)
+        }
 
         /** Dòng đầu cổng [cong] của [ip] (lời chào SSH), chờ tối đa [ms]; không mở / không nói gì thì null. */
         fun dongDau(ip: String, cong: Int, ms: Int, mang: SocketFactory?): String? = runCatching {
@@ -34,10 +54,26 @@ class SshLg(private val ip: String, private val matKhau: String, private val man
     }
 
     private fun phien(): Session {
-        val s = JSch().getSession("root", ip, CONG)
+        val jsch = JSch()
+        var daGhim = dauKhoaDaLuu
+        jsch.hostKeyRepository = object : com.jcraft.jsch.HostKeyRepository {
+            override fun check(host: String?, key: ByteArray?): Int {
+                if (key == null || !kiemTraTofu(daGhim, key) { moi -> daGhim = moi; ghiDauKhoa(moi) }) {
+                    return com.jcraft.jsch.HostKeyRepository.CHANGED
+                }
+                return com.jcraft.jsch.HostKeyRepository.OK
+            }
+            override fun add(hostkey: com.jcraft.jsch.HostKey?, ui: UserInfo?) {}
+            override fun remove(host: String?, type: String?) {}
+            override fun remove(host: String?, type: String?, key: ByteArray?) {}
+            override fun getKnownHostsRepositoryID(): String = "mtvkit-tofu"
+            override fun getHostKey(): Array<com.jcraft.jsch.HostKey> = emptyArray()
+            override fun getHostKey(host: String?, type: String?): Array<com.jcraft.jsch.HostKey> = emptyArray()
+        }
+        val s = jsch.getSession("root", ip, CONG)
         s.setPassword(matKhau)
-        // Tivi trong nhà, khoá máy chủ do tivi tự sinh: không đối chiếu (như lần đầu ssh bấm yes).
-        s.setConfig("StrictHostKeyChecking", "no")
+        // Kiểm tra TOFU ngay ở bước trao đổi khoá (trước khi gửi mật khẩu root).
+        s.setConfig("StrictHostKeyChecking", "yes")
         s.setConfig("PreferredAuthentications", "password,keyboard-interactive")
         // dropbear đời cũ chỉ có khoá ssh-rsa (SHA-1): JSch bản mới tắt mặc định, bật lại cho tivi cũ.
         s.setConfig("server_host_key", s.getConfig("server_host_key") + ",ssh-rsa")
@@ -46,7 +82,7 @@ class SshLg(private val ip: String, private val matKhau: String, private val man
             override fun getPassword(): String = matKhau
             override fun promptPassword(message: String?) = true
             override fun promptPassphrase(message: String?) = false
-            override fun promptYesNo(message: String?) = true
+            override fun promptYesNo(message: String?) = false
             override fun showMessage(message: String?) {}
             override fun promptKeyboardInteractive(destination: String?, name: String?, instruction: String?, prompt: Array<out String>?, echo: BooleanArray?): Array<String> =
                 Array(prompt?.size ?: 0) { matKhau }
@@ -57,6 +93,7 @@ class SshLg(private val ip: String, private val matKhau: String, private val man
             override fun getOutputStream(socket: Socket) = socket.getOutputStream()
         })
         try { s.connect(8000) } catch (e: JSchException) {
+            if (e.message?.contains("HostKey", ignoreCase = true) == true) throw SshKhoaDoiException()
             if (e.message?.contains("Auth", ignoreCase = true) == true) throw SshSaiMatKhauException()
             throw e
         }

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+    <permission android:name="vn.tivikit.permission.NOI_BO" android:protectionLevel="signature" />
+    <uses-permission android:name="vn.tivikit.permission.NOI_BO" />
     <!-- Đọc danh sách IPTV theo link của người dùng và phát luồng kênh. -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-feature android:name="android.software.leanback" android:required="false" />
@@ -14,10 +16,11 @@
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
         tools:ignore="MissingTvBanner">
-        <!-- Màn phát: gọi với tên kênh / mã kênh (PhatKenh.TEN, PhatKenh.MA); đang phát thì đổi kênh. -->
+        <!-- Màn phát: gọi với tên kênh / mã kênh (PhatKenh.TEN, PhatKenh.MA); chỉ nhận app ký cùng khoá MTVkit. -->
         <activity
             android:name=".PhatKenh"
             android:exported="true"
+            android:permission="vn.tivikit.permission.NOI_BO"
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
             android:taskAffinity=""

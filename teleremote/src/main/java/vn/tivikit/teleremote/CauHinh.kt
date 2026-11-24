@@ -76,10 +76,10 @@ data class CauHinh(
 class Kho(ctx: Context) {
     private val p = ctx.applicationContext.getSharedPreferences("tele_remote", Context.MODE_PRIVATE)
 
-    /** Token của bot (từ @BotFather); "" = chưa có. */
+    /** Token của bot (từ @BotFather), mã hoá AES-GCM qua AndroidKeyStore; "" = chưa có. */
     var token: String
-        get() = p.getString("token", null).orEmpty()
-        set(v) { p.edit().putString("token", v).apply() }
+        get() = MaHoaKho.docChuoi(p, "token", "mtvkit_tele_v1").orEmpty()
+        set(v) = MaHoaKho.ghiChuoi(p, "token", v, "mtvkit_tele_v1")
 
     /** Username của bot (getMe), không có @. */
     var bot: String

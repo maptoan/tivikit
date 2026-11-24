@@ -199,21 +199,61 @@ class TuChon(private val dv: MapVoiceDichVu) {
 
     /**
      * Link luồng M3U còn trả lời trong 5 giây. Không tìm thấy máy chủ, hết giờ, 404 / 410, 5xx: chết. 401 / 403 có khi chỉ vì
-     * thiếu header riêng của danh sách phát (M3U tự gửi): coi như còn, để M3U thử.
+     * thiếu header riêng của danh sách phát (M3U tự gửi): coi như còn, để M3U thử. Chặn chuyển hướng sang localhost / loopback.
      */
     private fun linkSong(url: String): Boolean = runCatching {
-        val c = URL(url).openConnection() as HttpURLConnection
-        try {
-            c.connectTimeout = 5000; c.readTimeout = 5000; c.instanceFollowRedirects = true
-            c.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android TV) ExoPlayer")
-            c.responseCode.let { it in 200..399 || it == 401 || it == 403 }
-        } finally {
-            c.disconnect()
+        var u = url.trim()
+        repeat(5) {
+            if (!linkAnToan(u)) return false
+            val host = URL(u).host.trim('[', ']')
+            val ds = java.net.InetAddress.getAllByName(host)
+            if (ds.isEmpty() || ds.any { !diaChiHopLe(it) }) return false
+            val c = URL(u).openConnection() as HttpURLConnection
+            try {
+                c.connectTimeout = 5000; c.readTimeout = 5000; c.instanceFollowRedirects = false
+                c.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android TV) ExoPlayer")
+                val ma = c.responseCode
+                if (ma in 300..399) {
+                    u = URL(URL(u), c.getHeaderField("Location") ?: return false).toString()
+                    return@repeat
+                }
+                return ma in 200..299 || ma == 401 || ma == 403
+            } finally {
+                c.disconnect()
+            }
         }
+        false
     }.getOrDefault(false)
 
     companion object {
         const val KHOA_TRE = "vn.tivikit.khoa"
+        private val RE_IP_THO = Regex("""^(?:0x[0-9a-fA-F]+|\d+)(?:\.(?:0x[0-9a-fA-F]+|\d+)){0,3}$""")
+
+        internal fun diaChiHopLe(dc: java.net.InetAddress): Boolean {
+            if (dc.isLoopbackAddress || dc.isAnyLocalAddress || dc.isLinkLocalAddress || dc.isMulticastAddress) return false
+            val b = dc.address
+            if (b.size == 4) {
+                val d0 = b[0].toInt() and 0xFF; val d1 = b[1].toInt() and 0xFF
+                if (d0 == 0 || d0 == 127 || (d0 == 169 && d1 == 254)) return false
+            }
+            return true
+        }
+
+        /** Kiểm tra link luồng là http(s) và không trỏ vào localhost / loopback / link-local. */
+        fun linkAnToan(url: String): Boolean {
+            val s = url.trim()
+            if (s.isEmpty() || s.any { it.isWhitespace() || it.code < 0x20 }) return false
+            val u = runCatching { URL(s) }.getOrNull() ?: return false
+            val gt = u.protocol.lowercase()
+            if (gt != "http" && gt != "https") return false
+            val host = u.host?.trim()?.trim('[', ']')?.lowercase().orEmpty()
+            if (host.isEmpty() || host == "localhost" || host.endsWith(".localhost")) return false
+            if (':' in host || RE_IP_THO.matches(host)) {
+                val dc = runCatching { java.net.InetAddress.getByName(host) }.getOrNull() ?: return false
+                if (!diaChiHopLe(dc)) return false
+            }
+            return true
+        }
         /**
          * Chờ lên tiếng: app mở nguội (màn chào, tải danh sách kênh) / app đang chạy sẵn; thêm [CHO_THEM] khi app đã tạo trình
          * phát. Skyworth (MediaTek, 1/11/2026): VTVgo mở nguội lên tiếng ở giây 15–18, hạn 15 giây cũ bỏ nhầm nguồn tốt.

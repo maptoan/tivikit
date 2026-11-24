@@ -58,3 +58,16 @@ Tài liệu này ghi nhận toàn bộ kết quả rà soát của Hội đồng
 | `app/.../ui/UngDung.kt` & `ManLauncher.kt` | Giải mã ảnh nền và icon bằng `BitmapFactory` trực tiếp trên Main Thread (UI Thread) gây hiện tượng khựng giao diện (jank). | - Chuyển toàn bộ tác vụ giải mã sang `Dispatchers.IO` kết hợp `produceState` bất đồng bộ. |
 | `app/.../lg/KetNoiLg.kt` & `SshLg.kt` | Rò rỉ kết nối HTTP ConnectionPool của OkHttp khi ngắt kết nối TV LG; đọc luồng SSH theo byte làm vỡ ký tự tiếng Việt UTF-8 đa byte. | - Bổ sung `http.connectionPool.evictAll()` khi đóng phiên.<br>- Đọc luồng SSH bằng `InputStreamReader` mã hoá UTF-8 với bộ đệm `CharArray(4096)`. |
 | `app/.../adb/TrenTv.kt` | Lỗi nuốt ký tự hoặc văng ứng dụng khi chuỗi Unicode thoát `\uXXXX` bị lỗi hoặc dở dang. | - Kiểm tra chặt chẽ độ dài chuỗi và kiểm tra ký tự Hex hợp lệ trước khi giải mã ký tự Unicode. |
+
+---
+
+### Giai đoạn 5: Gia cố Phòng thủ Chiều sâu (Defense-in-Depth) cho MTVkit 1.27.0
+
+| Tập tin sửa đổi | Vấn đề được phát hiện | Giải pháp kỹ thuật đã triển khai |
+| :--- | :--- | :--- |
+| `*/src/main/AndroidManifest.xml`, `MoTuDong.kt`, `PhatKenh.kt` | Các Activity nội bộ (`XacNhan`, `KhoaNgay`, `MoTuDong`, `PhatKenh`) đặt `exported="true"` không kèm quyền hệ thống, cho phép app bên thứ 3 trên TV bắn `Intent` giả mạo. | - Khai báo quyền chữ ký số `vn.tivikit.permission.NOI_BO` (`protectionLevel="signature"`) đồng bộ trên 8 module liên thông và gắn cứng lên cả 4 Activity nội bộ, kèm kiểm tra `launchedFromPackage` trên Android 14+. |
+| `app/.../dulieu/GoiY.kt` (`TaiLink`), `BoCaiMau.kt`, `PhienLamViec.kt` | Trình tải APK tự theo redirect `301/302` chưa chặn hạ cấp `HTTPS → HTTP` trên mirror cộng đồng và chưa áp trần kích thước tải. | - Bắt buộc `HTTPS` cho toàn bộ kho gợi ý `GoiY`, cấm tuyệt đối redirect hạ cấp `HTTPS → HTTP`, chặn IP nội bộ/DNS rebinding và giới hạn kích thước gói tải ở mức 1,5 GB. |
+| `iptv/.../DanhSach.kt`, `Kho.kt`, `app/.../Iptv.kt`, `mapvoice/.../TuChon.kt` | Danh sách M3U từ nguồn ngoài có thể cài cắm URL `http://127.0.0.1` / `[::1]` / `169.254.x.x` hoặc `file://` gây lỗi SSRF thăm dò dịch vụ nội bộ trên TV. | - Lọc bỏ mọi địa chỉ loopback (`127.0.0.0/8`, `::1`, dạng số nguyên/hex), link-local (`169.254.0.0/16`) và giao thức ngoài `http/https` ngay khi phân tích M3U lẫn trên từng bước redirect (vẫn giữ tương thích NAS mạng nhà `192.168.x.x`). |
+| `app/.../lg/KetNoiLg.kt`, `SshLg.kt`, `ui/LgTivi.kt` | Chấp nhận mù mọi chứng chỉ tự ký WSS cổng 3001 và SSH Host Key cổng 22 của TV LG, có nguy cơ bị MITM trên mạng LAN không tin cậy. | - Triển khai cơ chế **TOFU (Trust-On-First-Use)**: ghim dấu vân tay SHA-256 của chứng chỉ TLS và khóa SSH ngay lần ghép đôi đầu tiên (trước bước gửi mật khẩu root) và cảnh báo nếu phát hiện tráo khóa. |
+| `MaHoaKho.kt` (`:khoa`, `:teleremote`, `:app`), `khoa/Kho.kt`, `teleremote/CauHinh.kt` | Bot Token Telegram, khóa TOTP Khóa trẻ em và khóa/mật khẩu TV LG lưu dạng rõ trong `SharedPreferences`. | - Mã hoá bằng **AES-256-GCM qua phần cứng `AndroidKeyStore`** (tiền tố `enc1:`, IV ngẫu nhiên 12 byte), tự động nâng cấp mượt từ dữ liệu cũ và giữ nguyên cơ chế *fail-closed* của Khóa trẻ em. |
+

@@ -29,7 +29,7 @@ object HeThong {
 
     enum class LoaiMang { WIFI, DAY, KHAC, KHONG }
 
-    /** [ten] = tên Wi-Fi, chỉ có khi TiviKit đã cấp quyền vị trí (Android chỉ cho app có quyền đó đọc tên Wi-Fi). */
+    /** [ten] = tên Wi-Fi, chỉ có khi MTVkit đã cấp quyền vị trí (Android chỉ cho app có quyền đó đọc tên Wi-Fi). */
     data class Mang(val loai: LoaiMang, val ten: String? = null)
 
     fun mang(ctx: Context): Mang {
@@ -53,7 +53,7 @@ object HeThong {
     /** Android 14 trở đi không cho app đóng tiến trình nền của app khác: nút Dọn RAM ẩn đi. */
     fun donDuocRam() = Build.VERSION.SDK_INT < 34
 
-    /** Gói không bao giờ đóng: chính launcher, TiviKit và các app phụ của nó (Khoá trẻ em, Hẹn giờ…), Home sạch. */
+    /** Gói không bao giờ đóng: chính launcher, MTVkit và các app phụ của nó (Khoá trẻ em, Hẹn giờ…), Home sạch. */
     fun giuLai(goi: String, minh: String) =
         goi == minh || goi == "vn.tivikit" || goi.startsWith("vn.tivikit.") || goi == "com.gathin.tvhome" || goi == "com.ts.launcher"
 
@@ -65,7 +65,7 @@ object HeThong {
 
     /**
      * Gói đã mở trong 3 ngày qua, mới trước, theo thống kê sử dụng (bắt cả app mở bằng giọng nói, nút remote, từ app khác);
-     * rỗng nếu TiviKit chưa cấp quyền (appops GET_USAGE_STATS).
+     * rỗng nếu MTVkit chưa cấp quyền (appops GET_USAGE_STATS).
      */
     fun dungGanDay(ctx: Context): List<String> = runCatching {
         val usm = ctx.getSystemService(UsageStatsManager::class.java) ?: return emptyList()

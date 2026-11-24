@@ -11,7 +11,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * TiviKit đặt / đọc qua ADB:
+ * MTVkit đặt / đọc qua ADB:
  *   content call --uri content://vn.tivikit.mapvoice --method dat --arg '{"bat":true,"cachMo":"theo-cau",…,"cauRieng":[{"chu":"giá vàng","dich":"tro-ly"}]}'
  *   content call --uri content://vn.tivikit.mapvoice --method kenh --arg '{"vtvgo":[{"ten":"VTV1","ma":"1"}],"tv360":[…],"fptplay":[{"ten":"VTV1 HD","ma":"vtv1-hd"}]}'
  *   content call --uri content://vn.tivikit.mapvoice --method thu-tu --arg '[{"ten":"VTV1","nguon":[{"app":"tv360","so":"001"},…]}]'

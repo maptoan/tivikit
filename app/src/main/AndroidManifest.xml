@@ -17,7 +17,7 @@
 
     <application
         android:banner="@drawable/banner_tv"
-        android:label="TiviKit"
+        android:label="MTVkit"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher"
         android:theme="@style/Theme.TvSach"

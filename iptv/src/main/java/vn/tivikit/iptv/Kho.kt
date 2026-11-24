@@ -7,7 +7,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 /**
- * Link danh sách IPTV (TiviKit đặt qua ADB) và bản danh sách đã tải (file + lúc tải). Luôn tải theo link người dùng đặt —
+ * Link danh sách IPTV (MTVkit đặt qua ADB) và bản danh sách đã tải (file + lúc tải). Luôn tải theo link người dùng đặt —
  * link rút gọn cũng được, đi theo chuyển hướng tới file thật mỗi lần — nên danh sách đổi nguồn kênh thì app thấy ở lần tải
  * sau. Mở kênh mà bản đã tải cũ quá [CU] thì tải lại trước; tải không được thì dùng bản cũ.
  */
@@ -68,7 +68,7 @@ class Kho(ctx: Context) {
                 try {
                     c.instanceFollowRedirects = false
                     c.connectTimeout = 10_000; c.readTimeout = 10_000
-                    c.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android TV) TiviKit-IPTV")
+                    c.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android TV) MTVkit-IPTV")
                     val ma = c.responseCode
                     if (ma in 300..399) {
                         u = URL(URL(u), c.getHeaderField("Location") ?: error("chuyen huong rong")).toString()

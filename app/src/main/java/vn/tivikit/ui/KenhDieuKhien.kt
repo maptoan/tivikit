@@ -14,7 +14,7 @@ import vn.tivikit.adb.ThaoTacTv
  * rời màn / app xuống nền / đổi tivi:
  * - phím remote đi qua đây (27/10/2026): tivi nhận ngay, không chờ lệnh `input` khởi động một máy ảo Java (~0,5 giây mỗi
  *   lệnh trên Android 9–10). Chưa mở xong, đứt, hay tivi không chạy được máy chủ thì phím đi đường `input` như cũ;
- * - dán chữ có dấu vào ô đang chọn khi bộ gõ tiếng Việt của TiviKit không chạy được trên tivi.
+ * - dán chữ có dấu vào ô đang chọn khi bộ gõ tiếng Việt của MTVkit không chạy được trên tivi.
  * Thử trên TX3 Mini (Android 9): máy chủ mở trong khoảng 1 giây, tivi báo đã đặt clipboard sau ~20 ms.
  */
 class KenhDieuKhien(private val vm: PhienLamViec) {

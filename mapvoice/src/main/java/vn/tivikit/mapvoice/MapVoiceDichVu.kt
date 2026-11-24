@@ -95,7 +95,7 @@ class MapVoiceDichVu : AccessibilityService() {
 
     /**
      * Làm việc cho câu [cau] (trên luồng [viec]); [epYouTube] = Trợ lý đã tự mở YouTube gốc cho câu này. Việc đã làm dạng
-     * "loại|chi tiết" (ghi nhật ký; TiviKit đọc để hiện): "yt-phat|chữ tìm", "yt-tim|chữ tìm", "yt-app|", "kenh|app|tên",
+     * "loại|chi tiết" (ghi nhật ký; MTVkit đọc để hiện): "yt-phat|chữ tìm", "yt-tim|chữ tìm", "yt-app|", "kenh|app|tên",
      * "mo-app|gói", "tro-ly|chữ của câu riêng", "bo-qua|", "loi|lý do".
      */
     fun xuLy(cau: String, epYouTube: Boolean, laThu: Boolean): Lam {
@@ -122,12 +122,12 @@ class MapVoiceDichVu : AccessibilityService() {
         return ket
     }
 
-    /** Thử một câu gõ từ TiviKit như vừa nói (chờ làm xong, tối đa 15 giây). */
+    /** Thử một câu gõ từ MTVkit như vừa nói (chờ làm xong, tối đa 15 giây). */
     fun thu(cau: String): Lam = runCatching { viec.submit<Lam> { xuLy(cau, epYouTube = false, laThu = true) }.get(15, TimeUnit.SECONDS) }
         .getOrElse { Lam("loi|${it.javaClass.simpleName}") }
 
     /**
-     * App mở YouTube: app chọn ở TiviKit nếu còn trên tivi, không thì SmartTube đầu tiên có trên tivi, rồi TizenTube (YouTube
+     * App mở YouTube: app chọn ở MTVkit nếu còn trên tivi, không thì SmartTube đầu tiên có trên tivi, rồi TizenTube (YouTube
      * gốc chỉ khi được chọn: không chọn thì đó là việc của Trợ lý).
      */
     fun appYouTube(ch: CauHinh = kho.cauHinh): String? =
@@ -212,7 +212,7 @@ class MapVoiceDichVu : AccessibilityService() {
     private fun moApp(goi: String): Intent? = packageManager.getLeanbackLaunchIntentForPackage(goi) ?: packageManager.getLaunchIntentForPackage(goi)
 
     /**
-     * Mở [i]; tivi đang ở màn bảo vệ (câu thử từ TiviKit) thì tắt nó như bấm remote, như app Cast (TrinhPhat.danhThuc), không
+     * Mở [i]; tivi đang ở màn bảo vệ (câu thử từ MTVkit) thì tắt nó như bấm remote, như app Cast (TrinhPhat.danhThuc), không
      * thì app mở phía sau màn bảo vệ.
      */
     @Suppress("DEPRECATION")

@@ -51,7 +51,7 @@ object Dock {
     const val O_VUA = 7
 
     /**
-     * App gần đây theo thống kê sử dụng [suDung] nếu có (TiviKit đã cấp quyền), không thì theo lịch sử mở từ màn Home
+     * App gần đây theo thống kê sử dụng [suDung] nếu có (MTVkit đã cấp quyền), không thì theo lịch sử mở từ màn Home
      * [lichSu]; bỏ các gói [boQua] (launcher, chính màn Home). Mặc định lấy đủ chỗ trống còn lại cho dock vừa [O_VUA] ô.
      */
     fun ganDayTu(suDung: List<String>, lichSu: List<String>, dock: List<String>, coTren: Set<String>, boQua: Set<String>,

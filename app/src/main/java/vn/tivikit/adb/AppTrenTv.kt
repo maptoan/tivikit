@@ -37,7 +37,7 @@ class AppTrenTv(private val adb: KetNoiAdb) {
 
     /**
      * RAM, bộ nhớ, thời gian chạy, tải CPU, nhiệt độ, ai đang ăn CPU và CPU bận trong 1 giây (hai dòng /proc/stat cách nhau
-     * 1 giây, kèm utime / stime của chính TiviKit nếu nó chạy trên tivi để trừ ra), một lệnh shell (màn Làm mới tivi).
+     * 1 giây, kèm utime / stime của chính MTVkit nếu nó chạy trên tivi để trừ ra), một lệnh shell (màn Làm mới tivi).
      */
     fun tinhTrang(): TinhTrangTv = tuTinhTrang(sh("cat /proc/meminfo; echo @@; cat /proc/uptime; echo @@; df -k /data; echo @@; " +
         "cat /proc/loadavg; echo @@; cat /sys/devices/system/cpu/possible; echo @@; cat /sys/class/thermal/thermal_zone0/temp 2>/dev/null; " +

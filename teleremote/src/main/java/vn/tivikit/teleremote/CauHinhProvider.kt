@@ -13,7 +13,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * TiviKit đặt / đọc qua ADB:
+ * MTVkit đặt / đọc qua ADB:
  *   content call --uri content://vn.tivikit.teleremote --method token --arg '{"token":"123456:ABC…"}'  ("" = bỏ bot)
  *   content call --uri content://vn.tivikit.teleremote --method dat --arg '{"bat":true,"nguoiDung":[{"ten":"@abc","vaiTro":"chu"}],…}'
  *   content call --uri content://vn.tivikit.teleremote --method doc
@@ -26,7 +26,7 @@ import org.json.JSONObject
  *     (trong thư mục của app); trả chữ bot sẽ trả lời kèm chữ trên nút; để thử không cần Telegram)
  *   xin-them-gio (lý do khoá) / sap-tat (lúc tắt, ms): app Khoá trẻ em / Hẹn giờ báo để bot nhắn chủ tivi kèm nút.
  * Chỉ nhận lời gọi từ shell (ADB) hoặc root: app khác trên tivi không đọc được token hay đổi người được dùng. Riêng
- * xin-them-gio, sap-tat thì app phụ cùng khoá ký với TiviKit cũng gọi được (chỉ làm bot nhắn chủ tivi).
+ * xin-them-gio, sap-tat thì app phụ cùng khoá ký với MTVkit cũng gọi được (chỉ làm bot nhắn chủ tivi).
  */
 class CauHinhProvider : ContentProvider() {
     override fun onCreate() = true
@@ -34,7 +34,7 @@ class CauHinhProvider : ContentProvider() {
     override fun call(method: String, arg: String?, extras: Bundle?): Bundle {
         val uid = Binder.getCallingUid()
         val ctx = context!!
-        // App phụ khác của TiviKit (cùng khoá ký) báo việc cần nhắn chủ tivi: trẻ xin thêm giờ (Khoá trẻ em), tivi sắp tắt và
+        // App phụ khác của MTVkit (cùng khoá ký) báo việc cần nhắn chủ tivi: trẻ xin thêm giờ (Khoá trẻ em), tivi sắp tắt và
         // Auto Reboot lỗi / bỏ qua (Hẹn giờ).
         val cungKhoa = runCatching { ctx.packageManager.checkSignatures(uid, Process.myUid()) == PackageManager.SIGNATURE_MATCH }.getOrDefault(false)
         if (uid != Process.SHELL_UID && uid != 0 && uid != Process.myUid() && !(cungKhoa && method in BAO_TU_APP)) throw SecurityException("chỉ ADB")
@@ -142,7 +142,7 @@ class CauHinhProvider : ContentProvider() {
                 // "anh": ảnh coi như người dùng vừa gửi (thử 🖼 Đặt làm ảnh nền không cần Telegram); chỉ ảnh trong thư mục của app.
                 j.optString("anh").takeIf { it.isNotEmpty() }?.let(::File)?.takeIf { it.isFile && it.canonicalPath.contains("/vn.tivikit.teleremote/") }
                     ?.let { dv.anhCuoi = it }
-                val nd = kho.cauHinh.nguoiDung.firstOrNull { it.vaiTro == vt } ?: NguoiDung("@thu", 1, vt, "TiviKit")
+                val nd = kho.cauHinh.nguoiDung.firstOrNull { it.vaiTro == vt } ?: NguoiDung("@thu", 1, vt, "MTVkit")
                 val ra = GhiRa()
                 // Chat riêng của lệnh thử (không phải chat thật của người đó): việc đang chờ trả lời (gõ chữ, mã mở khoá) của
                 // người đang dùng bot trên Telegram không bị lệnh thử lấy mất.
@@ -157,7 +157,7 @@ class CauHinhProvider : ContentProvider() {
     }
 
     /**
-     * Danh sách TiviKit gửi, giữ ID / tên hiện tivi đã ghi cho cùng người: TiviKit đọc trạng thái trước khi người đó nhắn
+     * Danh sách MTVkit gửi, giữ ID / tên hiện tivi đã ghi cho cùng người: MTVkit đọc trạng thái trước khi người đó nhắn
      * bot lần đầu thì gửi lại mục chưa có ID, không được làm mất ID.
      */
     private fun ghep(cu: CauHinh, moi: CauHinh): CauHinh = moi.copy(nguoiDung = moi.nguoiDung.map { m ->

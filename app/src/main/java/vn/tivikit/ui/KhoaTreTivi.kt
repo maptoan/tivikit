@@ -18,8 +18,8 @@ import java.util.Locale
  * Khoá trẻ em (23/10/2026; tách khỏi PhienLamViec 28/10/2026): soạn giờ khoá, giới hạn mỗi ngày, mã mở khoá rồi lưu lên
  * app khoá trên tivi (module khoa/).
  *
- * Mã OTP (28/10/2026) thay PIN 4 số: lúc cài, TiviKit tạo mã gốc (MaOtp), phụ huynh quét QR vào app xác thực, cất mã gốc
- * và 10 mã dự phòng. TiviKit không giữ lại mã gốc. Tivi đã có mã thì vào màn này, Dòng lệnh ADB hay Khôi phục đều phải
+ * Mã OTP (28/10/2026) thay PIN 4 số: lúc cài, MTVkit tạo mã gốc (MaOtp), phụ huynh quét QR vào app xác thực, cất mã gốc
+ * và 10 mã dự phòng. MTVkit không giữ lại mã gốc. Tivi đã có mã thì vào màn này, Dòng lệnh ADB hay Khôi phục đều phải
  * nhập mã: tivi kiểm tra rồi trả một phiên ngắn để ghi cấu hình. Trẻ cầm điện thoại của bố mẹ cũng không tắt được khoá.
  */
 class KhoaTreTivi(private val vm: PhienLamViec) {
@@ -293,13 +293,13 @@ class KhoaTreTivi(private val vm: PhienLamViec) {
     }
 
     fun tat(): Unit = vm.chay(t("Đang tắt khoá…", "Turning the lock off…")) {
-        // Như mọi việc khác ở màn này: quá 15 phút từ lần nhập mã thì hỏi lại (28/10/2026: trước đây để TiviKit mở sẵn màn
+        // Như mọi việc khác ở màn này: quá 15 phút từ lần nhập mã thì hỏi lại (28/10/2026: trước đây để MTVkit mở sẵn màn
         // Khoá trẻ em thì ai cầm điện thoại cũng gỡ được khoá, không cần mã).
         val p = if (coOtp && !goDuoc) phienHoac { tat() } ?: return@chay else null
         vm.io { vm.tv.tatKhoa(go = true, phien = p) }
         trenTv = null; thoiGian = null; huyMaMoi(); boPhien()
-        bao = t("Đã tắt và gỡ Khoá trẻ em khỏi tivi. Dòng TiviKit trong app xác thực không dùng nữa, xoá được.",
-            "The Kids lock is off and removed from the TV. You can delete the TiviKit entry in the authenticator app.")
+        bao = t("Đã tắt và gỡ Khoá trẻ em khỏi tivi. Dòng MTVkit trong app xác thực không dùng nữa, xoá được.",
+            "The Kids lock is off and removed from the TV. You can delete the MTVkit entry in the authenticator app.")
     }
 
     // ---------- Khoá theo app (28/10/2026) ----------

@@ -66,7 +66,7 @@ object LamMoi {
      * Phần trăm CPU bận trên cả chip giữa hai dòng "cpu …" của /proc/stat (27/10/2026). Tải trung bình không đo được CPU trên
      * tivi chip MStar / MediaTek: luồng nhân của driver video nằm chờ (trạng thái D) cũng tính vào tải — Skyworth SWTV-22AE
      * đang phát SmartTube báo tải 70 trên 4 nhân mà CPU chỉ bận 42%. Bận = tổng − rảnh − chờ đĩa (8 cột đầu; guest đã nằm
-     * trong user). TiviKit chạy ngay trên tivi thì lệnh in thêm dòng "utime stime" của chính nó sau mỗi dòng cpu: phần đó
+     * trong user). MTVkit chạy ngay trên tivi thì lệnh in thêm dòng "utime stime" của chính nó sau mỗi dòng cpu: phần đó
      * trừ ra (TX3: vẽ màn vừa mở + vòng chờ làm số đo lên 81% trong khi tivi chỉ bận 13–24%). Không đủ hai dòng / không đổi
      * gì thì null.
      */

@@ -13,7 +13,7 @@ import org.json.JSONObject
 object ChuBot {
     private fun t(en: Boolean, vi: String, enS: String) = if (en) enS else vi
 
-    /** "1,3 GB" (tiếng Việt dùng dấu phẩy, như TiviKit Launcher) / "1.3 GB"; dưới 1 GB thì MB. */
+    /** "1,3 GB" (tiếng Việt dùng dấu phẩy, như MTVkit Launcher) / "1.3 GB"; dưới 1 GB thì MB. */
     fun gb(b: Long, en: Boolean): String = if (b >= 1L shl 30) String.format(if (en) Locale.US else Locale("vi"), "%.1f GB", b / (1L shl 30).toDouble())
         else "${b / (1L shl 20)} MB"
 
@@ -36,7 +36,7 @@ object ChuBot {
         return if (a.toLocalDate() == Instant.ofEpochMilli(bay).atZone(mui).toLocalDate()) hhmm else "${a.dayOfMonth}/${a.monthValue} $hhmm"
     }
 
-    /** Một dòng nhật ký nói bằng lời (như "Việc vừa làm" của TiviKit): "kenh|VTV1" → "mở kênh VTV1". */
+    /** Một dòng nhật ký nói bằng lời (như "Việc vừa làm" của MTVkit): "kenh|VTV1" → "mở kênh VTV1". */
     fun moTaViec(viec: String, en: Boolean, tenApp: (String) -> String): String {
         val sau = viec.substringAfter('|', "")
         return when (viec.substringBefore('|')) {
@@ -93,11 +93,11 @@ object ChuBot {
     /** Các app sắp đóng ([ten], đã xếp) và câu hỏi; không có app nào thì nói vậy. */
     fun hoiDaNhiem(ten: List<String>, tenTivi: String, en: Boolean): String {
         val dau = "🗂 ${t(en, "Tắt đa nhiệm", "Close all apps")} · $tenTivi"
-        if (ten.isEmpty()) return "$dau\n" + t(en, "Không có app nào đang mở, ngoài app hệ thống của tivi và TiviKit.",
-            "No apps are open apart from the TV's system apps and TiviKit.")
+        if (ten.isEmpty()) return "$dau\n" + t(en, "Không có app nào đang mở, ngoài app hệ thống của tivi và MTVkit.",
+            "No apps are open apart from the TV's system apps and MTVkit.")
         return "$dau\n" + t(en, "Đang mở ${ten.size} app: ", "${ten.size} apps are open: ") + ten.joinToString(", ") + "\n" +
-            t(en, "Đóng hết? App hệ thống của tivi và TiviKit vẫn chạy; app đang xem cũng đóng, tivi về Home.",
-                "Close them all? The TV's system apps and TiviKit keep running; the app on screen closes too and the TV goes Home.")
+            t(en, "Đóng hết? App hệ thống của tivi và MTVkit vẫn chạy; app đang xem cũng đóng, tivi về Home.",
+                "Close them all? The TV's system apps and MTVkit keep running; the app on screen closes too and the TV goes Home.")
     }
 
     /** Đã đóng [ten], RAM trống trước / sau. */
@@ -154,8 +154,8 @@ object ChuBot {
         }
         if (lich.isEmpty() && motLan.isEmpty()) dong += t(en, "Chưa hẹn gì.", "Nothing scheduled.")
         if (j.has("dichVuChay") && !j.optBoolean("dichVuChay")) dong += t(en,
-            "⚠️ Dịch vụ Hẹn giờ trên tivi đang tắt: mở TiviKit → Hẹn giờ, bấm Bật lại.", "⚠️ The Timer service on the TV is off: open TiviKit → Timer and turn it on again.")
-        dong += t(en, "Lịch hằng tuần đặt ở TiviKit → Hẹn giờ.", "Set the weekly schedule in TiviKit → Timer.")
+            "⚠️ Dịch vụ Hẹn giờ trên tivi đang tắt: mở MTVkit → Hẹn giờ, bấm Bật lại.", "⚠️ The Timer service on the TV is off: open MTVkit → Timer and turn it on again.")
+        dong += t(en, "Lịch hằng tuần đặt ở MTVkit → Hẹn giờ.", "Set the weekly schedule in MTVkit → Timer.")
         val nut = motLan.mapNotNull { m ->
             m.optString("id").takeIf { it.isNotEmpty() }?.let { it to "${gio(m.optLong("luc"), bay, mui)} " + viecHen(m.optString("loai"), null, en, tenApp) }
         }
@@ -169,9 +169,9 @@ object ChuBot {
     fun khoa(j: JSONObject, tenTivi: String, bay: Long, en: Boolean, mui: ZoneId, tenApp: (String) -> String): String {
         val dong = mutableListOf("🔒 ${t(en, "Khoá trẻ em", "Kids lock")} · $tenTivi")
         if (j.has("dichVuChay") && !j.optBoolean("dichVuChay")) dong += t(en,
-            "⚠️ Dịch vụ Khoá trẻ em trên tivi đang tắt: mở TiviKit → Khoá trẻ em.", "⚠️ The Kids lock service on the TV is off: open TiviKit → Kids lock.")
+            "⚠️ Dịch vụ Khoá trẻ em trên tivi đang tắt: mở MTVkit → Khoá trẻ em.", "⚠️ The Kids lock service on the TV is off: open MTVkit → Kids lock.")
         if (!j.optBoolean("bat")) {
-            dong += t(en, "Khoá trẻ em đang tắt: bật và đặt giờ ở TiviKit → Khoá trẻ em.", "Kids lock is off: turn it on and set the hours in TiviKit → Kids lock.")
+            dong += t(en, "Khoá trẻ em đang tắt: bật và đặt giờ ở MTVkit → Khoá trẻ em.", "Kids lock is off: turn it on and set the hours in MTVkit → Kids lock.")
             return dong.joinToString("\n")
         }
         val lyDo = j.optString("lyDo")
@@ -247,12 +247,12 @@ object ChuBot {
         }
     }
 
-    // ---------- Làm mới (như màn Làm mới tivi của TiviKit) ----------
+    // ---------- Làm mới (như màn Làm mới tivi của MTVkit) ----------
 
     /** Số đo của tivi: RAM (byte), CPU bận (%, null = không đo được), nhiệt độ chip (°C), thời gian chạy, bộ nhớ (byte). */
     data class SoDo(val ramTong: Long, val ramCon: Long, val cpu: Int?, val nhiet: Int?, val msChay: Long, val boNhoTong: Long, val boNhoCon: Long)
 
-    /** Phần trăm CPU bận giữa dòng "cpu …" đầu và cuối của /proc/stat (bận = tổng − rảnh − chờ đĩa), như TiviKit. */
+    /** Phần trăm CPU bận giữa dòng "cpu …" đầu và cuối của /proc/stat (bận = tổng − rảnh − chờ đĩa), như MTVkit. */
     fun tuProcStat(s: String): Int? {
         val dong = s.lineSequence().map { it.trim() }.filter { it.startsWith("cpu ") }.toList()
         if (dong.size < 2) return null
@@ -271,7 +271,7 @@ object ChuBot {
         return (if (v >= 1000) v / 1000 else v).toInt().takeIf { it in 1..150 }
     }
 
-    /** Bộ nhớ gần đầy: trống dưới 1 GB hay dưới 15% (như TiviKit; Android tự báo thiếu chỗ ở 10%). */
+    /** Bộ nhớ gần đầy: trống dưới 1 GB hay dưới 15% (như MTVkit; Android tự báo thiếu chỗ ở 10%). */
     fun boNhoGanDay(tong: Long, con: Long): Boolean = tong > 0 && con < maxOf(1L shl 30, tong * 15 / 100)
 
     fun lamMoi(sd: SoDo, tenTivi: String, en: Boolean): String {

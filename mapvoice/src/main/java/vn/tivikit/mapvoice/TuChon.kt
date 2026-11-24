@@ -30,7 +30,7 @@ class TuChon(private val dv: MapVoiceDichVu) {
     private enum class KetQua { PHAT, KHONG, THOI }
 
     /**
-     * Mở kênh [ten] bằng một trong [nguon] (ô Auto: nguồn TiviKit đã tìm khi lưu ô; [coDinh] = thứ tự riêng người dùng đặt,
+     * Mở kênh [ten] bằng một trong [nguon] (ô Auto: nguồn MTVkit đã tìm khi lưu ô; [coDinh] = thứ tự riêng người dùng đặt,
      * thử đúng thứ tự đó); lời gọi mới huỷ việc cũ.
      */
     fun mo(ten: String, nguon: List<Nguon>, coDinh: Boolean = false) {
@@ -70,7 +70,7 @@ class TuChon(private val dv: MapVoiceDichVu) {
     private fun phimTatM3u(): List<Nguon> =
         if (!dv.coApp(TuChonNguon.GOI_M3U)) emptyList() else dv.adb(TuChonNguon.LENH_PHIM_TAT_M3U, 5000)?.let(TuChonNguon::kenhM3u).orEmpty()
 
-    /** Nguồn M3U của ô chưa có link (TiviKit chỉ gửi mã kênh): lấy link trong phím tắt cùng mã để thử trước. */
+    /** Nguồn M3U của ô chưa có link (MTVkit chỉ gửi mã kênh): lấy link trong phím tắt cùng mã để thử trước. */
     private fun dienLink(ds: List<Nguon>): List<Nguon> {
         if (ds.none { it.app == TuChonNguon.M3U && it.url.isEmpty() }) return ds
         val link = phimTatM3u().associate { it.ma to it.url }
@@ -237,7 +237,7 @@ class TuChon(private val dv: MapVoiceDichVu) {
             TuChonNguon.VTVGO -> Intent(Intent.ACTION_VIEW, Uri.parse("vtvgo://play?mediaType=CHANNEL&contentId=${n.ma}")).setPackage(n.goi)
             // Deep link màn xem truyền hình của FPT Play bản tivi.
             TuChonNguon.FPT -> Intent(Intent.ACTION_VIEW, Uri.parse("https://fptplay.vn/xem-truyen-hinh/${n.ma}")).setPackage(n.goi)
-            // Màn phát của app IPTV của TiviKit: nó tự tìm link kênh trong danh sách mới nhất.
+            // Màn phát của app IPTV của MTVkit: nó tự tìm link kênh trong danh sách mới nhất.
             TuChonNguon.IPTV -> Intent().setClassName(TuChonNguon.GOI_IPTV, TuChonNguon.IPTV_PHAT).putExtra("ma", n.ma).putExtra("ten", n.ten)
             // Màn phát của M3U kèm mã kênh (như phím tắt Create Shortcut của M3U).
             TuChonNguon.M3U -> Intent(Intent.ACTION_VIEW).setClassName(TuChonNguon.GOI_M3U, TuChonNguon.M3U_PHAT)

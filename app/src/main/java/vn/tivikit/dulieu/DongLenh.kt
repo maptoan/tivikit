@@ -7,7 +7,7 @@ private val TEN_GOI = Regex("""^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)+$""")
 /** Một thành phần gói/lớp, VD com.vidu/.DichVu. */
 private val THANH_PHAN = Regex("""^[A-Za-z_][A-Za-z0-9_]*(\.[A-Za-z0-9_]+)+/[A-Za-z0-9_.]+$""")
 private val KHOA_CAI_DAT = Regex("""^[A-Za-z0-9_.:\-]+$""")
-/** Bản sao lưu TiviKit trên tivi (như ThaoTacTv.TEP_SAO_LUU_TV). */
+/** Bản sao lưu MTVkit trên tivi (như ThaoTacTv.TEP_SAO_LUU_TV). */
 private const val SAO_LUU_TV = "/data/local/tmp/cleantv-sao-luu.json"
 
 /**
@@ -88,7 +88,7 @@ object DongLenh {
         FILE("Bộ nhớ & file", "Storage & files"),
         NHAT_KY("Nhật ký & chẩn đoán", "Logs & diagnostics"),
         HE_THONG("Cài đặt hệ thống", "System settings"),
-        TIVIKIT("TiviKit trên tivi", "TiviKit on the TV"),
+        TIVIKIT("MTVkit trên tivi", "MTVkit on the TV"),
         NGUON("Khởi động lại & nguồn", "Restart & power");
 
         val ten: String get() = t(vi, en)
@@ -134,8 +134,8 @@ object DongLenh {
             l("pm list packages | grep -i {tukhoa}", "Tìm tên gói theo từ khoá, VD youtube, netflix.", "Find package names by keyword, e.g. youtube, netflix.")
             l("monkey -p {goi} -c android.intent.category.LEANBACK_LAUNCHER 1", "Mở app trên tivi.", "Open an app on the TV.")
             l("am force-stop {goi}", "Buộc dừng app đang treo hoặc chạy lỗi.", "Force-stop a frozen or misbehaving app.")
-            l("pm disable-user --user 0 {goi}", "Tắt app: biến khỏi tivi, không chạy nữa, dữ liệu giữ nguyên. TiviKit ghi vào bản sao lưu để Khôi phục tivi bật lại.",
-                "Disable an app: hidden and stopped, data kept. TiviKit records it in the backup so Restore turns it back on.")
+            l("pm disable-user --user 0 {goi}", "Tắt app: biến khỏi tivi, không chạy nữa, dữ liệu giữ nguyên. MTVkit ghi vào bản sao lưu để Khôi phục tivi bật lại.",
+                "Disable an app: hidden and stopped, data kept. MTVkit records it in the backup so Restore turns it back on.")
             l("pm enable --user 0 {goi}", "Bật lại app đã tắt.", "Re-enable a disabled app.")
             l("pm list packages -d", "Các gói đang bị tắt.", "Disabled packages.")
             l("pm clear {goi}", "Xoá toàn bộ dữ liệu app như mới cài (mất đăng nhập, cài đặt trong app). Hay chữa được app lỗi hoài.",
@@ -163,8 +163,8 @@ object DongLenh {
             l("pm list packages -s", "App hệ thống.", "System apps.")
             l("pm path {goi}", "Đường dẫn file APK của app.", "Where the app's APK file is.")
             l("dumpsys meminfo {goi}", "RAM app đang dùng (dòng TOTAL).", "RAM used by an app (TOTAL row).")
-            l("pm install -r {file}", "Cài file APK đã có trên tivi, VD file gửi bằng TiviKit vào /sdcard/Download/TiviKit (cài từ điện thoại thì dùng mục Cài app).",
-                "Install an APK already on the TV, e.g. one sent by TiviKit into /sdcard/Download/TiviKit (from the phone, use Install apps).")
+            l("pm install -r {file}", "Cài file APK đã có trên tivi, VD file gửi bằng MTVkit vào /sdcard/Download/TiviKit (cài từ điện thoại thì dùng mục Cài app).",
+                "Install an APK already on the TV, e.g. one sent by MTVkit into /sdcard/Download/TiviKit (from the phone, use Install apps).")
             l("pm set-app-link --user 0 {goi} always", "Luôn mở link của app bằng chính nó, không hỏi chọn app (Android 11 trở xuống; VD link YouTube mở bằng SmartTube). Dễ hơn: dùng Set App Link.",
                 "Always open the app's links in it without asking (Android 11 and older; e.g. YouTube links in SmartTube). Easier: use Set App Link.")
             l("pm set-app-links-user-selection --user 0 --package {goi} true all", "Như lệnh trên, cho Android 12 trở lên.", "Same as above, for Android 12 and newer.")
@@ -265,8 +265,8 @@ object DongLenh {
             l("ip neigh", "Thiết bị cùng mạng tivi đã liên lạc gần đây (IP, địa chỉ MAC).", "Devices on the network the TV talked to recently (IP, MAC).")
             l("netstat -tln", "Cổng TCP đang mở trên tivi (5555 là ADB).", "Open TCP ports on the TV (5555 is ADB).")
             l("svc wifi enable", "Bật Wi-Fi (khi tivi đang nối dây mạng).", "Turn Wi-Fi on (while connected by cable).")
-            l("svc wifi disable", "Tắt Wi-Fi — nếu TiviKit nối qua Wi-Fi thì mất kết nối, phải bật lại bằng remote.",
-                "Turn Wi-Fi off — if TiviKit uses Wi-Fi the link drops; turn it back on with the remote.")
+            l("svc wifi disable", "Tắt Wi-Fi — nếu MTVkit nối qua Wi-Fi thì mất kết nối, phải bật lại bằng remote.",
+                "Turn Wi-Fi off — if MTVkit uses Wi-Fi the link drops; turn it back on with the remote.")
         }
         with(Nhom.REMOTE) {
             l("input keyevent KEYCODE_HOME", "Bấm Home.", "Press Home.")
@@ -329,7 +329,7 @@ object DongLenh {
         with(Nhom.FILE) {
             l("df -h", "Dung lượng mọi phân vùng và ổ USB.", "Space on every partition and USB drive.")
             l("ls -la /sdcard/Download", "File trong thư mục Download.", "Files in Download.")
-            l("ls -la /sdcard/Download/TiviKit", "File đã gửi từ TiviKit.", "Files sent from TiviKit.")
+            l("ls -la /sdcard/Download/TiviKit", "File đã gửi từ MTVkit.", "Files sent from MTVkit.")
             l("du -sh /sdcard/* 2>/dev/null", "Mỗi thư mục trong bộ nhớ trong chiếm bao nhiêu.", "How much each folder in internal storage takes.")
             l("find /sdcard -type f -size +100M 2>/dev/null", "File lớn hơn 100 MB (hay là phim tải về quên xoá).", "Files over 100 MB (often forgotten downloads).")
             l("ls /storage", "Ổ USB, thẻ nhớ đang cắm (tên dạng 1234-ABCD).", "Plugged-in USB drives and cards (named like 1234-ABCD).")
@@ -340,7 +340,7 @@ object DongLenh {
             l("cp {file} {dich}", "Chép file.", "Copy a file.")
             l("mv {file} {dich}", "Chuyển hoặc đổi tên file.", "Move or rename a file.")
             l("mkdir -p {thumuc}", "Tạo thư mục.", "Create a folder.")
-            l("rm -r /sdcard/Download/TiviKit", "Xoá mọi file đã gửi từ TiviKit.", "Delete everything sent from TiviKit.")
+            l("rm -r /sdcard/Download/TiviKit", "Xoá mọi file đã gửi từ MTVkit.", "Delete everything sent from MTVkit.")
             l("sha256sum {file}", "Mã SHA-256 của file: so với mã trên trang tải để biết file không hỏng, không bị sửa.",
                 "A file's SHA-256: compare with the download page to make sure it's intact.")
         }
@@ -363,8 +363,8 @@ object DongLenh {
         }
         with(Nhom.HE_THONG) {
             l("settings get {bang} {khoa}", "Đọc một cài đặt (bảng: global, secure hoặc system).", "Read one setting (table: global, secure or system).")
-            l("settings put {bang} {khoa} {giatri}", "Ghi một cài đặt; TiviKit in giá trị cũ ra trước để đổi lại được.",
-                "Write a setting; TiviKit prints the old value first so you can undo.")
+            l("settings put {bang} {khoa} {giatri}", "Ghi một cài đặt; MTVkit in giá trị cũ ra trước để đổi lại được.",
+                "Write a setting; MTVkit prints the old value first so you can undo.")
             l("settings delete {bang} {khoa}", "Xoá một cài đặt (tivi dùng lại mặc định).", "Delete a setting (the TV goes back to its default).")
             l("settings list global", "Toàn bộ cài đặt global.", "All global settings.")
             l("settings list secure", "Toàn bộ cài đặt secure.", "All secure settings.")
@@ -378,15 +378,15 @@ object DongLenh {
             l("cmd overlay list", "Lớp phủ giao diện (overlay) đang có.", "UI overlays.")
         }
         with(Nhom.TIVIKIT) {
-            l("pm list packages | grep vn.tivikit", "App phụ TiviKit có trên tivi: Kênh nhanh, Hẹn giờ, Khoá trẻ em, bộ gõ.",
-                "TiviKit helper apps on the TV: Quick channel, Timer, Kids lock, typing.")
-            l("cat $SAO_LUU_TV", "Bản sao lưu TiviKit cất trên tivi: các gói đã tắt, Home cũ, DNS cũ.",
-                "TiviKit's backup stored on the TV: disabled packages, old Home, old DNS.")
+            l("pm list packages | grep vn.tivikit", "App phụ MTVkit có trên tivi: Kênh nhanh, Hẹn giờ, Khoá trẻ em, bộ gõ.",
+                "MTVkit helper apps on the TV: Quick channel, Timer, Kids lock, typing.")
+            l("cat $SAO_LUU_TV", "Bản sao lưu MTVkit cất trên tivi: các gói đã tắt, Home cũ, DNS cũ.",
+                "MTVkit's backup stored on the TV: disabled packages, old Home, old DNS.")
             l("dumpsys package com.gathin.tvhome | grep -E 'versionName|lastUpdateTime'", "Phiên bản Home sạch trên tivi (bản cho Xiaomi: com.ts.launcher).",
                 "The clean Home's version on the TV (Xiaomi build: com.ts.launcher).")
             l("settings get secure enabled_accessibility_services", "Dịch vụ trợ năng đang bật (Home sạch, Hẹn giờ, Khoá trẻ em dùng mục này).",
                 "Accessibility services that are on (the clean Home, Timer and Kids lock use them).")
-            l("ls -la /data/local/tmp", "Thư mục tạm của ADB (TiviKit cất bản sao lưu ở đây).", "ADB's temp folder (where TiviKit keeps its backup).")
+            l("ls -la /data/local/tmp", "Thư mục tạm của ADB (MTVkit cất bản sao lưu ở đây).", "ADB's temp folder (where MTVkit keeps its backup).")
         }
         with(Nhom.NGUON) {
             l("reboot", "Khởi động lại tivi (nút Khởi động lại ở màn chính thì tự nối lại sau khi tivi lên).",
@@ -573,7 +573,7 @@ object DongLenh {
     /** BAO: chỉ in ra rồi chạy; CAN_THAN: hỏi lại; NGUY_HIEM: hỏi lại, phải tích "tôi hiểu"; KHONG_CHAY: không gửi lên tivi. */
     enum class MucDo { BAO, CAN_THAN, NGUY_HIEM, KHONG_CHAY }
 
-    /** Một lời cảnh báo; [ma] cho biết luật nào bắt (thử nghiệm dùng); [matKetNoi]: chạy xong TiviKit mất kết nối với tivi. */
+    /** Một lời cảnh báo; [ma] cho biết luật nào bắt (thử nghiệm dùng); [matKetNoi]: chạy xong MTVkit mất kết nối với tivi. */
     class CanhBao(val ma: String, val mucDo: MucDo, private val vi: String, private val en: String, val matKetNoi: Boolean = false) {
         val chu: String get() = t(vi, en)
     }
@@ -712,8 +712,8 @@ object DongLenh {
         }
         fun tiviKit() = goi.filter { it.startsWith("vn.tivikit") }.forEach { p ->
             them(CanhBao("tivikit:$p", MucDo.BAO,
-                "$p là app phụ của TiviKit (Kênh nhanh, Hẹn giờ, Khoá trẻ em, bộ gõ): tắt hoặc gỡ thì tính năng đó ngừng chạy.",
-                "$p is a TiviKit helper (Quick channel, Timer, Kids lock, typing): disabling or removing it stops that feature."))
+                "$p là app phụ của MTVkit (Kênh nhanh, Hẹn giờ, Khoá trẻ em, bộ gõ): tắt hoặc gỡ thì tính năng đó ngừng chạy.",
+                "$p is a MTVkit helper (Quick channel, Timer, Kids lock, typing): disabling or removing it stops that feature."))
         }
         when (lenh) {
             "disable", "disable-user", "disable-until-used" -> {
@@ -778,12 +778,12 @@ object DongLenh {
 
     private fun canhBaoAdb(lenh: String?): CanhBao {
         val (vi, en) = when (lenh) {
-            "install", "install-multiple", "install-multi-package" -> "Cài app: dùng mục Cài app của TiviKit, hoặc pm install với file APK đã có trên tivi." to
-                "To install apps use TiviKit's Install apps, or pm install with an APK already on the TV."
-            "push", "pull", "sync" -> "Chép file lên tivi: dùng Gửi ảnh, video của TiviKit." to "To copy files to the TV, use TiviKit's Send photos, videos."
+            "install", "install-multiple", "install-multi-package" -> "Cài app: dùng mục Cài app của MTVkit, hoặc pm install với file APK đã có trên tivi." to
+                "To install apps use MTVkit's Install apps, or pm install with an APK already on the TV."
+            "push", "pull", "sync" -> "Chép file lên tivi: dùng Gửi ảnh, video của MTVkit." to "To copy files to the TV, use MTVkit's Send photos, videos."
             "reboot" -> "Khởi động lại: gõ reboot (bỏ chữ adb)." to "To restart, type reboot (without adb)."
             "devices", "connect", "disconnect", "pair", "tcpip", "usb", "kill-server", "start-server", "root", "unroot" ->
-                "TiviKit đã tự nối với tivi, không cần lệnh này." to "TiviKit is already connected; this isn't needed."
+                "MTVkit đã tự nối với tivi, không cần lệnh này." to "MTVkit is already connected; this isn't needed."
             else -> "Ở đây chỉ gõ phần sau chữ \"adb shell\"." to "Here, type only what comes after \"adb shell\"."
         }
         return CanhBao("adb", MucDo.KHONG_CHAY, "Lệnh adb chạy trên máy tính, không chạy trên tivi. $vi", "adb commands run on a computer, not on the TV. $en")
@@ -845,17 +845,17 @@ object DongLenh {
         "Định dạng / xoá phân vùng: mất toàn bộ dữ liệu trên đó, có thể hỏng tivi.",
         "Formats or erases a partition: everything on it is lost, and the TV may be bricked.")
     private val CB_TAT_WIFI = CanhBao("tat-wifi", MucDo.NGUY_HIEM,
-        "Tắt Wi-Fi: TiviKit đang nối qua Wi-Fi sẽ mất kết nối ngay; phải dùng remote vào Cài đặt bật lại Wi-Fi.",
-        "Turns Wi-Fi off: if TiviKit connects over Wi-Fi it loses the TV at once; turn Wi-Fi back on in Settings with the remote.", matKetNoi = true)
+        "Tắt Wi-Fi: MTVkit đang nối qua Wi-Fi sẽ mất kết nối ngay; phải dùng remote vào Cài đặt bật lại Wi-Fi.",
+        "Turns Wi-Fi off: if MTVkit connects over Wi-Fi it loses the TV at once; turn Wi-Fi back on in Settings with the remote.", matKetNoi = true)
     private val CB_TAT_MANG = CanhBao("tat-mang", MucDo.NGUY_HIEM,
-        "Tắt cổng mạng: nếu TiviKit đang đi qua cổng này thì mất kết nối, thường phải khởi động lại tivi mạng mới lên lại.",
-        "Takes a network interface down: if TiviKit goes through it the link drops, usually until the TV restarts.", matKetNoi = true)
+        "Tắt cổng mạng: nếu MTVkit đang đi qua cổng này thì mất kết nối, thường phải khởi động lại tivi mạng mới lên lại.",
+        "Takes a network interface down: if MTVkit goes through it the link drops, usually until the TV restarts.", matKetNoi = true)
     private val CB_TAT_BT = CanhBao("tat-bt", MucDo.CAN_THAN,
-        "Tắt Bluetooth: remote Bluetooth (loại có nút mic), loa, tai nghe ngừng chạy. Vẫn điều khiển được bằng Điều khiển + gõ chữ của TiviKit.",
-        "Turns Bluetooth off: Bluetooth remotes (the ones with a mic), speakers and headphones stop working. TiviKit's Remote + typing still works.")
+        "Tắt Bluetooth: remote Bluetooth (loại có nút mic), loa, tai nghe ngừng chạy. Vẫn điều khiển được bằng Điều khiển + gõ chữ của MTVkit.",
+        "Turns Bluetooth off: Bluetooth remotes (the ones with a mic), speakers and headphones stop working. MTVkit's Remote + typing still works.")
     private val CB_MAY_BAY = CanhBao("may-bay", MucDo.NGUY_HIEM,
-        "Chế độ máy bay tắt Wi-Fi và Bluetooth: TiviKit mất kết nối, remote Bluetooth ngừng chạy.",
-        "Airplane mode turns Wi-Fi and Bluetooth off: TiviKit loses the TV and Bluetooth remotes stop working.", matKetNoi = true)
+        "Chế độ máy bay tắt Wi-Fi và Bluetooth: MTVkit mất kết nối, remote Bluetooth ngừng chạy.",
+        "Airplane mode turns Wi-Fi and Bluetooth off: MTVkit loses the TV and Bluetooth remotes stop working.", matKetNoi = true)
     private val CB_OVERLAY = CanhBao("overlay", MucDo.CAN_THAN,
         "Tắt một lớp phủ giao diện của hệ thống: có thể làm vỡ giao diện hoặc mất chữ tiếng Việt.",
         "Disables a system UI overlay: layouts or translations may break.")
@@ -866,11 +866,11 @@ object DongLenh {
         "Đổi cấu hình ẩn của hệ thống: hiệu quả khó đoán, có khi chỉ mất đi sau khi khởi động lại.",
         "Changes hidden system flags: effects are hard to predict and may only clear after a restart.")
     private val CB_ADB_TAT = CanhBao("adb-tat", MucDo.NGUY_HIEM,
-        "Tắt ADB: TiviKit mất kết nối ngay và không tự nối lại được; phải vào Tuỳ chọn nhà phát triển trên tivi bật lại Gỡ lỗi. Muốn khoá ADB cho an toàn thì dùng nút Tắt ADB ở màn chính.",
-        "Turns ADB off: TiviKit loses the TV at once and can't reconnect until debugging is turned back on in Developer options. To lock ADB safely, use Turn off ADB on the main screen.", matKetNoi = true)
+        "Tắt ADB: MTVkit mất kết nối ngay và không tự nối lại được; phải vào Tuỳ chọn nhà phát triển trên tivi bật lại Gỡ lỗi. Muốn khoá ADB cho an toàn thì dùng nút Tắt ADB ở màn chính.",
+        "Turns ADB off: MTVkit loses the TV at once and can't reconnect until debugging is turned back on in Developer options. To lock ADB safely, use Turn off ADB on the main screen.", matKetNoi = true)
     private val CB_DEV_TAT = CanhBao("dev-tat", MucDo.NGUY_HIEM,
-        "Tắt Tuỳ chọn nhà phát triển: nhiều tivi tắt luôn ADB, TiviKit mất kết nối.",
-        "Turns Developer options off: many TVs switch ADB off too, and TiviKit loses the TV.", matKetNoi = true)
+        "Tắt Tuỳ chọn nhà phát triển: nhiều tivi tắt luôn ADB, MTVkit mất kết nối.",
+        "Turns Developer options off: many TVs switch ADB off too, and MTVkit loses the TV.", matKetNoi = true)
     private val CB_ADB_CONG = CanhBao("adb-cong", MucDo.CAN_THAN,
         "Khởi động lại / đổi cổng ADB: kết nối đang dùng có thể rớt; nối lại thì phải dùng đúng cổng mới.",
         "Restarts ADB or changes its port: the current link may drop; reconnect on the new port.", matKetNoi = true)
@@ -878,8 +878,8 @@ object DongLenh {
         "Tivi khởi động lại, mất kết nối 1–3 phút; bật Tự nối lại thì app tự nối khi tivi lên. Nút Khởi động lại ở màn chính lo việc này trọn gói.",
         "The TV restarts and the link drops for 1–3 minutes; with Auto-reconnect on, the app reconnects when it's back. The Reboot button on the main screen handles all of this.", matKetNoi = true)
     private val CB_TAT_HAN = CanhBao("tat-han", MucDo.NGUY_HIEM,
-        "Tắt hẳn tivi: TiviKit mất kết nối, phải bật lại bằng nút nguồn hoặc remote.",
-        "Shuts the TV down: TiviKit loses it, and it has to be turned on with the power button or remote.", matKetNoi = true)
+        "Tắt hẳn tivi: MTVkit mất kết nối, phải bật lại bằng nút nguồn hoặc remote.",
+        "Shuts the TV down: MTVkit loses it, and it has to be turned on with the power button or remote.", matKetNoi = true)
     private val CB_CHE_DO = CanhBao("che-do-dac-biet", MucDo.NGUY_HIEM,
         "Tivi vào chế độ đặc biệt (recovery, bootloader…): có thể không tự về màn hình thường, phải rút điện hoặc dùng nút trên tivi. Bấm nhầm trong recovery là xoá sạch tivi.",
         "The TV boots into a special mode (recovery, bootloader…): it may not come back by itself and need unplugging or its buttons. One wrong choice in recovery wipes the TV.", matKetNoi = true)
@@ -895,8 +895,8 @@ object DongLenh {
         "Xoá cả thư mục lớn (bộ nhớ trong, Download, ảnh, phim, dữ liệu app…) hoặc xoá theo mẫu * ở đó: mất hàng loạt file, không lấy lại được.",
         "Deletes a whole big folder (internal storage, Download, photos, movies, app data…) or everything matching * there: loads of files gone for good.")
     private val CB_RM_SAO_LUU = CanhBao("rm-sao-luu", MucDo.CAN_THAN,
-        "Đây là bản sao lưu TiviKit cất trên tivi: xoá rồi thì đổi điện thoại hoặc cài lại TiviKit sẽ không Khôi phục tivi được.",
-        "This is TiviKit's backup kept on the TV: without it, a new phone or a reinstalled TiviKit can't restore the TV.")
+        "Đây là bản sao lưu MTVkit cất trên tivi: xoá rồi thì đổi điện thoại hoặc cài lại MTVkit sẽ không Khôi phục tivi được.",
+        "This is MTVkit's backup kept on the TV: without it, a new phone or a reinstalled MTVkit can't restore the TV.")
     private val CB_FIND_XOA = CanhBao("find-xoa", MucDo.CAN_THAN,
         "Xoá mọi file tìm được, không có thùng rác.", "Deletes every file it finds, with no recycle bin.")
     private val CB_DD = CanhBao("dd-phan-vung", MucDo.NGUY_HIEM,
@@ -921,8 +921,8 @@ object DongLenh {
         "Sửa tường lửa (máy đã root): chặn nhầm là mất mạng hoặc mất kết nối ADB.",
         "Changes the firewall (rooted devices): a wrong rule cuts the network or ADB.", matKetNoi = true)
     private val CB_NGU = CanhBao("ngu", MucDo.BAO,
-        "Tivi sẽ ngủ: nhiều tivi tắt Wi-Fi khi ngủ nên TiviKit mất kết nối tới khi bật lại.",
-        "The TV goes to sleep: many TVs drop Wi-Fi while asleep, so TiviKit loses the link until it wakes.", matKetNoi = true)
+        "Tivi sẽ ngủ: nhiều tivi tắt Wi-Fi khi ngủ nên MTVkit mất kết nối tới khi bật lại.",
+        "The TV goes to sleep: many TVs drop Wi-Fi while asleep, so MTVkit loses the link until it wakes.", matKetNoi = true)
     private val CB_BAN_PHIM = CanhBao("ban-phim", MucDo.CAN_THAN,
         "Đổi bàn phím: sai tên là tivi không gõ được chữ (ô tìm kiếm, mật khẩu Wi-Fi). Xem tên đúng bằng ime list -s.",
         "Changes the keyboard: a wrong name leaves the TV unable to type (search, Wi-Fi passwords). See valid names with ime list -s.")
@@ -942,8 +942,8 @@ object DongLenh {
         "fastboot chạy trên máy tính khi tivi ở chế độ bootloader, không chạy được ở đây.",
         "fastboot runs on a computer while the TV is in bootloader mode; it can't run here.")
     private val CB_PM_TAT = CanhBao("pm-tat", MucDo.CAN_THAN,
-        "Tắt gói: app biến khỏi tivi và không chạy nữa, dữ liệu vẫn giữ. TiviKit ghi vào bản sao lưu để Khôi phục tivi bật lại được.",
-        "Disables a package: the app disappears and stops running, its data is kept. TiviKit records it in the backup so Restore can turn it back on.")
+        "Tắt gói: app biến khỏi tivi và không chạy nữa, dữ liệu vẫn giữ. MTVkit ghi vào bản sao lưu để Khôi phục tivi bật lại được.",
+        "Disables a package: the app disappears and stops running, its data is kept. MTVkit records it in the backup so Restore can turn it back on.")
     private val CB_PM_TAT_NHIEU = CanhBao("pm-tat-nhieu", MucDo.CAN_THAN,
         "Không rõ gói nào sẽ bị tắt (tên gói nằm trong biến, vòng lặp hoặc lấy từ lệnh khác): kiểm tra kỹ trước khi chạy. Gói tắt kiểu này không được ghi vào bản sao lưu.",
         "Can't tell which packages get disabled (names come from a variable, a loop or another command): check carefully. Packages disabled this way aren't recorded in the backup.")
@@ -978,8 +978,8 @@ object DongLenh {
         "Đặt proxy: proxy sai hoặc đã tắt là mọi app trên tivi mất mạng. Bỏ proxy: settings put global http_proxy :0",
         "Sets a proxy: a wrong or dead proxy cuts every app off the internet. To remove it: settings put global http_proxy :0")
     private val CB_DNS = CanhBao("dns", MucDo.BAO,
-        "Đổi DNS riêng: tên máy chủ sai là tivi mất mạng. Màn DNS chặn quảng cáo của TiviKit kiểm tra máy chủ trước khi đổi.",
-        "Changes private DNS: a wrong server name cuts the TV off. TiviKit's Ad-blocking DNS screen checks the server first.")
+        "Đổi DNS riêng: tên máy chủ sai là tivi mất mạng. Màn DNS chặn quảng cáo của MTVkit kiểm tra máy chủ trước khi đổi.",
+        "Changes private DNS: a wrong server name cuts the TV off. MTVkit's Ad-blocking DNS screen checks the server first.")
     private val CB_TRO_NANG = CanhBao("tro-nang", MucDo.CAN_THAN,
         "Lệnh này thay cả danh sách dịch vụ trợ năng: dịch vụ của Home sạch (nút remote), Hẹn giờ, Khoá trẻ em đang bật sẽ bị tắt. Muốn thêm mà giữ cái cũ thì dùng lệnh mẫu bật dịch vụ trợ năng ở nhóm Cấp quyền cho app.",
         "This replaces the whole accessibility service list: the clean Home (remote buttons), Timer and Kids lock services get switched off. To add one and keep the rest, use the accessibility example under App permissions.")

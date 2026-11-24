@@ -32,7 +32,7 @@ class TeleRemoteTivi(private val vm: PhienLamViec) {
     /** App phụ cần Android 8+. */
     val duocCai: Boolean get() = (vm.thongTin?.sdk ?: 0) >= 26
 
-    /** Cấu hình đang có trên tivi; chưa cài thì cấu hình mới (bot nói theo ngôn ngữ của TiviKit). */
+    /** Cấu hình đang có trên tivi; chưa cài thì cấu hình mới (bot nói theo ngôn ngữ của MTVkit). */
     val cauHinh: TeleRemote.CauHinh get() = trangThai?.cauHinh ?: TeleRemote.CauHinh(tiengAnh = !vn.tivikit.NgonNgu.tiengViet)
 
     fun mo() = vm.chay(t("Đang đọc Tele Remote trên tivi…", "Reading Tele Remote on the TV…")) {
@@ -73,8 +73,8 @@ class TeleRemoteTivi(private val vm: PhienLamViec) {
         baoLech = tt == null || !tt.dichVuChay || tt.adb != "da-noi"
         bao = when {
             tt == null -> t("Đã cài nhưng chưa đọc lại được từ tivi. Bấm Làm mới.", "Installed, but couldn't read it back from the TV. Tap Refresh.")
-            !tt.dichVuChay -> t("Đã cài, nhưng dịch vụ Tele Remote chưa chạy: vào Cài đặt → Trợ năng của tivi, bật \"Tele Remote (TiviKit)\", rồi bấm Làm mới.",
-                "Installed, but the Tele Remote service isn't running: open the TV's Settings → Accessibility, turn on \"Tele Remote (TiviKit)\", then tap Refresh.")
+            !tt.dichVuChay -> t("Đã cài, nhưng dịch vụ Tele Remote chưa chạy: vào Cài đặt → Trợ năng của tivi, bật \"Tele Remote (MTVkit)\", rồi bấm Làm mới.",
+                "Installed, but the Tele Remote service isn't running: open the TV's Settings → Accessibility, turn on \"Tele Remote (MTVkit)\", then tap Refresh.")
             tt.adb == "dang-hoi" -> t("Trên tivi đang hiện hộp \"Cho phép gỡ lỗi?\": tích \"Luôn cho phép từ máy tính này\" rồi chọn OK bằng remote. Xong bấm Làm mới.",
                 "The TV is showing \"Allow debugging?\": tick \"Always allow from this computer\" and press OK with the remote. Then tap Refresh.")
             tt.adb == "da-noi" && !tt.coToken -> t("Xong phần tivi. Giờ tạo bot ở @BotFather rồi dán token vào ô bên dưới.",

@@ -20,9 +20,9 @@ import android.widget.Toast
  * - Auto (1/11/2026): chuyển tên kênh, các nguồn và cờ thứ tự riêng cho Map Voice (MoTuDong), Map Voice thử lần lượt tới
  *   khi có tiếng; tivi chưa có Map Voice 1.2 thì mở nguồn đầu tiên tivi có (VTVgo, TV360, FPT Play, IPTV, M3U, hay theo
  *   thứ tự riêng của ô).
- * - IPTV (1/11/2026): màn phát của app IPTV của TiviKit với tên và mã kênh; app đó tự tìm link kênh trong danh sách mới nhất.
+ * - IPTV (1/11/2026): màn phát của app IPTV của MTVkit với tên và mã kênh; app đó tự tìm link kênh trong danh sách mới nhất.
  * App không nhận (bản sau đổi cổng / link) thì mở app như thường; chưa cài thì mở trang của app trên CH Play (M3U không có
- * trên CH Play: báo cài từ TiviKit).
+ * trên CH Play: báo cài từ MTVkit).
  */
 class MoKenh : Activity() {
     override fun onCreate(b: Bundle?) {

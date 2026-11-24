@@ -289,7 +289,7 @@ class Dial(
     private fun usn(loai: String) = if (loai == "uuid:$uuid") loai else "uuid:$uuid::$loai"
 
     /**
-     * Chẩn đoán (TiviKit / ADB gọi qua provider): tự phát một M-SEARCH tìm DIAL như điện thoại, ghi các máy trả lời (kể cả
+     * Chẩn đoán (MTVkit / ADB gọi qua provider): tự phát một M-SEARCH tìm DIAL như điện thoại, ghi các máy trả lời (kể cả
      * máy DIAL của hãng cùng IP) và sau bao nhiêu ms. Cùng IP mà máy hãng trả lời trước thì app YouTube chỉ thấy máy hãng.
      */
     fun thuTim(): org.json.JSONArray {

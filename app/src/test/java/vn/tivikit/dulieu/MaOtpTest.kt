@@ -42,7 +42,7 @@ class MaOtpTest {
     }
 
     @Test fun lienKet() {
-        assertEquals("otpauth://totp/TiviKit:Kho%C3%A1%20tr%E1%BA%BB%20em?secret=$KHOA&issuer=TiviKit&algorithm=SHA1&digits=6&period=30",
+        assertEquals("otpauth://totp/MTVkit:Kho%C3%A1%20tr%E1%BA%BB%20em?secret=$KHOA&issuer=MTVkit&algorithm=SHA1&digits=6&period=30",
             MaOtp.lienKet(KHOA))
     }
 

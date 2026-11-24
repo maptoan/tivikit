@@ -153,7 +153,7 @@ fun UngDung(vm: PhienLamViec = viewModel()) {
                 AlertDialog(
                     onDismissRequest = { vm.hoiCapNhat = false },
                     icon = { Icon(Icons.Rounded.SystemUpdate, null, tint = Nhan) },
-                    title = { Text(t("Có bản mới ${b.versionName}", "TiviKit ${b.versionName} is out")) },
+                    title = { Text(t("Có bản mới ${b.versionName}", "MTVkit ${b.versionName} is out")) },
                     text = {
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             if (b.ghiChu.isNotBlank()) Text(b.ghiChu)
@@ -176,7 +176,7 @@ fun UngDung(vm: PhienLamViec = viewModel()) {
                         Row {
                             if (AnhTivi.luuDuoc) TextButton(onClick = {
                                 val ok = AnhTivi.luu(ctxAnh, anh)
-                                Toast.makeText(ctxAnh, if (ok) t("Đã lưu vào Ảnh › TiviKit", "Saved to Pictures › TiviKit") else t("Không lưu được ảnh", "Couldn't save the picture"), Toast.LENGTH_SHORT).show()
+                                Toast.makeText(ctxAnh, if (ok) t("Đã lưu vào Ảnh › MTVkit", "Saved to Pictures › MTVkit") else t("Không lưu được ảnh", "Couldn't save the picture"), Toast.LENGTH_SHORT).show()
                             }) { Text(t("Lưu ảnh", "Save"), fontWeight = FontWeight.SemiBold) }
                             TextButton(onClick = { AnhTivi.chiaSe(ctxAnh, anh) }) { Text(t("Chia sẻ", "Share")) }
                             TextButton(onClick = { vm.anhTv = null }) { Text(t("Đóng", "Close")) }
@@ -397,7 +397,7 @@ internal fun DauTrang(icon: @Composable () -> Unit, tieuDe: String, phu: String?
 /** Mở hộp góp ý chung của vgs.zone (mục App CleanTV tự chọn theo chữ "CleanTV"), kèm bản app + model tivi. */
 @Composable
 internal fun NutGopY(vm: PhienLamViec) {
-    // Góp ý về TiviKit (26/10/2026): nhóm Telegram / báo lỗi trên GitHub, thay cho trang góp ý của VGS.
+    // Góp ý về MTVkit (26/10/2026): nhóm Telegram / báo lỗi trên GitHub, thay cho trang góp ý của VGS.
     NutPhu(t("Góp ý / báo lỗi", "Feedback / report a bug"), Icons.Rounded.Feedback) { vm.moLienHe = true }
 }
 
@@ -490,7 +490,7 @@ private fun ColumnScope.KetNoiTiviNay(vm: PhienLamViec) {
         OIcon(Icons.Rounded.Tv, 64.dp)
         Text(if (vm.dangKhoiPhuc) t("Kết nối lại để khôi phục tivi này", "Reconnect to restore this TV") else t("Dọn chính tivi này", "Clean this TV"),
             fontWeight = FontWeight.Bold, fontSize = 24.sp, textAlign = TextAlign.Center)
-        Phu(t("TiviKit đang chạy ngay trên tivi, không cần điện thoại.", "TiviKit is running on the TV itself, no phone needed."))
+        Phu(t("MTVkit đang chạy ngay trên tivi, không cần điện thoại.", "MTVkit is running on the TV itself, no phone needed."))
     }
     The(t("Trước khi bấm", "Before you start"), Icons.Rounded.Warning) {
         BuocSo(1, t("Tivi đã bật Gỡ lỗi USB (Tùy chọn nhà phát triển).", "USB debugging is on (Developer options)."))
@@ -530,21 +530,21 @@ private fun ManThongTin(vm: PhienLamViec) = Cuon {
         verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Row {
             Icon(Icons.Rounded.Warning, null, tint = DoTuoi); Spacer(Modifier.width(8.dp))
-            Phu(t("Máy này không khai là tivi Android (có thể là điện thoại hoặc máy tính bảng). TiviKit chỉ dọn tivi: tắt nhầm gói của điện thoại có thể làm máy không khởi động được.",
-                "This device does not report itself as an Android TV (it may be a phone or tablet). TiviKit only cleans TVs: disabling a phone's packages can stop it from booting."), ChuChinh)
+            Phu(t("Máy này không khai là tivi Android (có thể là điện thoại hoặc máy tính bảng). MTVkit chỉ dọn tivi: tắt nhầm gói của điện thoại có thể làm máy không khởi động được.",
+                "This device does not report itself as an Android TV (it may be a phone or tablet). MTVkit only cleans TVs: disabling a phone's packages can stop it from booting."), ChuChinh)
         }
         Hang(t("Tôi chắc đây là tivi / hộp tivi / máy chiếu", "I am sure this is a TV / TV box / projector"),
             t("Chỉ bật nếu đúng là thiết bị xem tivi", "Only if it really is a TV device"), vm.xacNhanLaTivi) { vm.xacNhanLaTivi = it }
     }
     if (vm.laAndroidCu && !vm.laFireTv) Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(NenCanhBao).padding(12.dp)) {
         Icon(Icons.Rounded.Warning, null, tint = Cam); Spacer(Modifier.width(8.dp))
-        Phu(t("Máy này chạy Android ${vm.thongTin?.android}: TiviKit dọn được quảng cáo, theo dõi và app rác, nhưng KHÔNG cài được Home sạch (cần Android 8 trở lên).",
-            "This device runs Android ${vm.thongTin?.android}: TiviKit can clean ads, tracking and junk apps but can NOT install the clean Home (needs Android 8 or later)."))
+        Phu(t("Máy này chạy Android ${vm.thongTin?.android}: MTVkit dọn được quảng cáo, theo dõi và app rác, nhưng KHÔNG cài được Home sạch (cần Android 8 trở lên).",
+            "This device runs Android ${vm.thongTin?.android}: MTVkit can clean ads, tracking and junk apps but can NOT install the clean Home (needs Android 8 or later)."))
     }
     if (vm.laFireTv) Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(NenCanhBao).padding(12.dp)) {
         Icon(Icons.Rounded.Warning, null, tint = Cam); Spacer(Modifier.width(8.dp))
-        Phu(t("Fire TV: TiviKit dọn được quảng cáo, theo dõi và app rác, nhưng KHÔNG thay được màn Home. Amazon khoá Home cho launcher của họ, không app nào thay được.",
-            "Fire TV: TiviKit can clean ads, tracking and junk apps but can NOT replace Home. Amazon locks Home to its own launcher; no app can change it."))
+        Phu(t("Fire TV: MTVkit dọn được quảng cáo, theo dõi và app rác, nhưng KHÔNG thay được màn Home. Amazon khoá Home cho launcher của họ, không app nào thay được.",
+            "Fire TV: MTVkit can clean ads, tracking and junk apps but can NOT replace Home. Amazon locks Home to its own launcher; no app can change it."))
     }
     if (info.adbSecure == "0") Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(NenCanhBao).padding(12.dp)) {
         Icon(Icons.Rounded.Warning, null, tint = Cam); Spacer(Modifier.width(8.dp))
@@ -1006,7 +1006,7 @@ private fun TheHomeNoiDung(vm: PhienLamViec) {
     TheMayChieu(vm)
 }
 
-/** Chọn nơi xem thời tiết (phường / xã hoặc thành phố); dùng chung cho Home sạch và TiviKit Launcher (cùng một lựa chọn). */
+/** Chọn nơi xem thời tiết (phường / xã hoặc thành phố); dùng chung cho Home sạch và MTVkit Launcher (cùng một lựa chọn). */
 @Composable
 internal fun ChonNoiThoiTiet(vm: PhienLamViec) {
     OutlinedTextField(vm.timXa, { vm.doiTimXa(it) }, label = { Text(t("Tìm phường / xã hoặc thành phố", "Find your ward or city")) },
@@ -1274,7 +1274,7 @@ private fun ManXong(vm: PhienLamViec) = Cuon {
     // Lời mời ủng hộ chỉ ở đây, sau khi việc đã xong, một dòng nhỏ: không bật hộp chặn, không hỏi lúc mở app.
     TextButton(onClick = { vm.moUngHo = true }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
         Icon(Icons.Rounded.Favorite, null, Modifier.size(18.dp), tint = DoTuoi); Spacer(Modifier.width(6.dp))
-        Text(t("TiviKit giúp được bạn? Ủng hộ tác giả", "Did TiviKit help? Support the author"))
+        Text(t("MTVkit giúp được bạn? Ủng hộ tác giả", "Did MTVkit help? Support the author"))
     }
     NutGopY(vm)
     NutChinh(t("Tắt ADB & kết thúc", "Turn off ADB & finish"), enabled = !vm.dangBan, icon = Icons.Rounded.Lock) { vm.tatAdbVaKetThuc() }
@@ -1317,7 +1317,7 @@ private fun ManKhoiPhuc(vm: PhienLamViec) = Cuon {
         }
         The {
             Hang(t("Gỡ luôn Home sạch", "Also uninstall the clean Home"), t("Bỏ chọn để giữ Home sạch trên tivi", "Untick to keep it on the TV"), goHomeKsl) { goHomeKsl = it }
-            Hang(t("Tôi hiểu: bật lại tất cả", "I understand: re-enable all"), t("Kể cả gói tôi tự tắt trước khi dùng TiviKit", "Including ones I disabled before using TiviKit"), dongY) { dongY = it }
+            Hang(t("Tôi hiểu: bật lại tất cả", "I understand: re-enable all"), t("Kể cả gói tôi tự tắt trước khi dùng MTVkit", "Including ones I disabled before using MTVkit"), dongY) { dongY = it }
         }
         NutChinh(if (vm.dangBan) t("Đang khôi phục…", "Restoring…") else t("Khôi phục", "Restore"), enabled = dongY && !vm.dangBan, icon = Icons.Rounded.Restore) {
             vm.chayKhoiPhucKhongSaoLuu(goHomeKsl)
@@ -1368,8 +1368,8 @@ private fun NutXemLenh(lenh: () -> List<String>) {
 private fun TheKichBan(vm: PhienLamViec) {
     val sl = vm.saoLuu ?: return
     The(t("Kịch bản khôi phục cho máy tính", "Restore script for a computer"), Icons.Rounded.Save) {
-        Phu(t("Lưu một file lệnh adb để đưa tivi về như cũ từ máy tính, kể cả khi mất điện thoại hay đã gỡ TiviKit. Windows bấm đúp file, Mac / Linux chạy sh tên-file.bat.",
-            "Save a file of adb commands that puts the TV back from a computer, even without this phone or TiviKit. Windows: double-click it; Mac / Linux: sh file-name.bat."))
+        Phu(t("Lưu một file lệnh adb để đưa tivi về như cũ từ máy tính, kể cả khi mất điện thoại hay đã gỡ MTVkit. Windows bấm đúp file, Mac / Linux chạy sh tên-file.bat.",
+            "Save a file of adb commands that puts the TV back from a computer, even without this phone or MTVkit. Windows: double-click it; Mac / Linux: sh file-name.bat."))
         val luu = androidx.activity.compose.rememberLauncherForActivityResult(androidx.activity.result.contract.ActivityResultContracts.CreateDocument("application/octet-stream")) { uri -> uri?.let { vm.xuatKichBan(it) } }
         // Đang bận thì việc lưu bị bỏ (chay) mà file đã tạo: để trống. Chờ xong việc rồi mới lưu.
         NutPhu(t("Lưu kịch bản khôi phục", "Save restore script"), Icons.Rounded.Save, enabled = !vm.dangBan) {
@@ -1383,8 +1383,8 @@ private fun TheKichBan(vm: PhienLamViec) {
 @Composable
 private fun TheBatTungApp(vm: PhienLamViec) {
     The(t("Bật lại từng app", "Re-enable single apps"), Icons.Rounded.Apps) {
-        Phu(t("Chỉ muốn bật lại vài app lỡ tắt? App đọc từ tivi mọi app đang tắt (kể cả khi đã cài lại TiviKit), bạn tích cái cần bật.",
-            "Only need a few apps back? The app reads every disabled app from the TV (even after reinstalling TiviKit); tick the ones to turn on."))
+        Phu(t("Chỉ muốn bật lại vài app lỡ tắt? App đọc từ tivi mọi app đang tắt (kể cả khi đã cài lại MTVkit), bạn tích cái cần bật.",
+            "Only need a few apps back? The app reads every disabled app from the TV (even after reinstalling MTVkit); tick the ones to turn on."))
         val ds = vm.dsTatTv
         if (ds == null) {
             NutPhu(t("Xem các app đang tắt", "See disabled apps"), Icons.Rounded.Search) { vm.docDsTat() }
@@ -1400,7 +1400,7 @@ private fun TheBatTungApp(vm: PhienLamViec) {
                 Spacer(Modifier.width(12.dp))
                 Column(Modifier.weight(1f)) {
                     Text(tenDep(p), fontSize = 14.sp, fontWeight = FontWeight.SemiBold, maxLines = 1)
-                    Text(p + if (p in cuaCleanTv) t(" · do TiviKit tắt", " · disabled by TiviKit") else "", fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = ChuPhu, maxLines = 1)
+                    Text(p + if (p in cuaCleanTv) t(" · do MTVkit tắt", " · disabled by MTVkit") else "", fontSize = 11.sp, fontFamily = FontFamily.Monospace, color = ChuPhu, maxLines = 1)
                 }
             }
         }

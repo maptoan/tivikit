@@ -44,7 +44,7 @@ class XinPhep : ManCoMa() {
 
     override fun onCreate(b: Bundle?) {
         super.onCreate(b)
-        // Tivi đang tắt màn: bật lên cho người trong nhà thấy (Android 14+ cần TURN_SCREEN_ON, TiviKit đã cấp; màn bảo
+        // Tivi đang tắt màn: bật lên cho người trong nhà thấy (Android 14+ cần TURN_SCREEN_ON, MTVkit đã cấp; màn bảo
         // vệ thì mo() đã tắt).
         if (Build.VERSION.SDK_INT >= 27) { setTurnScreenOn(true); setShowWhenLocked(true) }
         else @Suppress("DEPRECATION") window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON or WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED)

@@ -12,7 +12,7 @@ import vn.tivikit.t
 import java.io.File
 
 /**
- * Sao lưu & chuyển máy (25/10/2026): lưu dữ liệu TiviKit ra một file zip (bản sao lưu tivi, bộ cài đặt mẫu, tivi gần
+ * Sao lưu & chuyển máy (25/10/2026): lưu dữ liệu MTVkit ra một file zip (bản sao lưu tivi, bộ cài đặt mẫu, tivi gần
  * đây, tuỳ chọn khoá kết nối) và nhập lại trên điện thoại khác. Nhập khoá kết nối thì phải mở lại app (khoá được nạp
  * một lần lúc mở app).
  */
@@ -60,7 +60,7 @@ class ChuyenMay(private val vm: PhienLamViec) {
         val tam = File(vm.ctx.cacheDir, "nhap-sao-luu.zip")
         vm.io { (vm.ctx.contentResolver.openInputStream(uri) ?: error(t("Không mở được file.", "Couldn't open the file."))).use { i -> tam.outputStream().use { i.copyTo(it) } } }
         val nd = runCatching { vm.io { SaoLuuApp.xem(tam) } }.getOrElse {
-            tam.delete(); error(t("File này không phải bản sao lưu TiviKit.", "That file isn't a TiviKit backup."))
+            tam.delete(); error(t("File này không phải bản sao lưu MTVkit.", "That file isn't a MTVkit backup."))
         }
         if (nd.coKhoa) choNhap = tam else nhap(tam, dungKhoa = false)
     }

@@ -3,8 +3,8 @@ package vn.tivikit.dulieu
 import org.json.JSONObject
 
 /**
- * TiviKit Launcher (app vn.tivikit.launcher, module launcher/, 27/10/2026): màn Home kính mờ của TiviKit. TiviKit đóng sẵn
- * APK trong assets, cài lên tivi qua ADB như các app phụ khác — không cần cài TiviKit lên tivi — và chỉnh qua
+ * MTVkit Launcher (app vn.tivikit.launcher, module launcher/, 27/10/2026): màn Home kính mờ của MTVkit. MTVkit đóng sẵn
+ * APK trong assets, cài lên tivi qua ADB như các app phụ khác — không cần cài MTVkit lên tivi — và chỉnh qua
  * `content call` (CauHinhProvider của launcher, chỉ nhận lời gọi từ ADB).
  */
 object TiviKitLauncher {
@@ -21,7 +21,7 @@ object TiviKitLauncher {
     const val HOME = "$GOI/.Home"
 
     /**
-     * Dịch vụ trợ năng Nút nguồn (bản 1.4 trở đi): menu ⏻ của launcher tắt tivi và mở menu nguồn nhờ nó. TiviKit bật khi
+     * Dịch vụ trợ năng Nút nguồn (bản 1.4 trở đi): menu ⏻ của launcher tắt tivi và mở menu nguồn nhờ nó. MTVkit bật khi
      * cài / cập nhật, bỏ khỏi danh sách trợ năng khi gỡ.
      */
     const val DICH_VU = "$GOI/$GOI.NguonDichVu"
@@ -81,7 +81,7 @@ object TiviKitLauncher {
         return chiAscii(JSONObject().put("ten_app", o).toString())
     }
 
-    /** Ảnh nền có sẵn trong TiviKit để chọn cho launcher. */
+    /** Ảnh nền có sẵn trong MTVkit để chọn cho launcher. */
     data class AnhCoSan(val asset: String, val tenVi: String, val tenEn: String)
 
     /** Ảnh mặc định của launcher (đi kèm launcher): chọn nó = bỏ ảnh riêng. */
@@ -103,11 +103,11 @@ object TiviKitLauncher {
         AnhCoSan("theme/phong-canh/12-monsoon.jpg", "Mùa mưa", "Monsoon"),
         AnhCoSan("theme/phong-canh/13-lighthouse-coast.jpg", "Hải đăng", "Lighthouse coast"),
         AnhCoSan("theme/aurora.jpg", "Dải cực quang", "Aurora bands"),
-        AnhCoSan("theme/tivikit.jpg", "TiviKit", "TiviKit"),
+        AnhCoSan("theme/tivikit.jpg", "MTVkit", "MTVkit"),
     )
 
     /**
-     * Cấu hình gửi khi cài / cập nhật: tên lời chào và nơi xem thời tiết (như của Home sạch), ngôn ngữ của TiviKit trên
+     * Cấu hình gửi khi cài / cập nhật: tên lời chào và nơi xem thời tiết (như của Home sạch), ngôn ngữ của MTVkit trên
      * điện thoại, và [dock] chỉ khi mới cài (cập nhật thì giữ dock người dùng đã sắp trên tivi). Nháy đơn đổi thành ’ vì
      * lệnh shell bọc JSON trong nháy đơn.
      */

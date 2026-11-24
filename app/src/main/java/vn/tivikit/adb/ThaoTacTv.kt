@@ -512,7 +512,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         val troNang = sh("settings get secure enabled_accessibility_services").trim()
         val laHome = homeHienTai().startsWith("$pkgHome/")
         // Gỡ là mất config.json: giữ lại để dayCauHinh lấy các khoá app không tự biết (chuyển đè Home cũ, nút gán riêng,
-        // tên ô Kênh nhanh). 26/10/2026: Home sạch đổi sang khoá TiviKit, mọi tivi đã cài đi qua đây một lần.
+        // tên ô Kênh nhanh). 26/10/2026: Home sạch đổi sang khoá MTVkit, mọi tivi đã cài đi qua đây một lần.
         cauHinhTruocGo = docCauHinhTv()
         // Giữa lúc gỡ và cài lại tivi không có Home sạch; Home sạch đang là Home thì Home của hãng thường đã tắt từ lúc dọn:
         // rớt mạng hay cài lại hỏng là tivi không còn màn Home nào. Đặt gác cho Home của hãng đang tắt (tivi tự bật lại nếu
@@ -1481,7 +1481,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         if (teleRemoteDaCai()) { bao(t("Gỡ Tele Remote…", "Removing Tele Remote…")); runCatching { goTeleRemote() } }
         if (iptvDaCai()) { bao(t("Gỡ app IPTV…", "Removing the IPTV app…")); runCatching { goIptv() } }
         if (boGoDaCai()) { bao(t("Gỡ bộ gõ tiếng Việt…", "Removing the Vietnamese typing helper…")); runCatching { goBoGo() } }
-        // Home hệ thống của hãng: tìm và đặt trước khi gỡ Home sạch / TiviKit Launcher để tivi không bao giờ mất hết Home.
+        // Home hệ thống của hãng: tìm và đặt trước khi gỡ Home sạch / MTVkit Launcher để tivi không bao giờ mất hết Home.
         val heThong = sh("pm list packages -s").lines().map { it.trim().removePrefix("package:") }.toSet()
         val ung = sh("cmd package query-activities --brief -a android.intent.action.MAIN -c android.intent.category.HOME")
             .lines().map { it.trim() }.filter { it.contains('/') && !it.endsWith("FallbackHome") }
@@ -1491,7 +1491,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
             bao(t("Đặt Home gốc: $home", "Setting the stock Home: $home"))
             sh("cmd package set-home-activity --user 0 $home")
         }
-        if (tklDaCai()) { bao(t("Gỡ TiviKit Launcher…", "Removing TiviKit Launcher…")); runCatching { goTklHet() } }
+        if (tklDaCai()) { bao(t("Gỡ MTVkit Launcher…", "Removing MTVkit Launcher…")); runCatching { goTklHet() } }
         goAppPhuCu(bao)
         if (goLauncher && home != null) HOME_SACH.forEach { p ->
             if (sh("pm path $p").isNotBlank()) { bao(t("Gỡ Home sạch ($p)…", "Removing the clean Home ($p)…")); sh("pm uninstall $p") }
@@ -1561,8 +1561,8 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         if (teleRemoteDaCai()) { bao(t("Gỡ Tele Remote…", "Removing Tele Remote…")); runCatching { goTeleRemote() } }
         if (iptvDaCai()) { bao(t("Gỡ app IPTV…", "Removing the IPTV app…")); runCatching { goIptv() } }
         if (boGoDaCai()) { bao(t("Gỡ bộ gõ tiếng Việt…", "Removing the Vietnamese typing helper…")); runCatching { goBoGo() } }
-        // TiviKit Launcher đang là Home cũng gỡ: Home được đặt lại ở trên (có sao lưu) hay ngay bên dưới (không sao lưu).
-        if (tklDaCai()) { bao(t("Gỡ TiviKit Launcher…", "Removing TiviKit Launcher…")); runCatching { goTklHet() } }
+        // MTVkit Launcher đang là Home cũng gỡ: Home được đặt lại ở trên (có sao lưu) hay ngay bên dưới (không sao lưu).
+        if (tklDaCai()) { bao(t("Gỡ MTVkit Launcher…", "Removing MTVkit Launcher…")); runCatching { goTklHet() } }
         goAppPhuCu(bao)
         return loi
     }
@@ -1582,7 +1582,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
     fun docKhoa(): org.json.JSONObject? = if (khoaDaCai()) docQua(PKG_KHOA) else null
 
     /**
-     * Nhập mã Khoá trẻ em (28/10/2026): tivi kiểm tra mã OTP / mã dự phòng — TiviKit không giữ mã gốc — đúng thì trả phiên
+     * Nhập mã Khoá trẻ em (28/10/2026): tivi kiểm tra mã OTP / mã dự phòng — MTVkit không giữ mã gốc — đúng thì trả phiên
      * cho các lệnh đổi cấu hình. {ok, phien} / {loi: "sai", con} / {loi: "cho", giay}; null nếu không đọc được.
      */
     fun xacThucKhoa(ma: String): org.json.JSONObject? {
@@ -1685,7 +1685,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         KenhNhanh.kenhM3u(sh("dumpsys shortcut | sed -n '/Package: ${KenhNhanh.M3U}/,/Package: /p'"))
 
     /**
-     * Cài app của ô [o] (chưa có, hoặc khác bản đi kèm TiviKit thì cài đè — như capNhatLauncher) rồi đặt kênh.
+     * Cài app của ô [o] (chưa có, hoặc khác bản đi kèm MTVkit thì cài đè — như capNhatLauncher) rồi đặt kênh.
      * [json] không chứa nháy đơn (KenhNhanh.tenSach).
      */
     fun caiKenh(o: Int, apk: ByteArray, json: String, bao: (String) -> Unit) {
@@ -1768,7 +1768,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
     }
 
     /**
-     * Cài app phụ đi kèm TiviKit ([goi]: Kênh nhanh, Hẹn giờ, Khoá trẻ em) khi tivi chưa có hoặc đang có bản khác bản đi
+     * Cài app phụ đi kèm MTVkit ([goi]: Kênh nhanh, Hẹn giờ, Khoá trẻ em) khi tivi chưa có hoặc đang có bản khác bản đi
      * kèm (so SHA-256 như capNhatLauncher) — cài đè giữ dữ liệu của nó. [bao] chỉ gọi khi thật sự cài.
      */
     private fun caiAppPhu(goi: String, apk: ByteArray, bao: () -> Unit) {
@@ -2088,7 +2088,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         // Vừa cài: Android cần chút thời gian mới nhận app là bàn phím (`ime enable` lúc đó báo không biết bộ gõ).
         if (vuaCai) for (i in 1..6) { if (sh("ime list -a -s").contains(GoChu.BO_GO)) break; Thread.sleep(500) }
         var cu = sh("settings get secure default_input_method").trim()
-        // Bộ gõ đang dùng là của TiviKit (lần trước bị ngắt giữa chừng): trả về bàn phím khác đang bật.
+        // Bộ gõ đang dùng là của MTVkit (lần trước bị ngắt giữa chừng): trả về bàn phím khác đang bật.
         if (!GoChu.laBoGoCu(cu)) cu = sh("ime list -s").lines().map { it.trim() }.firstOrNull { GoChu.laBoGoCu(it) } ?: ""
         return GoChu.ketQua(sh(GoChu.lenh(chu, cu)))
     }
@@ -2096,11 +2096,11 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
     /** Gỡ bộ gõ (Khôi phục tivi); đang là bàn phím của tivi thì Android tự chọn bàn phím khác. */
     fun goBoGo() { if (boGoDaCai()) sh("pm uninstall ${GoChu.GOI}") }
 
-    // ---------- TiviKit Launcher (app vn.tivikit.launcher, 27/10/2026) ----------
+    // ---------- MTVkit Launcher (app vn.tivikit.launcher, 27/10/2026) ----------
 
     fun tklDaCai(): Boolean = coGoi(TiviKitLauncher.GOI)
 
-    /** TiviKit Launcher trên tivi: bản, bí danh Home đã bật chưa, có khác bản đi kèm [apk] không. */
+    /** MTVkit Launcher trên tivi: bản, bí danh Home đã bật chưa, có khác bản đi kèm [apk] không. */
     fun docTkl(apk: ByteArray): TiviKitLauncher.TrangThai {
         if (!tklDaCai()) return TiviKitLauncher.TrangThai(null)
         val j = TiviKitLauncher.docKetQua(sh(TiviKitLauncher.LENH_DOC))
@@ -2110,10 +2110,10 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         return TiviKitLauncher.trangThai(j, coSan != vn.tivikit.dulieu.sha256(apk))
     }
 
-    /** Gửi cấu hình cho TiviKit Launcher (TiviKitLauncher.cauHinh). */
+    /** Gửi cấu hình cho MTVkit Launcher (TiviKitLauncher.cauHinh). */
     fun datCauHinhTkl(cauHinh: String) { sh(TiviKitLauncher.lenhDat(cauHinh)) }
 
-    /** Gỡ TiviKit Launcher, bỏ dịch vụ Nút nguồn của nó khỏi danh sách trợ năng trước. */
+    /** Gỡ MTVkit Launcher, bỏ dịch vụ Nút nguồn của nó khỏi danh sách trợ năng trước. */
     private fun goTklHet(): String {
         boTroNang(TiviKitLauncher.DICH_VU)
         return sh("pm uninstall ${TiviKitLauncher.GOI}")
@@ -2140,7 +2140,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
     }
 
     /**
-     * Ảnh nền của TiviKit Launcher; [anh] null = về ảnh mặc định đi kèm launcher. Gửi bằng content write như ảnh nền Home
+     * Ảnh nền của MTVkit Launcher; [anh] null = về ảnh mặc định đi kèm launcher. Gửi bằng content write như ảnh nền Home
      * sạch rồi đọc lại cỡ file launcher đang giữ (nó kiểm ảnh xong mới thay, có thể chậm một chút): false nếu không nhận.
      */
     fun datNenTkl(anh: ByteArray?): Boolean {
@@ -2159,7 +2159,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
     }
 
     /**
-     * Tên kênh và logo các ô Kênh nhanh trên TiviKit Launcher, như app_labels / app_banners của Home sạch: [o] gói → (tên
+     * Tên kênh và logo các ô Kênh nhanh trên MTVkit Launcher, như app_labels / app_banners của Home sạch: [o] gói → (tên
      * kênh, logo JPEG; logo null = ô không logo), tên null = bỏ ô (xoá tên và logo riêng). null = chưa cài launcher; false =
      * launcher bản cũ chưa biết ảnh / tên riêng (Cập nhật ở Quản lý launcher); true = đã gửi.
      */
@@ -2179,7 +2179,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
     }
 
     /**
-     * Cài / cập nhật TiviKit Launcher (chỉ khi khác bản đi kèm), cấp quyền (TiviKitLauncher.LENH_CAP_QUYEN: tên Wi-Fi, thẻ
+     * Cài / cập nhật MTVkit Launcher (chỉ khi khác bản đi kèm), cấp quyền (TiviKitLauncher.LENH_CAP_QUYEN: tên Wi-Fi, thẻ
      * Đang phát, app mở gần đây), biên dịch sẵn phần mã hay dùng sau mỗi lần cài (TiviKitLauncher.LENH_TOI_UU), rồi gửi
      * [cauHinh] (TiviKitLauncher.cauHinh: tên lời chào, nơi xem thời tiết, ngôn ngữ, dock khi mới cài). Launcher đang hiện
      * mà cài đè làm tivi về Home của hãng (Google TV: Home sạch mở nó đè lên Home của hãng; Skyworth 27/10/2026) thì mở lại.
@@ -2200,7 +2200,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         caiAppPhu(TiviKitLauncher.GOI, apk) {
             vuaCai = true
             dangHien = goiDangHien() == TiviKitLauncher.GOI
-            bao(t("Cài TiviKit Launcher lên tivi…", "Installing TiviKit Launcher on the TV…"))
+            bao(t("Cài MTVkit Launcher lên tivi…", "Installing MTVkit Launcher on the TV…"))
         }
         sh(TiviKitLauncher.LENH_CAP_QUYEN)
         // Menu ⏻ (bản 1.4): bật dịch vụ Nút nguồn, giữ các dịch vụ trợ năng khác.
@@ -2212,13 +2212,13 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         return vuaCai && dangHien
     }
 
-    /** Cài đè lúc TiviKit Launcher đang hiện làm tivi về Home của hãng: mở lại nó. */
+    /** Cài đè lúc MTVkit Launcher đang hiện làm tivi về Home của hãng: mở lại nó. */
     private fun moLaiTkl() {
         if (goiDangHien() != TiviKitLauncher.GOI) moThu(TiviKitLauncher.HOME)?.let { moThu(TiviKitLauncher.MAN) }
     }
 
     /**
-     * Bật bí danh Home của TiviKit Launcher (launcher tự bật, xem TiviKitLauncher.HOME) để Đặt làm Home được, rồi chọn lại
+     * Bật bí danh Home của MTVkit Launcher (launcher tự bật, xem TiviKitLauncher.HOME) để Đặt làm Home được, rồi chọn lại
      * ngay Home mặc định [giu] ("gói/lớp"): thêm một màn HOME cùng mức ưu tiên làm Android bỏ Home đã chọn và hỏi chọn ở lần
      * bấm Home sau, nếu người dùng thôi giữa chừng. false nếu launcher không trả lời.
      */
@@ -2228,7 +2228,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         return ok
     }
 
-    /** Gỡ TiviKit Launcher (không phải Home đang dùng), rồi chọn lại Home mặc định [giu]: bớt một màn HOME cũng làm Android bỏ Home đã chọn. */
+    /** Gỡ MTVkit Launcher (không phải Home đang dùng), rồi chọn lại Home mặc định [giu]: bớt một màn HOME cũng làm Android bỏ Home đã chọn. */
     fun goTkl(giu: String): String {
         val out = goTklHet()
         if (!giu.startsWith("${TiviKitLauncher.GOI}/")) datLaiHome(giu)
@@ -2250,7 +2250,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
 
     /**
      * Tivi rảnh để tự cập nhật tiện ích: màn hình tắt, hay không phát gì (dumpsys media_session) mà đang ở launcher, màn
-     * chờ hay chính TiviKit (app chạy ngay trên tivi). Đang mở app khác (cả HDMI, IPTV không báo phiên phát) thì không: cài
+     * chờ hay chính MTVkit (app chạy ngay trên tivi). Đang mở app khác (cả HDMI, IPTV không báo phiên phát) thì không: cài
      * đè có lúc làm màn hình nhảy về Home.
      */
     fun tiviRanh(): Boolean {
@@ -2507,7 +2507,7 @@ class ThaoTacTv(private val adb: KetNoiAdb, private val kho: KhoSaoLuu) {
         val HOME_SACH = setOf(PKG_HOME, PKG_HOME_XIAOMI)
 
         /**
-         * App phụ phải chạy nền (27/10/2026): Home sạch (phím Home, mở đè), Khoá trẻ em, Hẹn giờ, TiviKit Launcher (thẻ Đang
+         * App phụ phải chạy nền (27/10/2026): Home sạch (phím Home, mở đè), Khoá trẻ em, Hẹn giờ, MTVkit Launcher (thẻ Đang
          * phát, thời tiết). Cách tv-remote giữ app của nó trên box RAM thấp (họ đo trên box FPT Play, Android 14): thêm vào danh
          * sách bỏ qua tối ưu pin (Doze), xếp nhóm "đang dùng" (App Standby), cho chạy nền.
          */

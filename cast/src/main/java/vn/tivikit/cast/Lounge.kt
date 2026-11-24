@@ -31,7 +31,7 @@ class Lounge(
         private const val URL_MA_TV = "$GOC/pairing/get_pairing_code?ctx=pair"
         const val APP = "tivikit"
         const val THEME = "cl"
-        private const val UA = "Mozilla/5.0 (Linux; Android) TiviKit-Cast/1.0"
+        private const val UA = "Mozilla/5.0 (Linux; Android) MTVkit-Cast/1.0"
         /** Long-poll im quá lâu (YouTube gửi noop chừng 30 giây một lần) thì coi như đứt, nối lại. */
         private const val NGHE_TOI_DA_MS = 120_000
         private const val TOKEN_MAC_DINH_MS = 12 * 3_600_000L

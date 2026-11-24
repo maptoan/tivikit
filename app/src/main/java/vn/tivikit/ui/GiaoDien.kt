@@ -46,7 +46,7 @@ import vn.tivikit.ManHinh
 import vn.tivikit.R
 
 /**
- * Giao diện kiểu Apple (25/10/2026, cùng lúc đổi tên TiviKit): màu hệ thống của iOS, sáng / tối theo điện thoại (chạy
+ * Giao diện kiểu Apple (25/10/2026, cùng lúc đổi tên MTVkit): màu hệ thống của iOS, sáng / tối theo điện thoại (chạy
  * ngay trên tivi thì luôn tối, như tvOS), chữ Inter (gần SF Pro nhất; SF Pro không được dùng ngoài máy Apple), thẻ bo
  * góc không viền trên nền xám như màn Cài đặt của iPhone, công tắc xanh lá, nút đặc màu nhấn. Tên màu đọc theo chế độ
  * sáng / tối nên chỉ dùng được trong hàm @Composable (trong drawBehind… thì lấy ra biến trước).

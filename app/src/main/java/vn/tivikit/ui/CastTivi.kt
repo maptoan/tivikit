@@ -71,8 +71,8 @@ class CastTivi(private val vm: PhienLamViec) {
         val tt = trangThai
         bao = when {
             tt == null -> t("Đã cài nhưng chưa đọc lại được từ tivi. Bấm Làm mới.", "Installed, but couldn't read it back from the TV. Tap Refresh.")
-            !tt.dichVuChay -> t("Đã cài, nhưng dịch vụ Cast chưa chạy trên tivi: vào Cài đặt → Trợ năng của tivi, bật \"Cast SmartTube (TiviKit)\", rồi bấm Làm mới.",
-                "Installed, but the Cast service isn't running on the TV: open the TV's Settings → Accessibility, turn on \"Cast SmartTube (TiviKit)\", then tap Refresh.")
+            !tt.dichVuChay -> t("Đã cài, nhưng dịch vụ Cast chưa chạy trên tivi: vào Cài đặt → Trợ năng của tivi, bật \"Cast SmartTube (MTVkit)\", rồi bấm Làm mới.",
+                "Installed, but the Cast service isn't running on the TV: open the TV's Settings → Accessibility, turn on \"Cast SmartTube (MTVkit)\", then tap Refresh.")
             !tt.daNoi -> t("Dịch vụ đang chạy nhưng chưa nối được YouTube (tivi có vào mạng không?). Đợi ít giây rồi bấm Làm mới.",
                 "The service is running but hasn't reached YouTube yet (is the TV online?). Wait a few seconds and tap Refresh.")
             else -> t("Xong. Trên điện thoại cùng Wi-Fi với tivi: mở YouTube → nút Cast → chọn \"${tt.ten}\".",

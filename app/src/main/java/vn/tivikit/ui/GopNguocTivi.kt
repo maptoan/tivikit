@@ -49,7 +49,7 @@ class GopNguocTivi(private val vm: PhienLamViec) {
     var ban by mutableStateOf<GopNguoc.BanXuat?>(null)
         private set
 
-    /** Tivi đã dọn còn gói TiviKit tắt (bản sao lưu trên điện thoại này). */
+    /** Tivi đã dọn còn gói MTVkit tắt (bản sao lưu trên điện thoại này). */
     val dsTv: List<BanSaoLuu> get() = vm.dsSaoLuu.filter { it.daTatBoiApp.isNotEmpty() }
 
     /** Mở hộp, chọn sẵn tivi đang nối (nếu đã dọn), không thì tivi sao lưu gần nhất. */
@@ -107,15 +107,15 @@ internal fun NoiDungGopNguoc(vm: PhienLamViec) {
     var xem by remember { mutableStateOf(false) }
     fun chep(chu: String, thongBao: String) { clip.setText(AnnotatedString(chu)); bao = thongBao }
     Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-        Phu(t("${DuLieu.SO_MAU} danh sách tivi trong TiviKit là của CleanYourTV, do người dùng khắp nơi góp. Gửi lại các gói bạn đã tắt để người cùng mẫu tivi dọn được an toàn.",
-            "TiviKit's ${DuLieu.SO_MAU} TV lists come from CleanYourTV, shared by owners everywhere. Send back the packages you disabled so owners of the same TV can clean it safely."), ChuChinh)
+        Phu(t("${DuLieu.SO_MAU} danh sách tivi trong MTVkit là của CleanYourTV, do người dùng khắp nơi góp. Gửi lại các gói bạn đã tắt để người cùng mẫu tivi dọn được an toàn.",
+            "MTVkit's ${DuLieu.SO_MAU} TV lists come from CleanYourTV, shared by owners everywhere. Send back the packages you disabled so owners of the same TV can clean it safely."), ChuChinh)
         val ds = g.dsTv
         if (ds.size > 1) FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
             ds.forEach { b -> ChonChip(b.ten, b.khoa == g.chon?.khoa) { if (!vm.dangBan) { bao = ""; xem = false; g.chonTv(b) } } }
         }
         val b = g.ban
         when {
-            g.chon == null -> Phu(t("Điện thoại này chưa dọn tivi nào bằng TiviKit.", "No TV has been cleaned with TiviKit on this phone yet."))
+            g.chon == null -> Phu(t("Điện thoại này chưa dọn tivi nào bằng MTVkit.", "No TV has been cleaned with MTVkit on this phone yet."))
             b == null && vm.dangBan -> Phu(t("Đang soạn danh sách…", "Preparing the list…"))
             b == null -> {
                 if (vm.loi.isNotBlank()) Phu(vm.loi, DoTuoi)
@@ -159,8 +159,8 @@ internal fun NoiDungGopNguoc(vm: PhienLamViec) {
                     if (xem) Text(b.debloat, fontFamily = FontFamily.Monospace, fontSize = 11.sp, lineHeight = 14.sp,
                         modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(The2).padding(10.dp).horizontalScroll(rememberScrollState()))
                     if (bao.isNotEmpty()) Phu(bao, Xanh)
-                    Phu(t("Không dùng GitHub? Gửi vào nhóm Telegram t.me/tivikit, tác giả TiviKit chuyển giúp. Danh sách chỉ có tên gói, mẫu tivi, bản Android và firmware: không có IP, số serial hay app bạn tự cài.",
-                        "No GitHub? Post it in the Telegram group t.me/tivikit and TiviKit's author will pass it on. The list holds package names, the TV model, Android version and firmware only: no IP, serial number or apps you installed."))
+                    Phu(t("Không dùng GitHub? Gửi vào nhóm Telegram t.me/tivikit, tác giả MTVkit chuyển giúp. Danh sách chỉ có tên gói, mẫu tivi, bản Android và firmware: không có IP, số serial hay app bạn tự cài.",
+                        "No GitHub? Post it in the Telegram group t.me/tivikit and MTVkit's author will pass it on. The list holds package names, the TV model, Android version and firmware only: no IP, serial number or apps you installed."))
                 }
             }
         }

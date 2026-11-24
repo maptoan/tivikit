@@ -8,7 +8,7 @@ import java.util.Calendar
 data class Khung(val tu: Int, val den: Int, val ngay: Set<Int>)
 
 /**
- * Cấu hình phụ huynh đặt từ TiviKit. [phutThuong] / [phutCuoiTuan]: số phút được xem mỗi ngày thứ Hai–Sáu / thứ Bảy–Chủ
+ * Cấu hình phụ huynh đặt từ MTVkit. [phutThuong] / [phutCuoiTuan]: số phút được xem mỗi ngày thứ Hai–Sáu / thứ Bảy–Chủ
  * Nhật, 0 = không giới hạn (25/10/2026). [coMa]: tivi đã có mã mở khoá (Kho.maMo, lưu riêng; 28/10/2026 thay PIN).
  * [apps]: luật khoá theo app (28/10/2026, xem KhoaApp).
  */
@@ -109,7 +109,7 @@ object Luat {
 
     /**
      * Vì sao tivi khoá: hết giờ xem hôm nay (ưu tiên: khung giờ khoá có hết thì vẫn khoá tới hết ngày), trong khung giờ khoá,
-     * giờ tivi sai, hay bố mẹ bấm Khoá trẻ em ngay trên TiviKit Launcher (KhoaNgay, 28/10/2026: khoá tới khi nhập mã).
+     * giờ tivi sai, hay bố mẹ bấm Khoá trẻ em ngay trên MTVkit Launcher (KhoaNgay, 28/10/2026: khoá tới khi nhập mã).
      */
     enum class LyDo { HET_GIO, GIO_KHOA, GIO_SAI, BO_ME_KHOA }
 

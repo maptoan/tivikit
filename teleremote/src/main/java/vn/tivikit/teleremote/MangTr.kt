@@ -1,7 +1,7 @@
 package vn.tivikit.teleremote
 
 /**
- * Kiểm tra mạng của tivi từ Telegram (31/10/2026), cùng cách với Kiểm tra mạng của TiviKit (dulieu/Mang.kt): đọc đường ra
+ * Kiểm tra mạng của tivi từ Telegram (31/10/2026), cùng cách với Kiểm tra mạng của MTVkit (dulieu/Mang.kt): đọc đường ra
  * Internet (`ip route get`), Wi-Fi đang nối (dòng mWifiInfo của `dumpsys wifi`), ping tới router / Internet / YouTube, rồi
  * nhận xét. "YouTube giật" thường do Wi-Fi tới tivi (sóng yếu, băng 2,4 GHz, nhiễu) chứ không phải tivi yếu.
  */
@@ -52,7 +52,7 @@ object MangTr {
 
     enum class VanDe { MAT_MANG, LOI_DNS, SONG_YEU, SONG_VUA, BANG_24, TOC_DO_THAP, NHIEU_TRONG_NHA, MANG_CHAM, MAT_GOI, CHAP_CHON }
 
-    /** Nhận xét theo thứ tự nặng trước; rỗng = mạng ổn (như Mang.danhGia của TiviKit). */
+    /** Nhận xét theo thứ tự nặng trước; rỗng = mạng ổn (như Mang.danhGia của MTVkit). */
     fun danhGia(kq: KetQua): List<VanDe> {
         val ds = mutableListOf<VanDe>()
         val (duong, wifi, _, router, net, youtube, loiTenYoutube) = kq
@@ -78,14 +78,14 @@ object MangTr {
 
     private fun t(en: Boolean, vi: String, enS: String) = if (en) enS else vi
 
-    /** Tên vấn đề và cách sửa (như màn Kiểm tra mạng của TiviKit). */
+    /** Tên vấn đề và cách sửa (như màn Kiểm tra mạng của MTVkit). */
     fun loiKhuyen(v: VanDe, en: Boolean): Pair<String, String> = when (v) {
         VanDe.MAT_MANG -> t(en, "Tivi không ra được Internet", "The TV can't reach the Internet") to
-            t(en, "Kiểm tra router còn mạng, tắt bật lại router và tivi. Nếu tivi đặt DNS riêng, thử tắt ở mục DNS chặn quảng cáo của TiviKit.",
-                "Check the router has Internet, restart the router and the TV. If the TV uses a private DNS, try turning it off in TiviKit's Ad-blocking DNS.")
+            t(en, "Kiểm tra router còn mạng, tắt bật lại router và tivi. Nếu tivi đặt DNS riêng, thử tắt ở mục DNS chặn quảng cáo của MTVkit.",
+                "Check the router has Internet, restart the router and the TV. If the TV uses a private DNS, try turning it off in MTVkit's Ad-blocking DNS.")
         VanDe.LOI_DNS -> t(en, "Lỗi DNS: tivi không tìm được địa chỉ YouTube", "DNS error: the TV can't look up YouTube") to
-            t(en, "Thường do DNS riêng đặt sai hoặc máy chủ DNS đang hỏng: vào DNS chặn quảng cáo của TiviKit, chọn Tắt rồi đo lại.",
-                "Usually a wrong private DNS or a broken DNS server: open TiviKit's Ad-blocking DNS, choose Off and measure again.")
+            t(en, "Thường do DNS riêng đặt sai hoặc máy chủ DNS đang hỏng: vào DNS chặn quảng cáo của MTVkit, chọn Tắt rồi đo lại.",
+                "Usually a wrong private DNS or a broken DNS server: open MTVkit's Ad-blocking DNS, choose Off and measure again.")
         VanDe.SONG_YEU -> t(en, "Sóng Wi-Fi yếu", "Weak Wi-Fi signal") to
             t(en, "Video dễ giật, tụt nét. Dời router lại gần tivi, bỏ vật cản, thêm bộ phát Mesh, hoặc cắm dây LAN.",
                 "Video will stutter or drop quality. Move the router closer, remove obstacles, add a mesh node, or use an Ethernet cable.")

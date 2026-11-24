@@ -23,7 +23,7 @@ class Kho(ctx: Context) {
         get() = p.getString("screen_id", null)
         set(v) { p.edit().putString("screen_id", v).apply() }
 
-    /** Tên hiện trong nút Cast do TiviKit đặt; null = tự đặt theo tên tivi. */
+    /** Tên hiện trong nút Cast do MTVkit đặt; null = tự đặt theo tên tivi. */
     var ten: String?
         get() = p.getString("ten", null)
         set(v) { p.edit().putString("ten", v).apply() }
@@ -54,7 +54,7 @@ class Kho(ctx: Context) {
         get() = p.getBoolean("nhan_cast", true)
         set(v) { p.edit().putBoolean("nhan_cast", v).apply() }
 
-    /** 30 dòng gần nhất {luc, viec}: TiviKit đọc để biết điện thoại nào đã nối, video nào đã mở. */
+    /** 30 dòng gần nhất {luc, viec}: MTVkit đọc để biết điện thoại nào đã nối, video nào đã mở. */
     val nhatKy: JSONArray get() = runCatching { JSONArray(p.getString("nhat_ky", "[]")) }.getOrDefault(JSONArray())
 
     @Synchronized fun ghi(viec: String) {

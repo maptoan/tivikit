@@ -7,7 +7,7 @@ import java.util.concurrent.CompletableFuture
 
 /**
  * Màn trong suốt gọi Khoá trẻ em ngay (vn.tivikit.khoa/.KhoaNgay) bằng startActivityForResult rồi báo kết quả cho dịch vụ
- * (31/10/2026): KhoaNgay chỉ nhận app ký cùng khoá TiviKit, mà dịch vụ trợ năng không gọi được startActivityForResult.
+ * (31/10/2026): KhoaNgay chỉ nhận app ký cùng khoá MTVkit, mà dịch vụ trợ năng không gọi được startActivityForResult.
  */
 class GoiKhoaNgay : Activity() {
     override fun onCreate(b: Bundle?) {

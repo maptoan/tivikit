@@ -73,7 +73,7 @@ object Iptv {
             try {
                 c.instanceFollowRedirects = false
                 c.connectTimeout = 10_000; c.readTimeout = 15_000
-                c.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android) TiviKit")
+                c.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android) MTVkit")
                 val ma = c.responseCode
                 if (ma in 300..399) {
                     u = URL(URL(u), c.getHeaderField("Location") ?: error("chuyển hướng rỗng")).toString()

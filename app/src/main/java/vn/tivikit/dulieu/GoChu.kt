@@ -21,7 +21,7 @@ object GoChu {
     /** Có ký tự `input text` không gõ được (chữ có dấu, đ, emoji…): phải đi qua bộ gõ. */
     fun canBoGo(s: String): Boolean = PhimTv.boDau(s) != s
 
-    /** Bộ gõ đang dùng trên tivi đọc được là tên hợp lệ, không phải bộ gõ của TiviKit (lần trước bị ngắt giữa chừng). */
+    /** Bộ gõ đang dùng trên tivi đọc được là tên hợp lệ, không phải bộ gõ của MTVkit (lần trước bị ngắt giữa chừng). */
     fun laBoGoCu(s: String): Boolean = TEN_BO_GO.matches(s) && !s.startsWith("$GOI/")
 
     /**

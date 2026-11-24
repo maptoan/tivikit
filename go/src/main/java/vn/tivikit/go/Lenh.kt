@@ -4,7 +4,7 @@ import org.json.JSONObject
 import java.util.Base64
 
 /**
- * Lệnh gõ TiviKit gửi qua ADB: [chu] cần gõ, [cu] = bộ gõ của tivi trước khi bật bộ gõ này (gói/lớp, để trả lại), [thay] =
+ * Lệnh gõ MTVkit gửi qua ADB: [chu] cần gõ, [cu] = bộ gõ của tivi trước khi bật bộ gõ này (gói/lớp, để trả lại), [thay] =
  * thay hết chữ đang có trong ô (Tele Remote gõ từ Telegram, không thấy con trỏ; 31/10/2026), không thì chèn ở con trỏ.
  */
 data class Lenh(val chu: String, val cu: String, val thay: Boolean = false) {

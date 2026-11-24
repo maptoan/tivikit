@@ -103,7 +103,7 @@ object KhoaApp {
     /** Danh sách tên gói trong JSON, bỏ chuỗi không phải tên gói. */
     fun dsGoi(a: JSONArray?): Set<String> = if (a == null) emptySet() else (0 until a.length()).map { a.getString(it) }.filter { TEN_GOI.matches(it) }.toSet()
 
-    /** "apps" trong cấu hình TiviKit gửi; luật không có gói nào thì bỏ. */
+    /** "apps" trong cấu hình MTVkit gửi; luật không có gói nào thì bỏ. */
     fun docLuat(a: JSONArray?): List<LuatApp> = if (a == null) emptyList() else (0 until a.length()).mapNotNull { i ->
         val o = a.getJSONObject(i)
         val ks = o.optJSONArray("khung") ?: JSONArray()

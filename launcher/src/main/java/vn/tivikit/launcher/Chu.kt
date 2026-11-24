@@ -7,7 +7,7 @@ import java.time.LocalDate
 import java.util.Locale
 
 /**
- * Tiếng Việt hay tiếng Anh: TiviKit gửi theo ngôn ngữ của app trên điện thoại ("ngon_ngu"), chưa gửi thì theo tivi.
+ * Tiếng Việt hay tiếng Anh: MTVkit gửi theo ngôn ngữ của app trên điện thoại ("ngon_ngu"), chưa gửi thì theo tivi.
  * Là state của Compose nên đổi ngôn ngữ thì màn Home vẽ lại ngay.
  */
 object NgonNgu {

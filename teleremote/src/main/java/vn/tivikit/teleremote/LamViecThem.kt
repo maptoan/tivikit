@@ -11,7 +11,7 @@ import vn.tivikit.teleremote.XuLyLenh.Den
  * Việc thêm của bot (31/10/2026): lời nhắn hiện lên tivi, ⚙️ Thêm (từ 1.2 chỉ gửi lại bàn phím), bật tivi, tắt đa nhiệm
  * (2/11/2026), âm lượng bằng câu, kiểm tra mạng,
  * nhật ký, người dùng (duyệt người xin dùng, đổi vai trò, bỏ, thêm theo @username), tạm khoá thành viên; quay màn hình, ảnh
- * nền TiviKit Launcher, tất cả kênh (qua Map Voice), duyệt máy xin cast. Hàm mở rộng của LamViec, gọi từ LamViec.lam (quyền
+ * nền MTVkit Launcher, tất cả kênh (qua Map Voice), duyệt máy xin cast. Hàm mở rộng của LamViec, gọi từ LamViec.lam (quyền
  * chủ / thành viên đã xét ở đó).
  */
 
@@ -265,7 +265,7 @@ internal fun LamViec.khoaThanhVien(d: Den, nd: NguoiDung, phut: Int) {
 internal fun LamViec.quayManHinh(d: Den, nd: NguoiDung) {
     if (!ch.chupManHinh) {
         if (d.nut != null) ra.traLoiNut(d.idNut)
-        ra.gui(d.chat, t("Chụp / quay màn hình đang tắt: bật ở TiviKit → Tele Remote.", "Screenshots / recordings are off: turn them on in TiviKit → Tele Remote."))
+        ra.gui(d.chat, t("Chụp / quay màn hình đang tắt: bật ở MTVkit → Tele Remote.", "Screenshots / recordings are off: turn them on in MTVkit → Tele Remote."))
         return
     }
     if (d.nut != null) ra.traLoiNut(d.idNut, t("Đang quay 10 giây…", "Recording 10 seconds…"))
@@ -280,22 +280,22 @@ internal fun LamViec.quayManHinh(d: Den, nd: NguoiDung) {
     ghi(nd, "quay")
 }
 
-// ---------- 🖼 Ảnh nền TiviKit Launcher ----------
+// ---------- 🖼 Ảnh nền MTVkit Launcher ----------
 
 internal fun LamViec.datNen(d: Den, nd: NguoiDung) {
     val anh = dv.anhCuoi?.takeIf { it.isFile }
     if (anh == null || !dv.coApp(LamViec.TKL)) {
         ra.traLoiNut(d.idNut, if (anh == null) t("Gửi lại ảnh rồi bấm 🖼 lần nữa (ảnh đó đã bị thay).", "Send the photo again, then tap 🖼 (that one was replaced).")
-            else t("Tivi chưa có TiviKit Launcher.", "The TV doesn't have TiviKit Launcher."), canhBao = true)
+            else t("Tivi chưa có MTVkit Launcher.", "The TV doesn't have MTVkit Launcher."), canhBao = true)
         return
     }
     ra.traLoiNut(d.idNut, t("Đang đặt ảnh nền…", "Setting the wallpaper…"))
     val ok = dv.datNenTkl(anh)
     ra.gui(d.chat, when {
-        ok -> t("🖼 Đã đặt làm ảnh nền TiviKit Launcher (cắt giữa cho vừa màn hình 16:9).", "🖼 Set as the TiviKit Launcher wallpaper (centre-cropped to 16:9).")
+        ok -> t("🖼 Đã đặt làm ảnh nền MTVkit Launcher (cắt giữa cho vừa màn hình 16:9).", "🖼 Set as the MTVkit Launcher wallpaper (centre-cropped to 16:9).")
         !dv.coAdb() -> chuChuaAdb()
-        else -> t("TiviKit Launcher chưa nhận ảnh: cập nhật launcher ở TiviKit → Quản lý launcher rồi thử lại.",
-            "TiviKit Launcher didn't take the picture: update it in TiviKit → Launcher manager and try again.")
+        else -> t("MTVkit Launcher chưa nhận ảnh: cập nhật launcher ở MTVkit → Quản lý launcher rồi thử lại.",
+            "MTVkit Launcher didn't take the picture: update it in MTVkit → Launcher manager and try again.")
     }, if (ok) XuLyLenh.nutBoNen(en) else null)
     if (ok) ghi(nd, "nen")
 }
@@ -304,7 +304,7 @@ internal fun LamViec.boNen(d: Den, nd: NguoiDung) {
     val ok = dv.datNenTkl(null)
     ra.traLoiNut(d.idNut, if (ok) t("↩️ Đã về ảnh nền mặc định", "↩️ Back to the default wallpaper") else chuChuaAdb(), canhBao = !ok)
     if (!ok) return
-    ra.sua(d.chat, d.idTin, t("↩️ TiviKit Launcher đã về ảnh nền mặc định.", "↩️ TiviKit Launcher is back to its default wallpaper."))
+    ra.sua(d.chat, d.idTin, t("↩️ MTVkit Launcher đã về ảnh nền mặc định.", "↩️ MTVkit Launcher is back to its default wallpaper."))
     ghi(nd, "bo-nen")
 }
 
@@ -312,7 +312,7 @@ internal fun LamViec.boNen(d: Den, nd: NguoiDung) {
 
 internal fun LamViec.tatCaKenh(d: Den, trang: Int) {
     if (!dv.coApp(LamViec.MAP_VOICE)) {
-        ra.traLoiNut(d.idNut, t("Cần Map Voice (cài ở TiviKit → Map Voice) để mở kênh theo tên.", "Map Voice is needed (install it in TiviKit → Map Voice) to open channels by name."), canhBao = true)
+        ra.traLoiNut(d.idNut, t("Cần Map Voice (cài ở MTVkit → Map Voice) để mở kênh theo tên.", "Map Voice is needed (install it in MTVkit → Map Voice) to open channels by name."), canhBao = true)
         return
     }
     hienBang(d, t("📺 Tất cả kênh: bấm để mở. Map Voice mở bằng app kênh đã chọn, như khi nói \"mở VTV3\".",
@@ -334,7 +334,7 @@ internal fun LamViec.moKenhTen(d: Den, nd: NguoiDung, i: Int) {
 internal fun LamViec.castDuyet(d: Den, nd: NguoiDung, so: Int, lam: String) {
     val may = dv.theoDoi?.castMay?.get(so)
     if (may == null) {
-        ra.traLoiNut(d.idNut, t("Yêu cầu này đã cũ (bot vừa chạy lại): duyệt ở TiviKit → Cast SmartTube.", "This request is stale (the bot restarted): handle it in TiviKit → Cast SmartTube."), canhBao = true)
+        ra.traLoiNut(d.idNut, t("Yêu cầu này đã cũ (bot vừa chạy lại): duyệt ở MTVkit → Cast SmartTube.", "This request is stale (the bot restarted): handle it in MTVkit → Cast SmartTube."), canhBao = true)
         return
     }
     val (id, ten) = may

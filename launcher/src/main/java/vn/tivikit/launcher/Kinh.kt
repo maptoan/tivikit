@@ -94,7 +94,7 @@ object AnhNen {
         return NenKinh(anh.asImageBitmap(), mo.asImageBitmap())
     }
 
-    /** File là ảnh giải mã được (TiviKit gửi ảnh nền riêng). */
+    /** File là ảnh giải mã được (MTVkit gửi ảnh nền riêng). */
     fun hopLe(f: java.io.File): Boolean = runCatching {
         val bien = BitmapFactory.Options().apply { inJustDecodeBounds = true }
         BitmapFactory.decodeFile(f.path, bien)

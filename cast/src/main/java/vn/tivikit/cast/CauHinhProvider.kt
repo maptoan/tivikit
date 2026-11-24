@@ -10,7 +10,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * TiviKit đọc trạng thái / đặt tên qua ADB:
+ * MTVkit đọc trạng thái / đặt tên qua ADB:
  *   content call --uri content://vn.tivikit.cast --method doc
  *   content call --uri content://vn.tivikit.cast --method dat --arg '{"ten":"SmartTube phòng khách"}'   ("" = tên mặc định)
  *   content call --uri content://vn.tivikit.cast --method ma-tv   (mã TV 12 số để liên kết điện thoại, sống 5 phút)

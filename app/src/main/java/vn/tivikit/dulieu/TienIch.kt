@@ -3,14 +3,14 @@ package vn.tivikit.dulieu
 import vn.tivikit.t
 
 /**
- * Tiện ích của TiviKit trên tivi (1/11/2026): các app phụ đi kèm TiviKit (Khoá trẻ em, Hẹn giờ, Kênh nhanh, Cast, Map
- * Voice, Tele Remote, bộ gõ, TiviKit Launcher, Home sạch). Trước đây mỗi cái chỉ lên bản mới khi mở đúng màn của nó rồi
+ * Tiện ích của MTVkit trên tivi (1/11/2026): các app phụ đi kèm MTVkit (Khoá trẻ em, Hẹn giờ, Kênh nhanh, Cast, Map
+ * Voice, Tele Remote, bộ gõ, MTVkit Launcher, Home sạch). Trước đây mỗi cái chỉ lên bản mới khi mở đúng màn của nó rồi
  * lưu; nay nối tivi là so cả lượt với bản đi kèm, màn chính hiện "N tiện ích có bản mới", cập nhật một lần (hay tự làm).
  */
 object TienIch {
     enum class Loai { KHOA, HEN_GIO, KENH, CAST, MAP_VOICE, TELE_REMOTE, GO, TKL, HOME, IPTV }
 
-    /** Một tiện ích: [goi] trên tivi, [apk] trong assets của TiviKit, [ten] hiện cho người dùng. */
+    /** Một tiện ích: [goi] trên tivi, [apk] trong assets của MTVkit, [ten] hiện cho người dùng. */
     data class Muc(val loai: Loai, val goi: String, val apk: String, val ten: String)
 
     /** Bản của một APK: versionCode, versionName, SHA-256 (chữ thường). */
@@ -32,7 +32,7 @@ object TienIch {
         Muc(Loai.IPTV, Iptv.GOI, Iptv.APK, "IPTV"),
         Muc(Loai.TELE_REMOTE, TeleRemote.GOI, TeleRemote.APK, "Tele Remote"),
         Muc(Loai.GO, GoChu.GOI, "go.apk", t("Bộ gõ tiếng Việt", "Vietnamese typing")),
-        Muc(Loai.TKL, TiviKitLauncher.GOI, TiviKitLauncher.APK, "TiviKit Launcher"),
+        Muc(Loai.TKL, TiviKitLauncher.GOI, TiviKitLauncher.APK, "MTVkit Launcher"),
         Muc(Loai.HOME, goiHome, apkHome, t("Home sạch", "Clean Home")),
     )
 
@@ -41,7 +41,7 @@ object TienIch {
 
     /**
      * Cần cập nhật [m]: tivi có tiện ích này và bản đi kèm có số bản (versionCode) lớn hơn. Riêng Home sạch (dựng từ
-     * CleanYourTV, TiviKit sửa mà giữ số bản của upstream) thì cùng số bản mà khác SHA-256 cũng cập nhật. App phụ của TiviKit
+     * CleanYourTV, MTVkit sửa mà giữ số bản của upstream) thì cùng số bản mà khác SHA-256 cũng cập nhật. App phụ của MTVkit
      * cùng số bản thì thôi: CI dựng lại có lúc chỉ khác baseline profile (Cast 2.0.2 bản 1.19.3 → 1.20.0), cài lại là thừa.
      * Không hạ bản trên tivi mới hơn (bản thử cài tay); đọc không ra số bản đi kèm thì cũng thôi.
      */

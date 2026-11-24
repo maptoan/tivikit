@@ -9,7 +9,7 @@ import android.os.Bundle
 import android.os.Process
 
 /**
- * TiviKit gõ chữ qua ADB, sau khi bật bộ gõ này (`ime enable` + `ime set vn.tivikit.go/.BoGo`):
+ * MTVkit gõ chữ qua ADB, sau khi bật bộ gõ này (`ime enable` + `ime set vn.tivikit.go/.BoGo`):
  *   content call --uri content://vn.tivikit.go --method chu --arg <base64 JSON {"chu": "…", "cu": "bộ gõ cũ", "thay": false}>
  * Trả ok=1, hoặc loi=<mã> (xem BoGo.go). Chỉ nhận lời gọi từ shell (ADB) hoặc root: app khác trên tivi không gõ chữ
  * được qua đây.

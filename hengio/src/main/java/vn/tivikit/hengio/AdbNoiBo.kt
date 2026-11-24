@@ -22,11 +22,11 @@ import java.security.spec.RSAPublicKeySpec
 import java.util.Base64
 
 /**
- * Khởi động lại tivi bằng ADB của chính tivi (127.0.0.1:5555) cho Auto Reboot (2/11/2026), chép từ AdbNoiBo của TiviKit
- * Launcher (29/10/2026, đã thử trên TX3): cùng lệnh reboot với nút Khởi động lại của TiviKit. App thường không tự khởi động
+ * Khởi động lại tivi bằng ADB của chính tivi (127.0.0.1:5555) cho Auto Reboot (2/11/2026), chép từ AdbNoiBo của MTVkit
+ * Launcher (29/10/2026, đã thử trên TX3): cùng lệnh reboot với nút Khởi động lại của MTVkit. App thường không tự khởi động
  * lại được; còn khởi động lại của Android thì trên tivi MediaTek thành tắt hẳn: TvServices của MediaTek thấy lý do tắt
  * "userrequested" là cho tivi về chờ (thấy trên Skyworth). Lần đầu tivi hỏi "Cho phép gỡ lỗi?" cho khoá riêng của Hẹn giờ
- * (filesDir/adbkey; app không cho sao lưu): TiviKit cho nối thử lúc bật Auto Reboot (lệnh kdl-adb), người dùng chọn Luôn
+ * (filesDir/adbkey; app không cho sao lưu): MTVkit cho nối thử lúc bật Auto Reboot (lệnh kdl-adb), người dùng chọn Luôn
  * cho phép. Chỉ giao thức ADB thường (khoá RSA, không TLS): tivi chỉ bật Gỡ lỗi không dây thì không dùng được.
  */
 object AdbNoiBo {

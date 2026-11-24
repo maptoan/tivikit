@@ -13,7 +13,7 @@ import java.time.ZoneId
 /**
  * Bộ hẹn giờ trên tivi (25/10/2026): một báo thức hệ thống cho lần kế tiếp (Lich.keTiep), tới giờ thì bật tivi (đánh
  * thức màn hình rồi mở app nếu có), tắt tivi (báo trước 60 giây, có Hoãn) hoặc mở app. Lịch hằng tuần và việc một lần
- * (31/10/2026) do TiviKit gửi qua ADB (CauHinhProvider) hay đặt ở màn Hẹn giờ trên tivi (BangHenGio); tivi tự chạy, không
+ * (31/10/2026) do MTVkit gửi qua ADB (CauHinhProvider) hay đặt ở màn Hẹn giờ trên tivi (BangHenGio); tivi tự chạy, không
  * cần điện thoại.
  */
 object HenGio {
@@ -110,7 +110,7 @@ object HenGio {
         if (bo.isNotEmpty()) kho.motLanDs = ds - bo.toSet()
     }
 
-    /** Thêm việc một lần (TiviKit hay màn Hẹn giờ trên tivi); trả mã lỗi ("trung", "qua-nhieu"), null nếu xong. */
+    /** Thêm việc một lần (MTVkit hay màn Hẹn giờ trên tivi); trả mã lỗi ("trung", "qua-nhieu"), null nếu xong. */
     fun themMotLan(ctx: Context, m: MotLan): String? {
         val kho = Kho(ctx)
         val ds = kho.motLanDs
@@ -131,7 +131,7 @@ object HenGio {
         return true
     }
 
-    /** Lưu lịch hằng tuần sửa trên màn Hẹn giờ của tivi (như lệnh dat của TiviKit, nhưng giữ lần hoãn tắt đang có). */
+    /** Lưu lịch hằng tuần sửa trên màn Hẹn giờ của tivi (như lệnh dat của MTVkit, nhưng giữ lần hoãn tắt đang có). */
     fun luuLich(ctx: Context, ds: List<Viec>) {
         Kho(ctx).lich = Lich.sapXep(ds)
         datBaoThuc(ctx)
@@ -152,7 +152,7 @@ object HenGio {
     /**
      * Sáng màn hình như bấm remote (31/10/2026): tivi đang chờ thì bật lên, đang ở màn bảo vệ thì tắt nó. Màn bảo vệ vẫn
      * tính là đang bật, mà app mở lúc đó nằm phía sau nó, không ai thấy (app Cast, TX3 28/10/2026). Khoá thức
-     * ACQUIRE_CAUSES_WAKEUP; Android 14+ cần quyền TURN_SCREEN_ON (TiviKit cấp qua ADB).
+     * ACQUIRE_CAUSES_WAKEUP; Android 14+ cần quyền TURN_SCREEN_ON (MTVkit cấp qua ADB).
      */
     private fun sangManHinh(ctx: Context, ms: Long) {
         @Suppress("DEPRECATION")

@@ -21,7 +21,7 @@ enum class CachMo(val ma: String) {
 data class CauRieng(val chu: String, val dich: String)
 
 /**
- * Cấu hình TiviKit gửi qua ADB (content call … --method dat). [appYouTube] = gói app mở YouTube (SmartTube, TizenTube,
+ * Cấu hình MTVkit gửi qua ADB (content call … --method dat). [appYouTube] = gói app mở YouTube (SmartTube, TizenTube,
  * YouTube gốc; "" = SmartTube đầu tiên có trên tivi). [nhacVideo] = câu tìm nhạc, video không nói "YouTube" cũng chuyển.
  * [kenh] = bắt câu mở kênh, mở bằng [appKenh] ("vtvgo" / "tv360" / "fptplay"; app đó không có kênh thì dùng app khác;
  * "auto" = tự chọn nguồn, TuChon). [cauRieng] = câu riêng, xét trước hết theo thứ tự. [doiNguon] = kênh mở tự chọn nguồn
@@ -92,7 +92,7 @@ data class KenhTv(
     val tenFpt: String = ten,
 )
 
-/** Một câu vừa nghe, việc đã làm và app đã mở ([app] = tên gói, "" nếu không mở app nào), cho TiviKit xem lại. */
+/** Một câu vừa nghe, việc đã làm và app đã mở ([app] = tên gói, "" nếu không mở app nào), cho MTVkit xem lại. */
 data class NhatKy(val luc: Long, val cau: String, val viec: String, val app: String = "")
 
 /** Cấu hình, danh sách kênh và nhật ký, lưu trên tivi. */
@@ -103,14 +103,14 @@ class Kho(ctx: Context) {
         get() = CauHinh.tuJson(p.getString("cau_hinh", null)) ?: CauHinh()
         set(v) { p.edit().putString("cau_hinh", v.json().toString()).apply() }
 
-    /** Danh sách kênh dạng TiviKit gửi ({"vtvgo":[…],"tv360":[…],"fptplay":[…]}). */
+    /** Danh sách kênh dạng MTVkit gửi ({"vtvgo":[…],"tv360":[…],"fptplay":[…]}). */
     var kenhJson: String
         get() = p.getString("kenh", null) ?: ""
         set(v) { p.edit().putString("kenh", v).apply() }
 
     /**
      * Danh sách kênh đã đọc. Nhớ chung cả app theo đúng chuỗi JSON: dịch vụ và CauHinhProvider mỗi bên một Kho, nhớ riêng thì
-     * dịch vụ không thấy danh sách TiviKit vừa gửi (thấy trên TX3: "Xem" mở được VTV3, "Chạy" lại bỏ qua).
+     * dịch vụ không thấy danh sách MTVkit vừa gửi (thấy trên TX3: "Xem" mở được VTV3, "Chạy" lại bỏ qua).
      */
     val dsKenh: List<KenhTv>
         get() {
@@ -120,8 +120,8 @@ class Kho(ctx: Context) {
         }
 
     /**
-     * Thứ tự riêng của các ô Kênh nhanh Auto (TuChonNguon.thuTuTu, TiviKit gửi): câu nói "mở VTV1" khi app kênh là "auto"
-     * thì theo đúng ô VTV1 đó, như bấm ô. Lưu nguyên chuỗi TiviKit gửi.
+     * Thứ tự riêng của các ô Kênh nhanh Auto (TuChonNguon.thuTuTu, MTVkit gửi): câu nói "mở VTV1" khi app kênh là "auto"
+     * thì theo đúng ô VTV1 đó, như bấm ô. Lưu nguyên chuỗi MTVkit gửi.
      */
     var thuTuJson: String
         get() = p.getString("thu_tu", null) ?: "[]"

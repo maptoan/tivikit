@@ -8,7 +8,7 @@ import android.os.Bundle
 import android.os.Process
 
 /**
- * TiviKit đặt / đọc kênh qua ADB:
+ * MTVkit đặt / đọc kênh qua ADB:
  *   content call --uri content://vn.tivikit.kenh --method dat --arg '{"so":"001","ten":"VTV1"}'
  *   content call --uri content://vn.tivikit.kenh --method dat --arg '{"app":"vtvgo","ma":"3","ten":"VTV3"}'
  *   content call --uri content://vn.tivikit.kenh --method dat --arg '{"app":"fptplay","ma":"vtv1-hd","ten":"VTV1"}'

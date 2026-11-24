@@ -217,7 +217,7 @@ object GoiY {
     private fun lay(url: String): String {
         val c = URL(url).openConnection() as HttpURLConnection
         c.connectTimeout = 15000; c.readTimeout = 20000
-        c.setRequestProperty("User-Agent", "TiviKit")
+        c.setRequestProperty("User-Agent", "MTVkit")
         c.setRequestProperty("Accept", "application/vnd.github+json, text/html, */*")
         try {
             if (c.responseCode != 200) error(t("Máy chủ trả lỗi ${c.responseCode} ($url)", "Server error ${c.responseCode} ($url)"))
@@ -305,7 +305,7 @@ object TaiLink {
             val c = URL(u).openConnection() as HttpURLConnection
             c.instanceFollowRedirects = false // tự theo để đi được cả http → https và sang tên miền khác
             c.connectTimeout = 15000; c.readTimeout = 30000
-            c.setRequestProperty("User-Agent", "TiviKit")
+            c.setRequestProperty("User-Agent", "MTVkit")
             try {
                 val ma = c.responseCode
                 if (ma in 300..399) { u = URL(URL(u), c.getHeaderField("Location") ?: error("Chuyển hướng không có địa chỉ")).toString(); return@repeat }

@@ -13,7 +13,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 /**
- * Tự cập nhật TiviKit (26/10/2026) từ GitHub Releases của [KHO]: mỗi bản phát hành đính kèm cap-nhat.json (số bản, link
+ * Tự cập nhật MTVkit (26/10/2026) từ GitHub Releases của [KHO]: mỗi bản phát hành đính kèm cap-nhat.json (số bản, link
  * APK, cỡ, SHA-256, nhật ký); link releases/latest/download luôn trỏ tới bản mới nhất (không tính lượt gọi API). Tải APK,
  * kiểm tra cỡ + SHA-256 rồi cài bằng PackageInstaller: Android 12+ cho app tự cập nhật chính nó không cần bấm, máy cũ
  * hơn mở hộp cài của Android. Android chỉ cài đè khi APK cùng chữ ký, nên bản giả không cài được.
@@ -22,7 +22,7 @@ import java.net.URL
  * từ JSON làm đường dẫn. App phụ, dữ liệu đi theo bản phát hành (ký, kiểm SHA-256).
  */
 object CapNhat {
-    const val KHO = "Circling5714/tivikit"
+    const val KHO = "maptoan/tivikit"
     const val GOC = "https://github.com/$KHO/releases/latest/download"
     /** Trang các bản phát hành, mỗi bản kèm nhật ký. */
     const val TRANG = "https://github.com/$KHO/releases"
@@ -35,7 +35,7 @@ object CapNhat {
 
     private fun prefs(ctx: Context) = ctx.getSharedPreferences("ota", Context.MODE_PRIVATE)
 
-    /** Tự tải và cài bản mới lúc không mở app (bật sẵn, tắt ở mục Cập nhật TiviKit). */
+    /** Tự tải và cài bản mới lúc không mở app (bật sẵn, tắt ở mục Cập nhật MTVkit). */
     fun tuCai(ctx: Context) = prefs(ctx).getBoolean("tu_cai", true)
 
     fun datTuCai(ctx: Context, bat: Boolean) = prefs(ctx).edit().putBoolean("tu_cai", bat).apply()
@@ -88,7 +88,7 @@ object CapNhat {
     /** Tải APK bản mới vào cache (tải sẵn rồi mà còn đúng thì dùng lại) và kiểm tra; sai cỡ / SHA-256 thì báo lỗi, không cài. */
     @Synchronized fun taiVe(ctx: Context, ban: BanMoi): File {
         // Tên file theo số bản (versionCode), không lấy versionName của JSON làm đường dẫn.
-        val f = File(ctx.cacheDir, "cap-nhat/TiviKit-${ban.versionCode}.apk").apply { parentFile?.mkdirs() }
+        val f = File(ctx.cacheDir, "cap-nhat/MTVkit-${ban.versionCode}.apk").apply { parentFile?.mkdirs() }
         if (f.isFile && hopLe(f.readBytes(), ban)) return f
         val b = tai(ban.apk, 180)
         if (!hopLe(b, ban)) error(t("file tải về không khớp bản đã phát hành (cỡ / SHA-256)", "the download doesn't match the release (size / SHA-256)"))
@@ -110,7 +110,7 @@ object CapNhat {
         }
         val id = pi.createSession(ts)
         pi.openSession(id).use { s ->
-            f.inputStream().use { i -> s.openWrite("TiviKit.apk", 0, f.length()).use { o -> i.copyTo(o); s.fsync(o) } }
+            f.inputStream().use { i -> s.openWrite("MTVkit.apk", 0, f.length()).use { o -> i.copyTo(o); s.fsync(o) } }
             val y = Intent(ctx, KetQuaCai::class.java).putExtra(KetQuaCai.NGAM, ngam)
                 .putExtra(KetQuaCai.MA, ban.versionCode).putExtra(KetQuaCai.TEN, ban.versionName).putExtra(KetQuaCai.GHI_CHU, ban.ghiChu)
             // FLAG_MUTABLE: hệ thống ghi kết quả (EXTRA_STATUS, hộp cài…) vào intent này.

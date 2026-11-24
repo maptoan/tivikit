@@ -104,7 +104,7 @@ class DieuKhien(private val vm: PhienLamViec) {
 
     /**
      * Gửi chữ trong ô lên tivi, [enter] = bấm Enter sau khi gõ. Chữ không dấu gõ bằng `input text` (nhanh); chữ có dấu
-     * (25/10/2026) đi qua bộ gõ tiếng Việt của TiviKit trên tivi (GoChu); bộ gõ hỏng thì dán qua clipboard (27/10/2026), ô
+     * (25/10/2026) đi qua bộ gõ tiếng Việt của MTVkit trên tivi (GoChu); bộ gõ hỏng thì dán qua clipboard (27/10/2026), ô
      * nhập không nhận thì gõ không dấu như trước.
      */
     fun guiChu(enter: Boolean) {
@@ -146,7 +146,7 @@ class DieuKhien(private val vm: PhienLamViec) {
     }
 
     /**
-     * Gõ chữ có dấu qua bộ gõ của TiviKit trên tivi (lần đầu cài bộ gõ); rớt kết nối thì nối lại một lần. Trả "ok" / mã
+     * Gõ chữ có dấu qua bộ gõ của MTVkit trên tivi (lần đầu cài bộ gõ); rớt kết nối thì nối lại một lần. Trả "ok" / mã
      * lỗi của bộ gõ ("loi" nếu cài không được…), null nếu mất kết nối (đã báo).
      */
     private suspend fun goCoDau(s: String): String? {

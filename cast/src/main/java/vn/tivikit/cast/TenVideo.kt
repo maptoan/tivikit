@@ -11,7 +11,7 @@ import kotlin.concurrent.thread
  * Tên và kênh của một video YouTube, tra bằng oEmbed của YouTube, hỏng thì bằng API player của trang web YouTube (không
  * cần khoá API; tên gốc của video, không phải tên YouTube dịch). SmartTube mở video từ đường link (video cast sang) thì
  * phiên phát chỉ có mã video, không có tên bài: nó ghi phiên lúc chưa tải xong tên và không ghi lại (28/10/2026,
- * Skyworth). Tra nền, nhớ trong bộ nhớ; tra hỏng thì 10 phút sau mới thử lại. TiviKit Launcher có bản giống hệt
+ * Skyworth). Tra nền, nhớ trong bộ nhớ; tra hỏng thì 10 phút sau mới thử lại. MTVkit Launcher có bản giống hệt
  * (launcher/TenVideo.kt).
  */
 object TenVideo {

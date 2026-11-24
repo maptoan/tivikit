@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-/** Màu các màn của app Cast (28/10/2026): nền chàm tím, kính mờ trắng như TiviKit Launcher. */
+/** Màu các màn của app Cast (28/10/2026): nền chàm tím, kính mờ trắng như MTVkit Launcher. */
 object Mau {
     val nenTren = Color(0xFF0B1026)
     val nenDuoi = Color(0xFF2E1B5A)
@@ -82,7 +82,7 @@ fun The(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Un
 private val PHIM_OK = setOf(Key.DirectionCenter, Key.Enter, Key.NumPadEnter)
 
 /**
- * Ô bấm được bằng remote: sáng lên khi đang chọn; OK (hay chạm, qua màn chiếu của TiviKit) để bấm. Dùng focusable() thay
+ * Ô bấm được bằng remote: sáng lên khi đang chọn; OK (hay chạm, qua màn chiếu của MTVkit) để bấm. Dùng focusable() thay
  * clickable(): clickable không nhận chọn sẵn khi tivi đang ở chế độ cảm ứng (TX3 vừa mở app bằng lệnh, chưa bấm phím nào).
  */
 @Composable

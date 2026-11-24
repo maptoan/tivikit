@@ -20,7 +20,7 @@ import java.io.File
 import java.io.FileNotFoundException
 
 /**
- * TiviKit đặt / đọc cấu hình qua ADB:
+ * MTVkit đặt / đọc cấu hình qua ADB:
  *   content call --uri content://vn.tivikit.launcher --method dat --arg '{"ten":"Nhà bác Hùng","dock":["org.smarttube.stable"],"ngon_ngu":"vi"}'
  *   content call --uri content://vn.tivikit.launcher --method doc
  *   content call --uri content://vn.tivikit.launcher --method bat-home   (hoặc tat-home)
@@ -61,7 +61,7 @@ class CauHinhProvider : ContentProvider() {
                 val ma = if (Build.VERSION.SDK_INT >= 28) pi.longVersionCode else pi.versionCode.toLong()
                 val homeBat = pm.getComponentEnabledSetting(ComponentName(ctx, HOME)) == PackageManager.COMPONENT_ENABLED_STATE_ENABLED
                 // Bài đang phát (như thẻ Đang phát đọc: bản 1.5.1 trở đi chỉ app đang phát nền), hoặc "khong-co-quyen" (box RAM
-                // thấp không cho đọc phiên phát): TiviKit báo ở thẻ. "coTieng" / "ngheNen" (1.5.1): tivi đang có tiếng nhạc /
+                // thấp không cho đọc phiên phát): MTVkit báo ở thẻ. "coTieng" / "ngheNen" (1.5.1): tivi đang có tiếng nhạc /
                 // video không, các app đã nghe thấy phát nền; để xem trên tivi thật vì sao thẻ hiện hay không.
                 val dangPhat: Any = try {
                     DangPhat.doc(ctx, { g -> runCatching { pm.getApplicationLabel(pm.getApplicationInfo(g, 0)).toString() }.getOrDefault(g) })?.first?.let { b ->
@@ -72,7 +72,7 @@ class CauHinhProvider : ContentProvider() {
                 } catch (_: Exception) {
                     JSONObject.NULL
                 }
-                // Ảnh riêng của từng app đang giữ: gói → cỡ file (TiviKit biết launcher nhận ảnh riêng, bản 1.1 trở đi).
+                // Ảnh riêng của từng app đang giữ: gói → cỡ file (MTVkit biết launcher nhận ảnh riêng, bản 1.1 trở đi).
                 val anhApp = JSONObject()
                 File(ctx.filesDir, ANH_APP).listFiles()?.filter { it.name.endsWith(".jpg") }?.forEach { anhApp.put(it.name.removeSuffix(".jpg"), it.length()) }
                 // Câu kinh mỗi ngày (bản 1.4 trở đi): bật không, bộ riêng hay Kinh Pháp Cú đi kèm, có bao nhiêu câu.
@@ -80,7 +80,7 @@ class CauHinhProvider : ContentProvider() {
                 val (rieng, bo) = runCatching { docBoCau(ctx) }.getOrDefault(false to emptyList())
                 val cau = JSONObject().put("bat", CauHinh.cauBat(cj)).put("ten", CauHinh.tenCau(cj)).put("rieng", rieng)
                     .put("so", bo.sumOf { it.soLuong }).put("co", File(ctx.filesDir, CAU).length())
-                // Dòng thông số, tốc độ mạng (bản 1.5 trở đi): TiviKit biết launcher tắt được chúng.
+                // Dòng thông số, tốc độ mạng (bản 1.5 trở đi): MTVkit biết launcher tắt được chúng.
                 val hienThi = JSONObject().put("thongSo", CauHinh.hienThongSo(cj)).put("tocDo", CauHinh.hienTocDo(cj))
                 val o = JSONObject().put("ban", pi.versionName).put("ma", ma).put("homeBat", homeBat).put("cauHinh", cj)
                     .put("nen", File(ctx.filesDir, ANH_NEN).length()).put("anhApp", anhApp).put("dangPhat", dangPhat).put("cau", cau)
@@ -163,9 +163,9 @@ class CauHinhProvider : ContentProvider() {
         /** Bí danh có bộ lọc HOME (AndroidManifest.xml). */
         const val HOME = "vn.tivikit.launcher.Home"
         const val ANH_NEN = "anh-nen.jpg"
-        /** Thư mục ảnh riêng của từng app (logo kênh của ô Kênh nhanh) TiviKit gửi. */
+        /** Thư mục ảnh riêng của từng app (logo kênh của ô Kênh nhanh) MTVkit gửi. */
         const val ANH_APP = "anh-app"
-        /** Bộ câu kinh riêng TiviKit gửi, thay Kinh Pháp Cú đi kèm (assets/phap-cu.txt). */
+        /** Bộ câu kinh riêng MTVkit gửi, thay Kinh Pháp Cú đi kèm (assets/phap-cu.txt). */
         const val CAU = "cau.txt"
         private const val CAU_TOI_DA = 1024L * 1024
 

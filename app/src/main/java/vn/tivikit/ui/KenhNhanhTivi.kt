@@ -18,9 +18,9 @@ import vn.tivikit.t
  * Kênh nhanh (25/10/2026, muốn một nút mở thẳng VTV1; cùng ngày thành nhiều ô; 26/10/2026 thêm ô VTVgo; 31/10/2026 ô
  * FPT Play; 1/11/2026 ô M3U, ô Auto, rồi ô IPTV thay cho M3U): tối đa KenhNhanh.SO_O ô kênh, mỗi ô một app phụ trên tivi
  * (module kenh/) mở thẳng một kênh trên TV360, VTVgo, FPT Play hoặc IPTV (kênh trong danh sách IPTV của người dùng, phát
- * bằng app IPTV của TiviKit); ô Auto để Map Voice chọn nguồn nào trong số đó đang phát được (TuChon của Map Voice). Ô M3U
+ * bằng app IPTV của MTVkit); ô Auto để Map Voice chọn nguồn nào trong số đó đang phát được (TuChon của Map Voice). Ô M3U
  * làm trước đó vẫn chạy, sửa thì thành ô IPTV. Thêm / sửa
- * ô (cài app của ô, đặt kênh, đặt tên ô theo tên kênh và logo kênh trên Home sạch và TiviKit Launcher, thêm vào dock Home
+ * ô (cài app của ô, đặt kênh, đặt tên ô theo tên kênh và logo kênh trên Home sạch và MTVkit Launcher, thêm vào dock Home
  * sạch nếu muốn), bấm thử, gán nút remote (màn Nút remote chọn sẵn ô đó), bỏ ô. Ô kênh VTVgo kiểu cũ (ô link của Home
  * sạch, KenhVtvGo; không gán được nút remote) chuyển được thành ô ở đây. Ảnh ô mang huy hiệu app mở kênh ở góc phải dưới
  * (1/11/2026, AnhOKenh); ô làm trước đó vẽ lại một lượt (veLaiAnh).
@@ -70,7 +70,7 @@ class KenhNhanhTivi(private val vm: PhienLamViec) {
     var kenhIptv by mutableStateOf<Iptv.Kenh?>(null)
         private set
     var moChonIptv by mutableStateOf(false)
-    /** App IPTV của TiviKit đang cài trên tivi. */
+    /** App IPTV của MTVkit đang cài trên tivi. */
     var coIptv by mutableStateOf(false)
         private set
     /** Kênh M3U có phím tắt trên tivi (ThaoTacTv.docKenhM3u): (tên, mã); còn dùng làm nguồn của ô Auto. */
@@ -403,7 +403,7 @@ class KenhNhanhTivi(private val vm: PhienLamViec) {
 
     /**
      * Cài / cập nhật app của ô [o] (app phụ cũ chưa biết VTVgo thì bản đi kèm thay vào), đặt kênh [k], tên ô, logo kênh
-     * (kèm huy hiệu app) và dock trên Home sạch, tên ô và logo trên TiviKit Launcher. Trả câu nói thêm ô nằm ở đâu trên Home sạch.
+     * (kèm huy hiệu app) và dock trên Home sạch, tên ô và logo trên MTVkit Launcher. Trả câu nói thêm ô nằm ở đâu trên Home sạch.
      */
     private suspend fun themO(o: Int, k: KenhNhanh.Kenh, trongDock: Boolean): String {
         val goi = KenhNhanh.goiCua(o)
@@ -420,7 +420,7 @@ class KenhNhanhTivi(private val vm: PhienLamViec) {
         val logo = logo(k)
         vm.thongTin?.khoaLuu?.let { ghiDaVeLai("$it#$o") }
         val tkl = if (!coTkl) "" else {
-            vm.thongBao = t("Đặt ô ${k.ten} trên TiviKit Launcher…", "Setting the ${k.ten} tile on TiviKit Launcher…")
+            vm.thongBao = t("Đặt ô ${k.ten} trên MTVkit Launcher…", "Setting the ${k.ten} tile on MTVkit Launcher…")
             tklCu(runCatching { vm.io { vm.tv.datOKenhTkl(mapOf(goi to (k.ten to logo))) } }.getOrNull())
         }
         if (!vm.daCoHomeSach) return tkl
@@ -450,13 +450,13 @@ class KenhNhanhTivi(private val vm: PhienLamViec) {
         } + tkl
     }
 
-    /** Lời nhắc khi TiviKit Launcher trên tivi còn bản cũ, chưa hiện tên kênh và logo của ô ([kq] của datOKenhTkl). */
+    /** Lời nhắc khi MTVkit Launcher trên tivi còn bản cũ, chưa hiện tên kênh và logo của ô ([kq] của datOKenhTkl). */
     private fun tklCu(kq: Boolean?) = if (kq != false) "" else t(
-        " TiviKit Launcher hiện tên kênh và logo của ô sau khi cập nhật nó: mở Quản lý launcher, bấm Cập nhật.",
-        " TiviKit Launcher shows the tile's channel name and logo once it's updated: open Manage launchers and tap Update.")
+        " MTVkit Launcher hiện tên kênh và logo của ô sau khi cập nhật nó: mở Quản lý launcher, bấm Cập nhật.",
+        " MTVkit Launcher shows the tile's channel name and logo once it's updated: open Manage launchers and tap Update.")
 
     /**
-     * Gửi tên kênh và logo của mọi ô đang có lên TiviKit Launcher (vừa cài / cập nhật launcher: nó chưa biết các ô có sẵn).
+     * Gửi tên kênh và logo của mọi ô đang có lên MTVkit Launcher (vừa cài / cập nhật launcher: nó chưa biết các ô có sẵn).
      * Kết quả như datOKenhTkl; null cả khi tivi không có ô nào.
      */
     suspend fun guiTkl(): Boolean? {
@@ -470,7 +470,7 @@ class KenhNhanhTivi(private val vm: PhienLamViec) {
     }
 
     /**
-     * Vẽ lại ảnh mọi ô đang có (logo kênh kèm huy hiệu app mở kênh) trên TiviKit Launcher và Home sạch, cho các ô làm trước
+     * Vẽ lại ảnh mọi ô đang có (logo kênh kèm huy hiệu app mở kênh) trên MTVkit Launcher và Home sạch, cho các ô làm trước
      * khi có huy hiệu (1/11/2026). Home sạch khởi động lại một lần mới thấy ảnh mới. Ô không vẽ được ảnh thì giữ ảnh cũ.
      */
     fun veLaiAnh() = vm.chay(t("Đang vẽ lại ảnh các ô…", "Redrawing the tiles…")) {
@@ -481,7 +481,7 @@ class KenhNhanhTivi(private val vm: PhienLamViec) {
         if (anh.none { (_, k, _) -> k.laAuto || k.app in bieuTuong }) error(t("Không đọc được biểu tượng app xem kênh trên tivi nên chưa vẽ lại. Thử lại.",
             "Couldn't read the channel apps' icons on the TV, so nothing was redrawn. Try again."))
         val tkl = if (TiviKitLauncher.GOI !in vm.trangThai?.caiDat.orEmpty()) "" else {
-            vm.thongBao = t("Gửi ảnh các ô lên TiviKit Launcher…", "Sending the tiles to TiviKit Launcher…")
+            vm.thongBao = t("Gửi ảnh các ô lên MTVkit Launcher…", "Sending the tiles to MTVkit Launcher…")
             tklCu(runCatching { vm.io { vm.tv.datOKenhTkl(anh.associate { (o, k, b) -> o.goi to (k.ten to b) }) } }.getOrNull())
         }
         if (vm.daCoHomeSach) {
@@ -604,7 +604,7 @@ class KenhNhanhTivi(private val vm: PhienLamViec) {
         baoLech = false
     }
 
-    /** Bỏ ô [o]: gỡ app của ô, bỏ tên ô và logo (Home sạch, TiviKit Launcher), ô trong dock và nút remote đang gán cho nó. */
+    /** Bỏ ô [o]: gỡ app của ô, bỏ tên ô và logo (Home sạch, MTVkit Launcher), ô trong dock và nút remote đang gán cho nó. */
     fun bo(o: O) = vm.chay(t("Đang bỏ ô ${o.kenh?.ten ?: o.so}…", "Removing tile ${o.kenh?.ten ?: o.so}…")) {
         vm.damBaoKetNoi()
         bao = ""; baoLech = false

@@ -6,7 +6,7 @@ import java.util.Locale
 
 /**
  * Chữ trên màn Hẹn giờ của tivi (31/10/2026): tiếng Việt khi tivi đặt tiếng Việt, không thì tiếng Anh (như Khoá trẻ em).
- * Nhật ký nói bằng lời giống TiviKit trên điện thoại (dulieu/HenGio.moTa).
+ * Nhật ký nói bằng lời giống MTVkit trên điện thoại (dulieu/HenGio.moTa).
  */
 internal object Chu {
     val vi: Boolean get() = Locale.getDefault().language == "vi"
@@ -110,7 +110,7 @@ internal object Chu {
         return "$v – $k"
     }
 
-    /** Kết quả Auto Reboot nói bằng lời (như dulieu/HenGio.moTa của TiviKit). */
+    /** Kết quả Auto Reboot nói bằng lời (như dulieu/HenGio.moTa của MTVkit). */
     fun kdl(kq: String): String = when (kq) {
         "khoi-dong-lai" -> t("tivi đang chờ, đã gửi lệnh khởi động lại", "the TV was in standby; restarting it")
         "thu" -> t("thử ngay: đã gửi lệnh khởi động lại", "test: restarting now")

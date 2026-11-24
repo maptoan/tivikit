@@ -31,7 +31,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
@@ -53,7 +53,7 @@ jobs:
       - name: "Ổn: commit và phát hành"
         if: steps.mau.outputs.doi == '1' && steps.test.outcome == 'success' && steps.mau.outputs.chan == ''
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.PAT_WORKFLOW || github.token }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -63,7 +63,7 @@ jobs:
           if python3 scripts/phat_hanh.py chi-du-lieu; then TU_DONG=true; else TU_DONG=false; fi
           gh workflow run phat-hanh.yml --ref "$GITHUB_REF_NAME" -f loai=va -f tu_dong=$TU_DONG \
             -f ghi_chu="$(cat dist/mau-ghi-chu.txt)" -f ghi_chu_en="$(cat dist/mau-ghi-chu-en.txt)"
-          if [ "$TU_DONG" = true ]; then CACH="tự phát hành"; else CACH="có code chưa phát hành nên chờ chủ kho duyệt"; fi
+          if [ "$TU_DONG" = true ]; then CACH="tự phát hành"; else CACH="phát hành kèm bản cập nhật mới"; fi
           echo "$(head -n 1 dist/mau-commit.txt) — $CACH" >> "$GITHUB_STEP_SUMMARY"
 
       - name: "Chưa ổn: mở pull request"

@@ -21,7 +21,7 @@ class MayThu(private val ctx: Context) {
     private val tp = TrinhPhat(ctx)
     private val lounge = Lounge(kho, ::tenHien, thietBi(), ::nhan, kho::ghi)
     private val dial = Dial(
-        kho.uuid, ::tenHien, Build.MANUFACTURER, Build.MODEL, "Android/${Build.VERSION.RELEASE} UPnP/1.1 TiviKit-Cast/1.0",
+        kho.uuid, ::tenHien, Build.MANUFACTURER, Build.MODEL, "Android/${Build.VERSION.RELEASE} UPnP/1.1 MTVkit-Cast/1.0",
         { ma, theme -> theme == Lounge.THEME && lounge.dangKyMa(ma) }, kho::ghi)
     private var khoaWifi: WifiManager.MulticastLock? = null
     /** Điện thoại đang nối (id → tên). */
@@ -127,7 +127,7 @@ class MayThu(private val ctx: Context) {
 
     // ---------- Điện thoại: duyệt, chặn, huỷ liên kết (28/10/2026) ----------
 
-    /** Làm [lam] với máy [id] (màn trên tivi, TiviKit qua provider). */
+    /** Làm [lam] với máy [id] (màn trên tivi, MTVkit qua provider). */
     fun lamDienThoai(id: String, lam: DanhBa.Lam) {
         val truoc = kho.dienThoai.firstOrNull { it.id == id } ?: return
         kho.doiDienThoai { DanhBa.lam(it, id, lam, System.currentTimeMillis()) }

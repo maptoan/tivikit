@@ -5,7 +5,7 @@ package vn.tivikit.dulieu
  * hay app hỏng vẫn đưa được tivi về như cũ chỉ với adb. Mỗi dòng là một lệnh adb thuần, không dùng tính năng riêng
  * của shell nào, nên cùng một file chạy được trên Windows (đuôi .bat) lẫn Mac / Linux (`sh file.bat`). Dòng chú thích
  * bắt đầu bằng ": # " — Windows coi là nhãn, sh coi là lệnh rỗng kèm chú thích — nên cả hai đều bỏ qua. Phải có "# ": sh
- * vẫn đọc các chữ sau ":" như lệnh, ngoặc hay nháy đơn ("TiviKit's", "(Android platform-tools)") làm hỏng cả file
+ * vẫn đọc các chữ sau ":" như lệnh, ngoặc hay nháy đơn ("MTVkit's", "(Android platform-tools)") làm hỏng cả file
  * (28/10/2026). Xuống dòng chỉ bằng LF: cmd.exe đọc được, còn CR làm sh thêm "\r" vào cuối mỗi lệnh.
  */
 object KichBanKhoiPhuc {
@@ -20,14 +20,14 @@ object KichBanKhoiPhuc {
         fun chu(s: String) { dong += ": # " + s.replace('\r', ' ').replace('\n', ' ') }
         // Lệnh để sẵn mà chưa chạy: người dùng bỏ ": " ở đầu dòng là thành lệnh.
         fun lenhTat(s: String) { dong += ": $s" }
-        chu(t("TiviKit: kịch bản khôi phục cho ${sl.ten}", "TiviKit: restore script for ${sl.ten}"))
+        chu(t("MTVkit: kịch bản khôi phục cho ${sl.ten}", "MTVkit: restore script for ${sl.ten}"))
         chu(t("Cần adb (Android platform-tools). Windows: bấm đúp file này. Mac / Linux: sh tên-file.bat",
             "Needs adb (Android platform-tools). Windows: double-click this file. Mac / Linux: sh file-name.bat"))
         chu(t("Tivi phải bật Gỡ lỗi USB. Sai IP thì sửa dòng adb connect bên dưới.", "USB debugging must be on. If the IP changed, edit the adb connect line below."))
         val dich = if (':' in sl.ip) sl.ip else "${sl.ip}:5555"
         dong += "adb connect $dich"
         val goi = sl.daTatBoiApp.filter { TEN_GOI.matches(it) }
-        if (goi.isNotEmpty()) chu(t("Bật lại ${goi.size} gói TiviKit đã tắt", "Re-enable the ${goi.size} packages TiviKit disabled"))
+        if (goi.isNotEmpty()) chu(t("Bật lại ${goi.size} gói MTVkit đã tắt", "Re-enable the ${goi.size} packages MTVkit disabled"))
         goi.forEach { dong += "adb shell pm enable --user 0 $it" }
         if ((sl.launcherDaCai || sl.homeDaDoi) && THANH_PHAN.matches(sl.homeTruoc) && !sl.homeTruoc.startsWith("android/") &&
             HOME_SACH.none { sl.homeTruoc.startsWith("$it/") }) {
@@ -51,8 +51,8 @@ object KichBanKhoiPhuc {
             else "adb shell settings put global private_dns_specifier ${sl.dnsHostTruoc}"
         }
         // App phụ cả tên gói mới lẫn tên trước khi đổi sang vn.tivikit (GoiCu): kịch bản không biết tivi đang có cái nào.
-        chu(t("Gỡ app phụ của TiviKit nếu có cài: Khoá trẻ em, Hẹn giờ, Kênh nhanh, bộ gõ tiếng Việt, TiviKit Launcher, Cast SmartTube, Map Voice, Tele Remote, IPTV (chưa cài thì báo lỗi, không sao)",
-            "Remove TiviKit's helper apps if installed: Kids lock, Timer, Quick channel, Vietnamese typing, TiviKit Launcher, Cast to SmartTube, Map Voice, Tele Remote, IPTV (errors here are fine)"))
+        chu(t("Gỡ app phụ của MTVkit nếu có cài: Khoá trẻ em, Hẹn giờ, Kênh nhanh, bộ gõ tiếng Việt, MTVkit Launcher, Cast SmartTube, Map Voice, Tele Remote, IPTV (chưa cài thì báo lỗi, không sao)",
+            "Remove MTVkit's helper apps if installed: Kids lock, Timer, Quick channel, Vietnamese typing, MTVkit Launcher, Cast to SmartTube, Map Voice, Tele Remote, IPTV (errors here are fine)"))
         (listOf(PKG_KHOA, HenGio.GOI, GoChu.GOI, TiviKitLauncher.GOI, CastSmartTube.GOI, MapVoice.GOI, TeleRemote.GOI, Iptv.GOI) + (1..KenhNhanh.SO_O).map { KenhNhanh.goiCua(it) } + GoiCu.APP_PHU)
             .forEach { dong += "adb uninstall $it" }
         dong += "adb shell input keyevent KEYCODE_HOME"

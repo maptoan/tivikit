@@ -16,7 +16,7 @@ import java.util.Calendar
 
 /**
  * Bảng phụ huynh trên tivi (28/10/2026): lúc không cầm điện thoại, bố mẹ nhập mã ngay trên tivi rồi bấm remote để mở tivi
- * thêm, tạm tắt khoá tới sáng mai, khoá / mở một app, hẹn giờ khoá app. Lịch tuần và cài mã vẫn làm trong TiviKit (nhập
+ * thêm, tạm tắt khoá tới sáng mai, khoá / mở một app, hẹn giờ khoá app. Lịch tuần và cài mã vẫn làm trong MTVkit (nhập
  * giờ, quét QR bằng remote thì khổ). Dịch vụ khoá hỏi mã trước rồi mới mở bảng; phím do dịch vụ chuyển vào ([phim]): lên /
  * xuống chọn dòng, OK làm, Back lùi một bước. Lớp trợ năng che kín như màn khoá; để yên 2 phút thì tự đóng.
  */

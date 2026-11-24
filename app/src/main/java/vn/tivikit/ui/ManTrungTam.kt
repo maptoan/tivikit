@@ -51,7 +51,7 @@ internal fun ManChinh(vm: PhienLamViec) = Cuon {
         Image(painterResource(R.drawable.logo_tivikit), null, Modifier.size(42.dp))
         Spacer(Modifier.width(12.dp))
         Column(Modifier.weight(1f)) {
-            Text("TiviKit", style = KieuTieuDeLon)
+            Text("MTVkit", style = KieuTieuDeLon)
             Text(t("Bộ công cụ cho Android TV", "The Android TV toolkit"), fontSize = 13.sp, color = ChuPhu)
         }
         NutNgonNgu()
@@ -105,14 +105,14 @@ internal fun ManChinh(vm: PhienLamViec) = Cuon {
                 }
             }
         },
-        // 27/10/2026: màn Home kính mờ riêng của TiviKit (app phụ vn.tivikit.launcher): cài, mở thử, đặt làm Home ở thẻ đầu
+        // 27/10/2026: màn Home kính mờ riêng của MTVkit (app phụ vn.tivikit.launcher): cài, mở thử, đặt làm Home ở thẻ đầu
         // màn Quản lý launcher.
-        MucChucNang(Icons.Rounded.AutoAwesome, MauO.xanh, "TiviKit Launcher",
+        MucChucNang(Icons.Rounded.AutoAwesome, MauO.xanh, "MTVkit Launcher",
             t("Màn Home kính mờ: giờ lớn, âm lịch, dock app", "A frosted-glass Home: big clock, lunar date, app dock"), bat = !vm.khongCaiHome) {
             vm.moChucNang {
                 when {
                     vm.laFireTv -> vm.loi = t("Fire TV không cho app nào thay màn Home (Amazon khoá).", "Fire TV doesn't let any app replace Home (Amazon locks it).")
-                    vm.khongCaiHome -> vm.loi = t("Máy này cần Android 8 trở lên mới cài được TiviKit Launcher.", "This device needs Android 8 or later for TiviKit Launcher.")
+                    vm.khongCaiHome -> vm.loi = t("Máy này cần Android 8 trở lên mới cài được MTVkit Launcher.", "This device needs Android 8 or later for MTVkit Launcher.")
                     else -> vm.qlLauncher.mo()
                 }
             }
@@ -198,11 +198,11 @@ internal fun ManChinh(vm: PhienLamViec) = Cuon {
     ))
 
     // Nhóm của chính app: dữ liệu trên điện thoại, giấy phép. Không cần nối tivi.
-    TieuDeMuc("TiviKit")
+    TieuDeMuc("MTVkit")
     NhomChucNang(vm, listOfNotNull(
         MucChucNang(Icons.Rounded.SettingsBackupRestore, MauO.xanh, t("Sao lưu & chuyển máy", "Back up & move phones"),
             t("Lưu bản sao lưu tivi, bộ cài đặt mẫu ra file, nhập trên điện thoại khác", "Save TV backups and setup sets to a file, import on another phone")) { vm.chuyenMay.mo() },
-        MucChucNang(Icons.Rounded.SystemUpdate, MauO.la, t("Cập nhật TiviKit", "TiviKit updates"),
+        MucChucNang(Icons.Rounded.SystemUpdate, MauO.la, t("Cập nhật MTVkit", "MTVkit updates"),
             t("Bản ${BuildConfig.VERSION_NAME} · tự cài bản mới: ", "Version ${BuildConfig.VERSION_NAME} · auto-install: ") + if (vm.tuCai) t("bật", "on") else t("tắt", "off")) { vm.moCapNhat = true },
         MucChucNang(Icons.Rounded.Forum, MauO.xanh, t("Góp ý & liên hệ", "Feedback & contact"),
             t("Nhóm Telegram t.me/tivikit, báo lỗi trên GitHub", "Telegram group t.me/tivikit, report bugs on GitHub")) { vm.moLienHe = true },
@@ -227,7 +227,7 @@ internal fun ManChinh(vm: PhienLamViec) = Cuon {
 }
 
 /**
- * Hộp Cập nhật TiviKit (26/10/2026): bản đang dùng, công tắc tự cài bản mới (Android 12+ không cần bấm), kiểm tra ngay,
+ * Hộp Cập nhật MTVkit (26/10/2026): bản đang dùng, công tắc tự cài bản mới (Android 12+ không cần bấm), kiểm tra ngay,
  * nhật ký các bản trên GitHub. Có bản mới thì nút chính thành "Cập nhật lên …".
  */
 @Composable
@@ -237,7 +237,7 @@ private fun HopCapNhat(vm: PhienLamViec) {
     AlertDialog(
         onDismissRequest = { vm.moCapNhat = false },
         icon = { Icon(Icons.Rounded.SystemUpdate, null, tint = Nhan) },
-        title = { Text(t("Cập nhật TiviKit", "TiviKit updates")) },
+        title = { Text(t("Cập nhật MTVkit", "MTVkit updates")) },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 Text(t("Đang dùng bản ${BuildConfig.VERSION_NAME}", "Running version ${BuildConfig.VERSION_NAME}"), fontWeight = FontWeight.SemiBold)
@@ -307,16 +307,16 @@ private fun TheTivi(vm: PhienLamViec) {
             Hang(t("Tự nối lại", "Auto-reconnect"), t("Rớt kết nối thì tự nối lại; mở app là tự nối tivi này", "Reconnects when the link drops, and when you open the app"),
                 vm.giuKetNoi.bat) { vm.giuKetNoi.doiBat(it) }
             Hang(t("Tự cập nhật tiện ích", "Update helpers automatically"),
-                t("Nối tivi là cập nhật các tiện ích TiviKit trên tivi lên bản đi kèm app, lúc tivi rảnh (không phát gì, đang ở Home / màn chờ)",
-                    "On connecting, TiviKit's helpers on the TV are updated to the versions bundled with the app while the TV is idle (nothing playing, on Home / the screensaver)"),
+                t("Nối tivi là cập nhật các tiện ích MTVkit trên tivi lên bản đi kèm app, lúc tivi rảnh (không phát gì, đang ở Home / màn chờ)",
+                    "On connecting, MTVkit's helpers on the TV are updated to the versions bundled with the app while the TV is idle (nothing playing, on Home / the screensaver)"),
                 vm.tuCapNhatTienIch) { vm.datTuCapNhatTienIch(it) }
             if (hoiKhoiDong) HoiKhoiDongLai(vm, dong = { hoiKhoiDong = false })
             if (hoiTatAdb) AlertDialog(
                 onDismissRequest = { hoiTatAdb = false },
                 icon = { Icon(Icons.Rounded.Lock, null, tint = Nhan) },
                 title = { Text(t("Tắt ADB trên tivi?", "Turn off ADB on the TV?")) },
-                text = { Text(t("Từ giờ không ai cùng Wi-Fi điều khiển được tivi bằng ADB, kể cả TiviKit. Hẹn giờ, Khoá trẻ em, Kênh nhanh, Home sạch vẫn chạy bình thường; riêng Map Voice cần ADB nên thôi chuyển câu nói. Lần sau dùng TiviKit: vào Cài đặt → Tuỳ chọn nhà phát triển trên tivi, bật lại Gỡ lỗi USB.",
-                    "From now on nobody on the Wi-Fi can control the TV over ADB, TiviKit included. Timer, Kids lock, Quick channel and the clean Home keep working; Map Voice needs ADB, so it stops moving voice requests. To use TiviKit again: on the TV open Settings → Developer options and turn USB debugging back on.")) },
+                text = { Text(t("Từ giờ không ai cùng Wi-Fi điều khiển được tivi bằng ADB, kể cả MTVkit. Hẹn giờ, Khoá trẻ em, Kênh nhanh, Home sạch vẫn chạy bình thường; riêng Map Voice cần ADB nên thôi chuyển câu nói. Lần sau dùng MTVkit: vào Cài đặt → Tuỳ chọn nhà phát triển trên tivi, bật lại Gỡ lỗi USB.",
+                    "From now on nobody on the Wi-Fi can control the TV over ADB, MTVkit included. Timer, Kids lock, Quick channel and the clean Home keep working; Map Voice needs ADB, so it stops moving voice requests. To use MTVkit again: on the TV open Settings → Developer options and turn USB debugging back on.")) },
                 confirmButton = { TextButton(onClick = { hoiTatAdb = false; vm.tatAdbVaKetThuc() }) { Text(t("Tắt ADB", "Turn off ADB"), fontWeight = FontWeight.SemiBold) } },
                 dismissButton = { TextButton(onClick = { hoiTatAdb = false }) { Text(t("Thôi", "Cancel")) } },
                 containerColor = The1,
@@ -340,7 +340,7 @@ private fun TheTivi(vm: PhienLamViec) {
 }
 
 /**
- * Thẻ tiện ích có bản mới (1/11/2026): đã nối tivi mà có tiện ích khác bản đi kèm TiviKit (hay vừa cập nhật xong): từng dòng
+ * Thẻ tiện ích có bản mới (1/11/2026): đã nối tivi mà có tiện ích khác bản đi kèm MTVkit (hay vừa cập nhật xong): từng dòng
  * "Tele Remote 1.0 → 1.0.1", nút Cập nhật hết.
  */
 @Composable
@@ -387,8 +387,8 @@ internal fun HoiKhoiDongLai(vm: PhienLamViec, dong: () -> Unit, sau: (() -> Unit
         onDismissRequest = dong,
         icon = { Icon(Icons.Rounded.RestartAlt, null, tint = Nhan) },
         title = { Text(t("Khởi động lại tivi?", "Reboot the TV?")) },
-        text = { Text(if (ManHinh.laTv) t("Tivi tắt rồi bật lại trong 1–3 phút; TiviKit đang chạy trên tivi nên cũng tắt theo, mở lại sau khi tivi lên.",
-                "The TV turns off and back on in 1–3 minutes; TiviKit runs on this TV, so it closes too — open it again afterwards.")
+        text = { Text(if (ManHinh.laTv) t("Tivi tắt rồi bật lại trong 1–3 phút; MTVkit đang chạy trên tivi nên cũng tắt theo, mở lại sau khi tivi lên.",
+                "The TV turns off and back on in 1–3 minutes; MTVkit runs on this TV, so it closes too — open it again afterwards.")
             else t("Tivi tắt rồi bật lại trong 1–3 phút. App chờ tivi lên rồi tự nối lại; đang xem gì trên tivi sẽ bị ngắt.",
                 "The TV turns off and back on in 1–3 minutes. The app waits and reconnects; whatever is playing stops.")) },
         confirmButton = { TextButton(onClick = { dong(); vm.khoiDongLaiVaNoiLai(sau) }) { Text(t("Khởi động lại", "Reboot"), fontWeight = FontWeight.SemiBold) } },

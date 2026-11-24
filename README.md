@@ -1,16 +1,16 @@
-# TiviKit
+# MTVkit
 
 **Bộ công cụ cho Android TV.** App Android dọn quảng cáo và chăm sóc Android TV / Google TV qua Wi-Fi: tắt quảng cáo, theo dõi, app rác của hãng, thay màn Home sạch, rồi cài app, điều khiển, gửi ảnh, hẹn giờ bật tắt, khoá trẻ em… Không root, không gỡ gì (chỉ tắt), khôi phục một chạm. Có thêm chế độ điều khiển tivi LG webOS.
 
 **The Android TV toolkit.** An Android app that cleans up and looks after Android TV / Google TV over Wi-Fi: it switches off the maker's ads, tracking and junk, swaps in a clean Home, then installs apps, works as a remote, sends photos, runs on/off timers and a kids lock. No root, nothing uninstalled (only disabled), one-tap restore. LG webOS TVs get a remote mode too.
 
 > **Nguồn gốc & Lịch sử Dự án (Origin & Lineage):**
-> - **Bản kho mã nguồn gốc trực tiếp:** Dự án này được phát triển và tối ưu hoá từ kho gốc [**Circling5714/tivikit**](https://github.com/Circling5714/tivikit) (phiên bản `1.26.2`).
+> - **Tên ứng dụng:** **MTVkit** ([**maptoan/tivikit**](https://github.com/maptoan/tivikit)).
+> - **Bản kho mã nguồn gốc trực tiếp:** Phát triển và tối ưu hoá từ kho gốc [**Circling5714/tivikit**](https://github.com/Circling5714/tivikit) (phiên bản `1.26.2`).
 > - **Dự án tiền thân:** Kế thừa nền tảng công nghệ từ [CleanTV 2.8.2 – 3.0.0](https://github.com/vgscity/vgs-cleantv) của VGS (Vietnam Gaming Setup) / AlexVGS.
-> - **Hệ thống Home Launcher sạch:** Tích hợp và tùy biến từ [CleanYourTV 3.0](https://github.com/Gathin23/cleanyourtv) của tác giả Gathin.
-> - **Bản Fork Tối ưu hoá Toàn diện:** [**maptoan/tivikit**](https://github.com/maptoan/tivikit) — Đã được rà soát bởi hội đồng chuyên gia, khắc phục toàn diện các lỗ hổng bảo mật, rò rỉ bộ nhớ RAM, tối ưu hóa giao thức ADB/Scrcpy và bổ sung tài liệu kỹ thuật trên toàn bộ 11 module.
+> - **Hệ thống Home Launcher & Danh sách TV:** Tích hợp và tự động cập nhật hằng tuần danh sách TV từ [CleanYourTV](https://github.com/Gathin23/cleanyourtv) của tác giả Gathin.
 
-[Bản phát hành mới nhất](https://github.com/maptoan/tivikit/releases) · [Tài liệu Cài đặt](HUONG_DAN_CAI_DAT.md) · [Kiến trúc Hệ thống](docs/KIEN_TRUC_HE_THONG.md) · [Báo cáo Vá lỗi](docs/TOI_UU_VA_VA_LOI.md) · [Tiếng Việt](#tiếng-việt) · [English](#english)
+[Tải APK MTVkit mới nhất](https://github.com/maptoan/tivikit/releases/latest) · [Tài liệu Cài đặt](HUONG_DAN_CAI_DAT.md) · [Kiến trúc Hệ thống](docs/KIEN_TRUC_HE_THONG.md) · [Báo cáo Vá lỗi](docs/TOI_UU_VA_VA_LOI.md) · [Tiếng Việt](#tiếng-việt) · [English](#english)
 
 ---
 
@@ -36,7 +36,7 @@ Dự án cung cấp bộ tài liệu hoàn chỉnh hỗ trợ người dùng, k�
 Phần này lấy từ CleanTV 2.8.2, bản đã phát hành công khai, kèm các bản sửa đưa về đến 3.0.0; TiviKit giữ nguyên cách dọn, chỉ đổi giao diện, tên gói và lớp kết nối. ✅ TiviKit 1.0 đã dọn tivi và cài Home sạch trên box Tanix TX3 Mini (Android 9). ⚠️ Khôi phục chưa thử lại với TiviKit.
 
 - **Kết nối tivi qua Wi-Fi** bằng ADB: quét mạng hoặc gõ IP; Google TV đời mới ghép bằng mã 6 số (Gỡ lỗi không dây), app tự dò cổng. Hướng dẫn 7 bước có hình trong app.
-- **So với 457 danh sách đã thử** của cộng đồng CleanYourTV (nhiều hãng: TCL, Sony, Xiaomi, Philips, Hisense, Skyworth, onn, Chromecast, máy chiếu…), tự cập nhật hằng tuần. Chưa khớp mẫu thì gợi ý mẫu gần giống; tivi lạ dùng luật chung an toàn.
+- **So với 513 danh sách đã thử** của cộng đồng CleanYourTV (nhiều hãng: TCL, Sony, Xiaomi, Philips, Hisense, Skyworth, onn, Chromecast, máy chiếu…), tự cập nhật hằng tuần. Chưa khớp mẫu thì gợi ý mẫu gần giống; tivi lạ dùng luật chung an toàn.
 - **Chỉ tắt, không gỡ** quảng cáo, theo dõi, app rác. Không đụng cổng HDMI, remote, bàn phím, CH Play, gói đang giữ Wi-Fi, gói lõi Android và Home đang dùng. Google Home / cast và tìm kiếm giọng nói không bao giờ tích sẵn.
 - **Home sạch** (launcher CleanYourTV kèm bản vá của CleanTV): đồng hồ, lịch âm có can chi, thời tiết theo 3.321 phường/xã, dock 8 app, cụm nút Máy chiếu · Mạng · Màn hình chờ · Cài đặt; 8 giao diện, ảnh nền riêng từ điện thoại hoặc từ tivi / USB, 89 tuỳ chọn Nâng cao.
 - ⚠️ **Home sạch 3.0** (CleanYourTV 3.0 kèm bản vá của CleanTV 3.0): ô kênh truyền hình trên dock mở thẳng kênh trong app VTVgo (Home sạch vẫn hiện các ô đã chọn ở bản 1.2 – 1.4; nay làm ô kênh VTVgo ở Kênh nhanh), luôn mở Home sạch khi bật tivi, mở app đã chọn cả khi bật lại từ chế độ chờ, Home sạch nói tiếng Việt trên tivi Xiaomi bản Trung Quốc; cùng các bản sửa của CleanYourTV (nút nguồn trên TCL, nút YouTube / Netflix của remote TCL, âm lịch, ít RAM hơn…). Home sạch nay ký bằng khoá TiviKit: lần đầu cập nhật, app gỡ Home sạch cũ rồi cài lại và tự đặt lại giao diện; app chọn ở "Mở khi khởi động" trên tivi thì chọn lại.
@@ -298,7 +298,7 @@ TiviKit (`vn.tivikit`) là app riêng: cài song song được với CleanTV và
 From CleanTV 2.8.2, a publicly released app, with fixes ported up to 3.0.0; TiviKit keeps the clean-up logic and only changes the interface, package names and connection layer. ✅ TiviKit 1.0 cleaned a Tanix TX3 Mini (Android 9) and installed the clean Home. ⚠️ Restore hasn't been re-tested with TiviKit.
 
 - **Connects over Wi-Fi** with ADB: scan or type the IP; newer Google TVs pair with a 6-digit code and the app finds the port. A 7-step picture guide is built in.
-- **Matches 457 tested lists** from the CleanYourTV community (many brands), updated weekly; suggests close models; unknown TVs get safe general rules.
+- **Matches 513 tested lists** from the CleanYourTV community (many brands), updated weekly; suggests close models; unknown TVs get safe general rules.
 - **Disables, never uninstalls** ads, tracking and junk. Leaves HDMI inputs, the remote, keyboards, Play Store, the Wi-Fi owner, core Android packages and the Home in use alone. Google Home / casting and voice search are never pre-ticked.
 - **Clean Home** (the CleanYourTV launcher with CleanTV's patches): clock, Vietnamese lunar date, ward-level weather, an 8-app dock, 8 themes, your own wallpaper, 89 Advanced options. The Home key lands on it, and remote keys keep working from each model's key map.
 - ⚠️ **Clean Home 3.0** (CleanYourTV 3.0 with CleanTV 3.0's patches): channel tiles on the dock that open a channel straight in the VTVgo app (the clean Home still shows the ones picked in 1.2 – 1.4; VTVgo channel tiles are now made under Quick channel), the clean Home at every power-on, the picked app also when waking from standby, a Vietnamese clean Home on China-market Xiaomi TVs; plus CleanYourTV's fixes (the power key on TCL, the TCL remote's YouTube / Netflix keys, the lunar date, less memory…). The clean Home is now signed with TiviKit's key: on the first update the app removes the old one, installs the new one and puts your look back; pick the "Open on start" app on the TV again.

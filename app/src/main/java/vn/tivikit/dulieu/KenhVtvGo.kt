@@ -16,7 +16,7 @@ import org.json.JSONObject
  * Kênh của VTVgo. Danh sách kênh lấy từ API công khai của VTVgo (display/v21.0/catalogs/with-channels, không cần đăng
  * nhập), nhớ vào máy; ô Kênh nhanh VTVgo (app phụ, KenhNhanh) mở kênh bằng vtvgo://play?mediaType=CHANNEL&contentId=<mã>.
  *
- * Ô kênh kiểu cũ trên Home sạch (CleanTV 2.10.0 – 3.0.0; TiviKit 1.2 – 1.4 chọn ở màn Home sạch): mỗi kênh một ô link ở
+ * Ô kênh kiểu cũ trên Home sạch (CleanTV 2.10.0 – 3.0.0; MTVkit 1.2 – 1.4 chọn ở màn Home sạch): mỗi kênh một ô link ở
  * đầu dock. Launcher vẽ ô theo link_tiles của bản vá (LinkTiles.java); ô mang tên gói giả vgs.kenh.<slug> trong dock_apps
  * nên đổi chỗ / bỏ khỏi Home như app thường. Ảnh ô là thumbnail kênh của VTVgo, gửi kèm khi Áp dụng (launcher không có
  * mạng); app không đóng sẵn logo của đài, tải không được thì launcher vẽ ô chữ. Ô kiểu này không gán được nút remote nên

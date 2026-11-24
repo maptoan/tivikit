@@ -89,7 +89,7 @@ object XuLyLenh {
     data class KhoaThanhVien(val phut: Int) : Viec
     /** 📹 Quay màn hình tivi 10 giây gửi về Telegram. */
     data object QuayManHinh : Viec
-    /** Đặt ảnh vừa gửi làm ảnh nền TiviKit Launcher / về ảnh nền mặc định. */
+    /** Đặt ảnh vừa gửi làm ảnh nền MTVkit Launcher / về ảnh nền mặc định. */
     data object DatNen : Viec
     data object BoNen : Viec
     /** 📺 Tất cả kênh (trang [trang]) / mở kênh thứ [i] trong [KENH_TV] (qua Map Voice). */
@@ -137,7 +137,7 @@ object XuLyLenh {
     const val TOI_SANG = -1
 
     /**
-     * Kênh của 📺 Tất cả kênh: tên Map Voice hiểu khi nói "mở …" (thử trên TX3 với danh sách kênh TiviKit gửi, 31/10/2026);
+     * Kênh của 📺 Tất cả kênh: tên Map Voice hiểu khi nói "mở …" (thử trên TX3 với danh sách kênh MTVkit gửi, 31/10/2026);
      * Map Voice mở bằng app kênh đã chọn, app đó không có kênh thì app kia.
      */
     val KENH_TV = listOf(
@@ -445,7 +445,7 @@ object XuLyLenh {
     fun sauKhiChup(en: Boolean): JSONObject = nutTrongTin(listOf(listOf((if (en) "📸 Again" else "📸 Chụp lại") to "cm",
         (if (en) "📹 Record 10 s" else "📹 Quay 10 giây") to "qv")))
 
-    /** Sau khi chiếu ảnh lên tivi (chủ, tivi có TiviKit Launcher): đặt ảnh đó làm ảnh nền Home. */
+    /** Sau khi chiếu ảnh lên tivi (chủ, tivi có MTVkit Launcher): đặt ảnh đó làm ảnh nền Home. */
     fun nutDatNen(en: Boolean): JSONObject = nutTrongTin(listOf(listOf((if (en) "🖼 Set as Home wallpaper" else "🖼 Đặt làm ảnh nền Home") to "nen")))
 
     fun nutBoNen(en: Boolean): JSONObject = nutTrongTin(listOf(listOf((if (en) "↩️ Back to the default wallpaper" else "↩️ Về ảnh nền mặc định") to "nen:x")))
@@ -601,15 +601,15 @@ object XuLyLenh {
         else -> if (en) "$phut min" else "$phut phút"
     }
 
-    /** Số ô Kênh nhanh tối đa (KenhNhanh.SO_O của TiviKit). */
+    /** Số ô Kênh nhanh tối đa (KenhNhanh.SO_O của MTVkit). */
     const val SO_O = 6
 
-    /** Gói của ô Kênh nhanh [o] (KenhNhanh.goiCua của TiviKit). */
+    /** Gói của ô Kênh nhanh [o] (KenhNhanh.goiCua của MTVkit). */
     fun goiKenh(o: Int): String = if (o == 1) "vn.tivikit.kenh" else "vn.tivikit.kenh$o"
 
     /**
      * Tên kênh trong kết quả lệnh doc của một ô Kênh nhanh ("Result: Bundle[{json={"ten":"VTV1",…}}]"); null nếu không đọc
-     * được. Lấy từ sau "json=" tới "}]" cuối như docQua của TiviKit: dấu "}" cuối cùng là của Bundle, không phải của JSON.
+     * được. Lấy từ sau "json=" tới "}]" cuối như docQua của MTVkit: dấu "}" cuối cùng là của Bundle, không phải của JSON.
      */
     fun tenKenh(kq: String): String? = jsonTrong(kq)?.optString("ten")?.takeIf { it.isNotBlank() }
 

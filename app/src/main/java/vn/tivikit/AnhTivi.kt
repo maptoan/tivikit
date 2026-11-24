@@ -20,7 +20,7 @@ object AnhTivi {
     /** Android 10+ lưu vào Pictures/CleanTV không cần xin quyền; máy cũ hơn dùng Chia sẻ. */
     val luuDuoc: Boolean get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
 
-    private fun ten() = "TiviKit-" + SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(Date()) + ".png"
+    private fun ten() = "MTVkit-" + SimpleDateFormat("yyyyMMdd-HHmmss", Locale.US).format(Date()) + ".png"
 
     /** Lưu vào thư viện ảnh; trả false khi không ghi được. */
     fun luu(ctx: Context, anh: Bitmap): Boolean {
@@ -28,7 +28,7 @@ object AnhTivi {
         val v = ContentValues().apply {
             put(MediaStore.Images.Media.DISPLAY_NAME, ten())
             put(MediaStore.Images.Media.MIME_TYPE, "image/png")
-            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/TiviKit")
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MTVkit")
             put(MediaStore.Images.Media.IS_PENDING, 1)
         }
         val cr = ctx.contentResolver

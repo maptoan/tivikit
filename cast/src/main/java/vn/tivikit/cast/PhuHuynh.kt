@@ -20,7 +20,7 @@ object PhuHuynh {
     sealed interface Can
     object KhongCan : Can
     class HoiMa(val intent: Intent) : Can
-    /** Khoá trẻ em đang chạy mà là bản cũ, chưa có màn xác nhận: không cho làm, nhắc cập nhật bằng TiviKit. */
+    /** Khoá trẻ em đang chạy mà là bản cũ, chưa có màn xác nhận: không cho làm, nhắc cập nhật bằng MTVkit. */
     object KhoaCu : Can
 
     fun can(ctx: Context): Boolean =
@@ -56,8 +56,8 @@ open class ManCoMa : ComponentActivity() {
         if (SystemClock.elapsedRealtime() < moDen) { lam(); return }
         when (val c = PhuHuynh.can(this, viec)) {
             PhuHuynh.KhongCan -> lam()
-            PhuHuynh.KhoaCu -> Toast.makeText(this, t("Khoá trẻ em trên tivi là bản cũ: mở TiviKit trên điện thoại, lưu lại Khoá trẻ em để cập nhật rồi làm lại.",
-                "The Kids lock on this TV is outdated: open TiviKit on a phone and save the Kids lock to update it, then try again."), Toast.LENGTH_LONG).show()
+            PhuHuynh.KhoaCu -> Toast.makeText(this, t("Khoá trẻ em trên tivi là bản cũ: mở MTVkit trên điện thoại, lưu lại Khoá trẻ em để cập nhật rồi làm lại.",
+                "The Kids lock on this TV is outdated: open MTVkit on a phone and save the Kids lock to update it, then try again."), Toast.LENGTH_LONG).show()
             is PhuHuynh.HoiMa -> {
                 choMa = { ok -> if (ok) { moDen = SystemClock.elapsedRealtime() + 5 * 60_000L; lam() } }
                 runCatching { xinMa.launch(c.intent) }.onFailure { choMa = null }

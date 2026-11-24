@@ -2,7 +2,7 @@ package vn.tivikit.teleremote
 
 /**
  * 🗂 Tắt đa nhiệm từ Telegram (2/11/2026): đóng mọi app người dùng cài đang chạy trên tivi, như vuốt hết app ở màn đa nhiệm
- * của điện thoại. Giữ app hệ thống (cài sẵn trong tivi), app của TiviKit (cả Home sạch), app Home và app đang giữ một vai trò
+ * của điện thoại. Giữ app hệ thống (cài sẵn trong tivi), app của MTVkit (cả Home sạch), app Home và app đang giữ một vai trò
  * cho tivi: dịch vụ trợ năng, bàn phím, màn bảo vệ, VPN luôn bật, đọc thông báo. Buộc dừng những app đó làm tivi mất tính
  * năng (TX3, Android 9: buộc dừng còn bỏ dịch vụ trợ năng của app khỏi danh sách bật).
  */
@@ -27,7 +27,7 @@ object DaNhiemTr {
     fun laTiviKit(goi: String): Boolean = goi == "vn.tivikit" || goi.startsWith("vn.tivikit.") || goi == "com.gathin.tvhome"
 
     /**
-     * Gói cần đóng theo kết quả [kq] của [LENH_DOC]: app người dùng cài có tiến trình đang chạy, trừ TiviKit, [giuThem] (app
+     * Gói cần đóng theo kết quả [kq] của [LENH_DOC]: app người dùng cài có tiến trình đang chạy, trừ MTVkit, [giuThem] (app
      * Home, chính bot) và app đang giữ vai trò; xếp theo tên gói. Rỗng nếu đọc không ra (chưa nối ADB, kết quả hỏng).
      */
     fun chon(kq: String, giuThem: Set<String>): List<String> {

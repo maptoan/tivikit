@@ -3,7 +3,7 @@ package vn.tivikit.launcher
 import java.nio.charset.Charset
 
 /**
- * Câu kinh mỗi ngày dưới âm lịch (28/10/2026): mặc định Kinh Pháp Cú bản thơ lục bát (assets/phap-cu.txt, 423 câu), TiviKit
+ * Câu kinh mỗi ngày dưới âm lịch (28/10/2026): mặc định Kinh Pháp Cú bản thơ lục bát (assets/phap-cu.txt, 423 câu), MTVkit
  * gửi được bộ khác (cau.txt qua CauHinhProvider) hay tắt hẳn ("cau" trong cấu hình). Mỗi ngày một câu, mọi tivi như nhau;
  * mỗi vòng đi hết bộ theo một thứ tự xáo riêng nên chưa hết bộ thì không câu nào lặp lại.
  */

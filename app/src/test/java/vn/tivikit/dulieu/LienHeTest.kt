@@ -9,7 +9,7 @@ import org.junit.Test
 class LienHeTest {
     @Test fun noiDung_coBanAppDienThoaiTiviVaLoi() {
         val s = LienHe.noiDungBaoLoi(true, "1.4.0", "Samsung SM-A515F, Android 13", "TX3 Mini (p281, Android 9)", "Mất kết nối\nvới tivi")
-        assertTrue(s.contains("- TiviKit: 1.4.0"))
+        assertTrue(s.contains("- MTVkit: 1.4.0"))
         assertTrue(s.contains("- Điện thoại: Samsung SM-A515F, Android 13"))
         assertTrue(s.contains("- Tivi: TX3 Mini (p281, Android 9)"))
         assertTrue("lỗi gọn một dòng", s.contains("- App báo lỗi: Mất kết nối với tivi"))
@@ -28,8 +28,8 @@ class LienHeTest {
     }
 
     @Test fun linkBaoLoi_khoTiviKit_dauCachLa20() {
-        val l = LienHe.linkBaoLoi("[TiviKit 1.4.0] ", "a b")
-        assertTrue(l.startsWith("https://github.com/Circling5714/tivikit/issues/new?title="))
+        val l = LienHe.linkBaoLoi("[MTVkit 1.4.0] ", "a b")
+        assertTrue(l.startsWith("https://github.com/maptoan/tivikit/issues/new?title="))
         assertTrue(l.endsWith("&body=a%20b"))
         assertFalse(l.contains("+"))
     }

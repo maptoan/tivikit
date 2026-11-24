@@ -13,10 +13,10 @@ import org.json.JSONObject
 import java.util.Calendar
 
 /**
- * Báo cáo cho TiviKit (25/10/2026), [soNgay] ngày gần nhất, cũ trước:
+ * Báo cáo cho MTVkit (25/10/2026), [soNgay] ngày gần nhất, cũ trước:
  *   {homNay, demTu, coQuyen, ngay: [{ngay, thu, giay, gioiHan, apps: [{goi, ten, giay}]}]}
  * giay của ngày = thời gian tivi được xem do dịch vụ khoá đếm (giới hạn mỗi ngày tính theo số này; chỉ có từ ngày
- * [Kho.demTu]); apps = app đã mở, lấy từ thống kê của tivi (cần quyền GET_USAGE_STATS, TiviKit cấp qua ADB), không tính
+ * [Kho.demTu]); apps = app đã mở, lấy từ thống kê của tivi (cần quyền GET_USAGE_STATS, MTVkit cấp qua ADB), không tính
  * màn hình chính.
  */
 object BaoCao {

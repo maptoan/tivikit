@@ -35,7 +35,7 @@ object DanhSachApp {
         return xepTen(ds.values)
     }
 
-    /** Đổi tên các app TiviKit đặt tên riêng ([ten]: gói → tên, như tên kênh của ô Kênh nhanh) rồi xếp lại theo tên. */
+    /** Đổi tên các app MTVkit đặt tên riêng ([ten]: gói → tên, như tên kênh của ô Kênh nhanh) rồi xếp lại theo tên. */
     fun doiTen(ds: List<AppTv>, ten: Map<String, String>): List<AppTv> =
         if (ds.none { it.goi in ten }) ds else xepTen(ds.map { a -> ten[a.goi]?.let { a.copy(ten = it) } ?: a })
 
@@ -47,7 +47,7 @@ object DanhSachApp {
     fun ieMo(pm: PackageManager, goi: String): Intent? = pm.getLeanbackLaunchIntentForPackage(goi) ?: pm.getLaunchIntentForPackage(goi)
 
     /**
-     * Banner [rong]×(rong·9/16) điểm ảnh — ảnh riêng TiviKit gửi ([rieng]: logo kênh của ô Kênh nhanh) hoặc banner của app
+     * Banner [rong]×(rong·9/16) điểm ảnh — ảnh riêng MTVkit gửi ([rieng]: logo kênh của ô Kênh nhanh) hoặc banner của app
      * nếu có —, biểu tượng [co]×[co] và màu nền cho ô không có banner.
      */
     fun anh(pm: PackageManager, goi: String, rong: Int = 256, co: Int = 96, rieng: File? = null): AnhApp {

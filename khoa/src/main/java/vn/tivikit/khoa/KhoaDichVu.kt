@@ -76,7 +76,7 @@ class KhoaDichVu : AccessibilityService() {
         private const val XIN_THEM = "📩  Xin thêm giờ"
         private const val O_PHU_HUYNH = 12
         private const val O_XIN = 13
-        /** Bot Telegram của tivi (TiviKit → Tele Remote). */
+        /** Bot Telegram của tivi (MTVkit → Tele Remote). */
         private const val TELE_REMOTE = "vn.tivikit.teleremote"
         /** Xin thêm giờ xong thì chừng này sau mới xin lại được (khỏi nhắn bố mẹ liên tục). */
         private const val XIN_CACH_MS = 5 * 60_000L
@@ -99,7 +99,7 @@ class KhoaDichVu : AccessibilityService() {
     private enum class BaoVe { CAI_DAT, GO_APP, ADB }
     /** Nhập mã để mở bảng phụ huynh; [cheTruoc] = lớp đang che lúc bấm Phụ huynh (Back thì về đó). */
     private object CheMaPh : Che
-    /** App khác của TiviKit xin mã bố mẹ (XacNhan): [viecXacNhan] hiện trên lớp, [xongXacNhan] nhận kết quả. */
+    /** App khác của MTVkit xin mã bố mẹ (XacNhan): [viecXacNhan] hiện trên lớp, [xongXacNhan] nhận kết quả. */
     private object CheXacNhan : Che
     private var viecXacNhan = ""
     private var xongXacNhan: ((Boolean) -> Unit)? = null
@@ -140,7 +140,7 @@ class KhoaDichVu : AccessibilityService() {
     /**
      * Giờ tự động (27/10/2026): khung giờ khoá, giới hạn mỗi ngày và lượt mở tạm đều tính theo giờ tivi — trẻ tắt giờ tự
      * động rồi chỉnh giờ là né được khoá (tv-remote khoá luôn Cài đặt vì lý do này). Khoá đang bật thì ai tắt giờ tự động
-     * là bật lại ngay, Android đồng bộ lại giờ mạng. Cần WRITE_SECURE_SETTINGS (TiviKit cấp qua ADB, như CanhGac).
+     * là bật lại ngay, Android đồng bộ lại giờ mạng. Cần WRITE_SECURE_SETTINGS (MTVkit cấp qua ADB, như CanhGac).
      */
     private val gioTuDong = object : android.database.ContentObserver(tay) {
         override fun onChange(selfChange: Boolean) = giuGioTuDong()
@@ -257,15 +257,15 @@ class KhoaDichVu : AccessibilityService() {
         tvQuen.text = quen; tvQuen.visibility = if (quen.isEmpty()) View.GONE else View.VISIBLE
     }
 
-    /** Lời báo có yêu cầu quên mã đang chờ ("" nếu không có): trên màn khoá thì nhập mã ngay đó, lời báo góc thì vào TiviKit. */
+    /** Lời báo có yêu cầu quên mã đang chờ ("" nếu không có): trên màn khoá thì nhập mã ngay đó, lời báo góc thì vào MTVkit. */
     private fun chuQuen(trenManKhoa: Boolean): String {
         val y = kho.yeuCauGo
         if (y <= 0) return ""
         val luc = java.text.SimpleDateFormat("HH:mm dd/MM", Locale.getDefault()).format(java.util.Date(y + XacThuc.CHO_QUEN_MS))
-        return t("Có người bấm Quên mã Khoá trẻ em trong TiviKit: từ $luc ai cũng đổi được khoá mà không cần mã. Không phải bố mẹ gửi thì " +
-            (if (trenManKhoa) "nhập đúng mã ở đây (hoặc trong TiviKit) để huỷ." else "vào Khoá trẻ em trong TiviKit, nhập đúng mã để huỷ."),
-            "Someone tapped Forgot code for the Kids lock in TiviKit: from $luc anyone can change the lock without the code. If it wasn't you, " +
-            (if (trenManKhoa) "enter the code here (or in TiviKit) to cancel." else "open Kids lock in TiviKit and enter the code to cancel."))
+        return t("Có người bấm Quên mã Khoá trẻ em trong MTVkit: từ $luc ai cũng đổi được khoá mà không cần mã. Không phải bố mẹ gửi thì " +
+            (if (trenManKhoa) "nhập đúng mã ở đây (hoặc trong MTVkit) để huỷ." else "vào Khoá trẻ em trong MTVkit, nhập đúng mã để huỷ."),
+            "Someone tapped Forgot code for the Kids lock in MTVkit: from $luc anyone can change the lock without the code. If it wasn't you, " +
+            (if (trenManKhoa) "enter the code here (or in MTVkit) to cancel." else "open Kids lock in MTVkit and enter the code to cancel."))
     }
 
     // ---------- Khoá theo app, bảo vệ Cài đặt (28/10/2026) ----------
@@ -449,7 +449,7 @@ class KhoaDichVu : AccessibilityService() {
     }
 
     /**
-     * Khoá tivi ngay (KhoaNgay: menu ⏻ của TiviKit Launcher, 28/10/2026): thôi mở tạm, che lại tới khi bố mẹ nhập mã. false
+     * Khoá tivi ngay (KhoaNgay: menu ⏻ của MTVkit Launcher, 28/10/2026): thôi mở tạm, che lại tới khi bố mẹ nhập mã. false
      * nếu tivi chưa có mã (khoá rồi không ai mở được).
      */
     fun khoaNgay(): Boolean {
@@ -467,7 +467,7 @@ class KhoaDichVu : AccessibilityService() {
         if (!::kho.isInitialized) return@post
         val c = kho.cauHinh
         if (c == null || !c.coMa) {
-            bao(t("Khoá trẻ em chưa có mã: cài bằng TiviKit trên điện thoại trước.", "The Kids lock has no code yet: set it up with TiviKit on a phone first."), 10_000)
+            bao(t("Khoá trẻ em chưa có mã: cài bằng MTVkit trên điện thoại trước.", "The Kids lock has no code yet: set it up with MTVkit on a phone first."), 10_000)
             return@post
         }
         if (bangPh.dangMo || che == CheMaPh) return@post
@@ -485,7 +485,7 @@ class KhoaDichVu : AccessibilityService() {
     }
 
     /**
-     * App khác của TiviKit xin mã bố mẹ trước một việc quản lý (XacNhan, 28/10/2026: Cast SmartTube duyệt / chặn điện thoại,
+     * App khác của MTVkit xin mã bố mẹ trước một việc quản lý (XacNhan, 28/10/2026: Cast SmartTube duyệt / chặn điện thoại,
      * huỷ liên kết…). Khoá đang tắt hay chưa có mã thì cho qua ngay; tivi đang khoá cả / bảng phụ huynh đang mở thì thôi;
      * không thì hiện ô nhập mã như bảng phụ huynh: [xong] nhận true khi nhập đúng, false khi Back, để yên hay việc khác chen.
      */
@@ -815,7 +815,7 @@ class KhoaDichVu : AccessibilityService() {
         else -> go(nhan)
     }
 
-    /** Tivi có bot Telegram của TiviKit (Tele Remote) để nhắn bố mẹ. */
+    /** Tivi có bot Telegram của MTVkit (Tele Remote) để nhắn bố mẹ. */
     private fun coTeleRemote(): Boolean = runCatching { packageManager.getApplicationInfo(TELE_REMOTE, 0).enabled }.getOrDefault(false)
 
     private fun veXin(s: String) {

@@ -18,7 +18,7 @@ class Kho(ctx: Context) {
         get() = p.getLong("hoan_den", 0)
         set(v) { p.edit().putLong("hoan_den", v).apply() }
 
-    /** Thử đánh thức (nút Thử ở TiviKit) lúc này (ms); 0 = không thử. */
+    /** Thử đánh thức (nút Thử ở MTVkit) lúc này (ms); 0 = không thử. */
     var thuDen: Long
         get() = p.getLong("thu_den", 0)
         set(v) { p.edit().putLong("thu_den", v).apply() }
@@ -38,7 +38,7 @@ class Kho(ctx: Context) {
         get() = Lich.docMotLanDs(p.getString("mot_lan", null)).sortedBy { it.luc }
         set(v) { p.edit().putString("mot_lan", Lich.jsonMotLan(v).toString()).apply() }
 
-    /** Tên app TiviKit gửi (ô Kênh nhanh mang tên kênh): màn tivi hiện thay cho tên app chung "Kênh nhanh 2". */
+    /** Tên app MTVkit gửi (ô Kênh nhanh mang tên kênh): màn tivi hiện thay cho tên app chung "Kênh nhanh 2". */
     var tenApp: Map<String, String>
         get() = runCatching { JSONObject(p.getString("ten_app", null) ?: "{}").let { o -> o.keys().asSequence().associateWith { o.getString(it) } } }
             .getOrDefault(emptyMap())
@@ -99,7 +99,7 @@ class Kho(ctx: Context) {
         if (ds.any { it.bao <= luc }) motLanDs = ds.filter { it.bao > luc }
     }
 
-    /** 20 dòng gần nhất: {luc, viec, kq} để TiviKit xem lần chạy có được không. */
+    /** 20 dòng gần nhất: {luc, viec, kq} để MTVkit xem lần chạy có được không. */
     val nhatKy: JSONArray get() = runCatching { JSONArray(p.getString("nhat_ky", "[]")) }.getOrDefault(JSONArray())
 
     /** Ghi một dòng; [chac]: ghi xong mới trả (ngay trước khi tivi khởi động lại). */

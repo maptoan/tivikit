@@ -8,7 +8,7 @@ import java.time.ZoneId
 
 /**
  * Hẹn giờ (25/10/2026): app phụ vn.tivikit.hengio trên tivi (module hengio/) giữ lịch bật tivi / tắt tivi / mở app
- * và tự chạy bằng báo thức của tivi. Ở đây: lịch dạng TiviKit gửi đi (cùng dạng JSON với vn.tivikit.hengio.Lich) và
+ * và tự chạy bằng báo thức của tivi. Ở đây: lịch dạng MTVkit gửi đi (cùng dạng JSON với vn.tivikit.hengio.Lich) và
  * trạng thái app phụ trả về.
  */
 object HenGio {

@@ -20,8 +20,8 @@ internal fun ManChuyenMay(vm: PhienLamViec) = Cuon {
     val mo = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) { uri -> if (uri != null) cm.moFile(uri) }
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(t("Sao lưu & chuyển máy", "Back up & move phones"), style = KieuTieuDeLon)
-        Phu(t("Lưu dữ liệu của TiviKit ra một file để giữ lại hoặc mang sang điện thoại khác: bản sao lưu từng tivi, bộ cài đặt mẫu, danh sách tivi gần đây.",
-            "Save TiviKit's data to one file to keep it or move it to another phone: each TV's backup, setup sets and recent TVs."))
+        Phu(t("Lưu dữ liệu của MTVkit ra một file để giữ lại hoặc mang sang điện thoại khác: bản sao lưu từng tivi, bộ cài đặt mẫu, danh sách tivi gần đây.",
+            "Save MTVkit's data to one file to keep it or move it to another phone: each TV's backup, setup sets and recent TVs."))
     }
 
     The(t("Trên điện thoại này", "On this phone"), Icons.Rounded.PhoneAndroid) {

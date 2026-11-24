@@ -77,7 +77,7 @@ class HenGioDichVu : AccessibilityService() {
 
     /**
      * Vừa bật tivi và mở [goi]: trong [CANH_MS] mà màn chính (launcher) nào lên trên thì mở lại [goi] một lần. Launcher
-     * tự về Home lúc tivi vừa bật (Home sạch mở TiviKit Launcher 0,8 giây sau khi màn hình sáng) đè lên app vừa mở; app
+     * tự về Home lúc tivi vừa bật (Home sạch mở MTVkit Launcher 0,8 giây sau khi màn hình sáng) đè lên app vừa mở; app
      * chưa kịp chạy thì không bao giờ chạy nữa (Kênh nhanh không mở VTV1, Skyworth 28/10/2026).
      */
     fun canhHome(goi: String) {

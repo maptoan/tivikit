@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 
 /**
  * Chỉ để có quyền đọc phiên phát nhạc / video của app khác (MediaSessionManager.getActiveSessions cần một dịch vụ đọc
- * thông báo đã được cho phép). Không đọc thông báo nào. TiviKit cho phép qua ADB: cmd notification allow_listener.
+ * thông báo đã được cho phép). Không đọc thông báo nào. MTVkit cho phép qua ADB: cmd notification allow_listener.
  */
 class NgheNhac : NotificationListenerService()
 
@@ -26,7 +26,7 @@ class NgheNhac : NotificationListenerService()
 data class BaiDangPhat(val goi: String, val tieuDe: String, val phu: String, val dangPhat: Boolean, val anh: ImageBitmap? = null)
 
 /**
- * App nào đang phát nền, cho thẻ Đang phát (TiviKit Launcher 1.5.1, 4/11/2026).
+ * App nào đang phát nền, cho thẻ Đang phát (MTVkit Launcher 1.5.1, 4/11/2026).
  *
  * App không phát nền được (TizenTube, IPTV…) về Home là tự dừng, nhưng phiên phát của nó có thể còn: ở trạng thái tạm dừng,
  * có app vẫn báo "đang phát" dù đã im tiếng. Trước đây thẻ hiện cả các phiên đó, chỉ có tên và biểu tượng app. Giờ thẻ chỉ

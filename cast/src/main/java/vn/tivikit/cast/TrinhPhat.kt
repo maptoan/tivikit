@@ -23,7 +23,7 @@ import java.util.UUID
 
 /**
  * Mở video điện thoại gửi bằng SmartTube và giữ trạng thái phát để báo lại điện thoại. Tivi cho app nghe thông báo
- * (NgheThongBao, TiviKit bật qua ADB) thì điều khiển và đọc vị trí thật qua phiên media của SmartTube; không thì bấm
+ * (NgheThongBao, MTVkit bật qua ADB) thì điều khiển và đọc vị trí thật qua phiên media của SmartTube; không thì bấm
  * phím media, tua bằng cách mở lại video ở giây mới, vị trí tự ước lượng.
  */
 class TrinhPhat(private val ctx: Context) {
@@ -41,7 +41,7 @@ class TrinhPhat(private val ctx: Context) {
 
         /**
          * Bật màn hình như bấm remote: tắt màn bảo vệ (không thì video hay hộp hỏi XinPhep hiện phía sau nó), tivi đang
-         * chờ thì bật lên như app YouTube gốc. Android 14+ cần quyền TURN_SCREEN_ON (TiviKit cấp qua ADB).
+         * chờ thì bật lên như app YouTube gốc. Android 14+ cần quyền TURN_SCREEN_ON (MTVkit cấp qua ADB).
          */
         @Suppress("DEPRECATION")
         fun danhThuc(ctx: Context) = runCatching {
@@ -146,7 +146,7 @@ class TrinhPhat(private val ctx: Context) {
 
     /**
      * App lên trước màn hình cuối cùng từ [tu] (giờ máy, ms) tới giờ, theo thống kê dùng app; null nếu không có lần nào
-     * trong khoảng đó hay không đọc được (thiếu GET_USAGE_STATS, TiviKit cấp qua ADB). Thống kê ghi đúng từng lần một màn
+     * trong khoảng đó hay không đọc được (thiếu GET_USAGE_STATS, MTVkit cấp qua ADB). Thống kê ghi đúng từng lần một màn
      * lên trước; sự kiện cửa sổ của dịch vụ trợ năng thì gộp trong 100 ms và có lúc lệch khi launcher và SmartTube đổi nhau
      * nhanh (28/10/2026 trên Skyworth: cập nhật launcher, bấm Home, launcherx tự lên — máy nhận tưởng SmartTube đang hiện
      * nên không đưa video mới về nghe nền).
@@ -166,7 +166,7 @@ class TrinhPhat(private val ctx: Context) {
     }.getOrNull()
 
     /**
-     * Bài SmartTube đang phát (provider dang-phat, cho thẻ Đang phát của TiviKit): mã video, tên, kênh. Phiên của SmartTube
+     * Bài SmartTube đang phát (provider dang-phat, cho thẻ Đang phát của MTVkit): mã video, tên, kênh. Phiên của SmartTube
      * thiếu tên bài (video mở từ đường link) thì tra theo mã (TenVideo). Rỗng nếu tivi không cho đọc phiên phát.
      */
     fun baiDangPhat(): JSONObject {

@@ -8,7 +8,7 @@ import java.util.Locale
 import kotlin.math.roundToInt
 
 /**
- * Thời tiết hiện tại từ Open-Meteo (miễn phí, không cần khoá, CC BY 4.0) cho nơi TiviKit gửi (như dòng thời tiết của Home
+ * Thời tiết hiện tại từ Open-Meteo (miễn phí, không cần khoá, CC BY 4.0) cho nơi MTVkit gửi (như dòng thời tiết của Home
  * sạch). Mã thời tiết WMO và chữ theo Weather.java của Home sạch (CleanYourTV, MIT).
  */
 object ThoiTiet {

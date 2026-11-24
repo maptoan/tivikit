@@ -6,7 +6,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 
 /**
- * Ô Kênh nhanh Auto (kenh/MoKenh, 1/11/2026) gọi vào đây với tên kênh ([TEN]) và nguồn TiviKit đã tìm khi lưu ô ([NGUON],
+ * Ô Kênh nhanh Auto (kenh/MoKenh, 1/11/2026) gọi vào đây với tên kênh ([TEN]) và nguồn MTVkit đã tìm khi lưu ô ([NGUON],
  * TuChonNguon.tuJson; [CO_DINH] = ô có thứ tự riêng, thử đúng thứ tự đó): dịch vụ Map Voice tự chọn nguồn (TuChon). Dịch vụ
  * chưa chạy (Map Voice đang tắt trong Trợ năng) thì mở ngay nguồn đầu tiên tivi có, không thử tiếp. Không hiện gì
  * (Theme.NoDisplay). App khác gọi được cũng chỉ mở kênh, như link vtvgo:// hay fptplay.vn.

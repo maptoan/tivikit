@@ -22,7 +22,7 @@ import java.security.spec.RSAPublicKeySpec
 import java.util.Base64
 
 /**
- * Khởi động lại tivi bằng ADB của chính tivi (127.0.0.1:5555), cùng lệnh reboot với nút Khởi động lại của TiviKit
+ * Khởi động lại tivi bằng ADB của chính tivi (127.0.0.1:5555), cùng lệnh reboot với nút Khởi động lại của MTVkit
  * (29/10/2026). App thường không tự khởi động lại được; còn mục Khởi động lại trong menu nguồn của Android thì trên tivi
  * MediaTek thành tắt hẳn: TvServices của MediaTek thấy lý do tắt "userrequested" là cho tivi về chờ (thấy trên Skyworth,
  * phải bật lại bằng remote). Lần đầu tivi hỏi "Cho phép gỡ lỗi?" cho khoá riêng của launcher (filesDir/adbkey; launcher

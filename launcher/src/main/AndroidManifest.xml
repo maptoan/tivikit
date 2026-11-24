@@ -38,7 +38,7 @@
 
     <!-- Không có ô trong danh sách app: cài, chọn làm Home và chỉnh ở TiviKit trên điện thoại. -->
     <application
-        android:label="TiviKit Launcher"
+        android:label="MTVkit Launcher"
         android:icon="@mipmap/ic_launcher"
         android:banner="@drawable/banner"
         android:allowBackup="false"
@@ -74,7 +74,7 @@
         <service
             android:name=".NgheNhac"
             android:exported="true"
-            android:label="TiviKit Launcher"
+            android:label="MTVkit Launcher"
             android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE">
             <intent-filter>
                 <action android:name="android.service.notification.NotificationListenerService" />

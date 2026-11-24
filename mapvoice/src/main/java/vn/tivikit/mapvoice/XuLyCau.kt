@@ -16,7 +16,7 @@ object XuLyCau {
     sealed interface Viec
     /**
      * Mở app YouTube tìm [tim] ("" = chỉ mở app); [phatLuon] = phát luôn video đầu tiên; [app] = gói app (câu riêng chọn
-     * app), "" = app YouTube đã chọn ở TiviKit.
+     * app), "" = app YouTube đã chọn ở MTVkit.
      */
     data class YouTube(val tim: String, val phatLuon: Boolean, val app: String = "") : Viec
     /**
@@ -204,7 +204,7 @@ object XuLyCau {
     }
 
     /**
-     * App mở kênh [k]: app người dùng nói ("… trên TV360"), không thì app đã chọn ở TiviKit; app đó không có kênh / chưa cài
+     * App mở kênh [k]: app người dùng nói ("… trên TV360"), không thì app đã chọn ở MTVkit; app đó không có kênh / chưa cài
      * thì app khác biết chắc kênh này (VTVgo, FPT Play theo mã kênh, TV360 theo số kênh), sau cùng TV360 tìm theo tên. Nói
      * rõ "trên TV360" thì mở TV360 dù TV360 không biết số kênh.
      */
@@ -229,7 +229,7 @@ object XuLyCau {
         .replace(Regex("\\b(kenh|truyen hinh|hd|fhd|uhd|4k)\\b"), " ").replace(Regex("[^a-z0-9]"), "")
 
     /**
-     * Tên viết tắt / tên khác hay nói mà VTVgo ghi đủ: tên gọn → tên gọn của VTVgo (như KenhVtvGo.TEN_KHAC của TiviKit). FPT
+     * Tên viết tắt / tên khác hay nói mà VTVgo ghi đủ: tên gọn → tên gọn của VTVgo (như KenhVtvGo.TEN_KHAC của MTVkit). FPT
      * Play ghi "HaNoiTV 1", "Quốc Phòng VN", "Vĩnh Long 1"; người xem hay nói "THVL1".
      */
     private val BI_DANH = mapOf(
@@ -239,7 +239,7 @@ object XuLyCau {
     )
 
     /**
-     * Danh sách kênh từ JSON TiviKit gửi: {"vtvgo":[{"ten","ma"}…],"tv360":[{"ten","so"}…],"fptplay":[{"ten","ma"}…]}. Kênh
+     * Danh sách kênh từ JSON MTVkit gửi: {"vtvgo":[{"ten","ma"}…],"tv360":[{"ten","so"}…],"fptplay":[{"ten","ma"}…]}. Kênh
      * cùng tên (đã gọn) ở các app gộp làm một.
      */
     fun dsKenh(json: String): List<KenhTv> {

@@ -9,7 +9,7 @@ import android.os.Process
 import org.json.JSONObject
 
 /**
- * TiviKit / Map Voice gọi qua ADB:
+ * MTVkit / Map Voice gọi qua ADB:
  *   content call --uri content://vn.tivikit.iptv --method dat --arg '{"link":"https://…"}'   (link danh sách IPTV)
  *   content call --uri content://vn.tivikit.iptv --method doc                                  (link, số kênh, lúc tải)
  *   content call --uri content://vn.tivikit.iptv --method tai                                  (tải lại danh sách ngay)

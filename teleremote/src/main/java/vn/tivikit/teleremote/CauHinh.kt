@@ -17,23 +17,23 @@ enum class VaiTro(val ma: String) {
 }
 
 /**
- * Người được dùng bot. [ten] = tên Telegram dạng @username (chủ tivi nhập ở TiviKit; "" nếu duyệt người không đặt
+ * Người được dùng bot. [ten] = tên Telegram dạng @username (chủ tivi nhập ở MTVkit; "" nếu duyệt người không đặt
  * username), [id] = ID số Telegram của người đó (0 = chưa nhắn bot lần nào), [tenHien] = tên hiện trên Telegram.
  * Khớp theo [id] khi đã có; chưa có thì theo [ten]. Lần đầu khớp theo [ten] thì ghi lại [id] và từ đó chỉ tin [id]: đổi
  * username vẫn dùng được, người khác lấy lại username cũ cũng không vào được.
  */
 data class NguoiDung(val ten: String, val id: Long, val vaiTro: VaiTro, val tenHien: String = "")
 
-/** Người lạ vừa nhắn bot (chưa có trong danh sách): TiviKit hiện "chờ duyệt". */
+/** Người lạ vừa nhắn bot (chưa có trong danh sách): MTVkit hiện "chờ duyệt". */
 data class XinDung(val id: Long, val ten: String, val tenHien: String, val luc: Long)
 
-/** Một việc bot đã làm, cho TiviKit xem lại: [ai] = @username / tên hiện. */
+/** Một việc bot đã làm, cho MTVkit xem lại: [ai] = @username / tên hiện. */
 data class NhatKy(val luc: Long, val ai: String, val viec: String)
 
 /**
- * Cấu hình TiviKit gửi qua ADB (content call … --method dat). [bat] = tạm tắt bot (không hỏi Telegram), [nguoiDung] =
+ * Cấu hình MTVkit gửi qua ADB (content call … --method dat). [bat] = tạm tắt bot (không hỏi Telegram), [nguoiDung] =
  * người được dùng, [chupManHinh] = cho chủ chụp màn hình tivi gửi qua Telegram (tắt sẵn), [baoTin] = bot nhắn các chủ khi
- * tivi vừa bật / vừa tắt (tắt sẵn), [tiengAnh] = bot nói tiếng Anh (theo ngôn ngữ của TiviKit lúc cài). Token của bot gửi
+ * tivi vừa bật / vừa tắt (tắt sẵn), [tiengAnh] = bot nói tiếng Anh (theo ngôn ngữ của MTVkit lúc cài). Token của bot gửi
  * riêng (lệnh token), không nằm trong cấu hình.
  */
 data class CauHinh(
@@ -130,7 +130,7 @@ class Kho(ctx: Context) {
         p.edit().putString("nhat_ky", a.toString()).apply()
     }
 
-    /** Chủ tạm khoá thành viên tới lúc này (ms); 0 = không khoá. Ngoài cấu hình: TiviKit gửi cấu hình không đụng tới nó. */
+    /** Chủ tạm khoá thành viên tới lúc này (ms); 0 = không khoá. Ngoài cấu hình: MTVkit gửi cấu hình không đụng tới nó. */
     var khoaThanhVienDen: Long
         get() = p.getLong("khoa_thanh_vien_den", 0)
         set(v) { p.edit().putLong("khoa_thanh_vien_den", v).apply() }

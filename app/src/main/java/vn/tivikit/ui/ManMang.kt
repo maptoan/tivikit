@@ -142,8 +142,8 @@ private fun TheChPlay(cp: ChPlay.TrangThai) {
 
 private fun loiKhuyenChPlay(v: ChPlay.VanDe, cp: ChPlay.TrangThai): Pair<String, String> = when (v) {
     ChPlay.VanDe.KHONG_CO_CH_PLAY -> t("Tivi không có CH Play", "No Play Store on this TV") to
-        t("Một số máy (Fire TV, box nhà mạng) không có CH Play. Cài app bằng mục Cài app của TiviKit.",
-            "Some devices (Fire TV, operator boxes) have no Play Store. Install apps with Install apps in TiviKit.")
+        t("Một số máy (Fire TV, box nhà mạng) không có CH Play. Cài app bằng mục Cài app của MTVkit.",
+            "Some devices (Fire TV, operator boxes) have no Play Store. Install apps with Install apps in MTVkit.")
     ChPlay.VanDe.GOI_GOOGLE_TAT -> t("Gói Google mà CH Play cần đang bị tắt", "A Google package the Play Store needs is disabled") to
         t("Đang tắt: ${cp.goiTat.joinToString { tenGoiGoogle(it) }}. Bật lại trong Quản lý app rồi mở lại CH Play.",
             "Disabled: ${cp.goiTat.joinToString { tenGoiGoogle(it) }}. Re-enable it under Manage apps, then reopen the Play Store.")

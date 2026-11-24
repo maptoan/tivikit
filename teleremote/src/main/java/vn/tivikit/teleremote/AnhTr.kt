@@ -8,7 +8,7 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 
 /**
- * Ảnh qua Telegram (31/10/2026): ảnh người dùng gửi (đọc vừa màn hình cho XemTep, làm ảnh nền 16:9 cho TiviKit Launcher), ảnh
+ * Ảnh qua Telegram (31/10/2026): ảnh người dùng gửi (đọc vừa màn hình cho XemTep, làm ảnh nền 16:9 cho MTVkit Launcher), ảnh
  * chụp màn hình tivi.
  */
 object AnhTr {

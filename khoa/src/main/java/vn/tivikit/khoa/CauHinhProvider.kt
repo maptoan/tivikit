@@ -10,7 +10,7 @@ import org.json.JSONObject
 import java.util.Calendar
 
 /**
- * TiviKit đặt / đọc cấu hình qua ADB:
+ * MTVkit đặt / đọc cấu hình qua ADB:
  *   content call --uri content://vn.tivikit.khoa --method doc
  *   content call --uri content://vn.tivikit.khoa --method xac-thuc --arg <mã OTP 6 số / mã dự phòng 8 số>   (→ phien)
  *   content call --uri content://vn.tivikit.khoa --method dat --arg '<json>'

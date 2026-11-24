@@ -124,7 +124,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     val caiDatNhanh by lazy { CaiDatNhanhTivi(this) }
     /** Cập nhật app gợi ý đã cài (SmartTube, Kodi…) lên bản mới nhất (ui/CapNhatApp.kt). */
     val capNhatApp by lazy { CapNhatApp(this) }
-    /** Sao lưu dữ liệu TiviKit ra file / nhập trên điện thoại khác (ui/ChuyenMay.kt). */
+    /** Sao lưu dữ liệu MTVkit ra file / nhập trên điện thoại khác (ui/ChuyenMay.kt). */
     val chuyenMay by lazy { ChuyenMay(this) }
     /** Giữ kết nối: rớt thì tự nối lại, mở app thì tự nối tivi lần trước (ui/GiuKetNoi.kt). */
     val giuKetNoi by lazy { GiuKetNoi(this) }
@@ -395,7 +395,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     var dangCapNhat by mutableStateOf(false)
     /** Hộp mời nâng cấp: hiện một lần cho mỗi bản mới lúc mở app. */
     var hoiCapNhat by mutableStateOf(false)
-    /** Hộp "Cập nhật TiviKit" ở màn chính (26/10/2026): bản đang dùng, công tắc tự cài, nút kiểm tra ngay. */
+    /** Hộp "Cập nhật MTVkit" ở màn chính (26/10/2026): bản đang dùng, công tắc tự cài, nút kiểm tra ngay. */
     var moCapNhat by mutableStateOf(false)
     var tuCai by mutableStateOf(vn.tivikit.CapNhat.tuCai(ctx))
         private set
@@ -530,7 +530,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
             try {
                 val f = io { vn.tivikit.CapNhat.taiVe(ctx, b) }
                 if (android.os.Build.VERSION.SDK_INT >= 31) android.widget.Toast.makeText(ctx,
-                    t("Đang cài TiviKit ${b.versionName}: app sẽ tự đóng, mở lại là bản mới.", "Installing TiviKit ${b.versionName}: the app will close; reopen it for the new version."),
+                    t("Đang cài MTVkit ${b.versionName}: app sẽ tự đóng, mở lại là bản mới.", "Installing MTVkit ${b.versionName}: the app will close; reopen it for the new version."),
                     android.widget.Toast.LENGTH_LONG).show()
                 io { vn.tivikit.CapNhat.cai(ctx, b, f, ngam = false) }
             } catch (e: Throwable) { loi = t("Cập nhật không được: ${e.message}", "Couldn't update: ${e.message}") }
@@ -540,7 +540,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
 
     fun datTuCai(bat: Boolean) { vn.tivikit.CapNhat.datTuCai(ctx, bat); tuCai = bat }
 
-    /** Nút Kiểm tra ngay trong hộp Cập nhật TiviKit. */
+    /** Nút Kiểm tra ngay trong hộp Cập nhật MTVkit. */
     fun kiemTraBanMoi() {
         if (dangKiemTraBan) return
         dangKiemTraBan = true; baoKiemTra = ""
@@ -558,7 +558,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
 
     // ---------- Tiện ích có bản mới (1/11/2026) ----------
     // Mỗi tiện ích (Khoá trẻ em, Hẹn giờ, Tele Remote…) trước chỉ lên bản mới khi mở đúng màn của nó rồi lưu. Nay nối tivi là
-    // so cả lượt với bản đi kèm TiviKit: thẻ ở màn chính, nút Cập nhật hết, công tắc tự cập nhật ở thẻ tivi.
+    // so cả lượt với bản đi kèm MTVkit: thẻ ở màn chính, nút Cập nhật hết, công tắc tự cập nhật ở thẻ tivi.
 
     /** Tiện ích trên tivi đang nối khác bản đi kèm (TienIch.canCapNhat). */
     var tienIchMoi by mutableStateOf<List<TienIch.CanCapNhat>>(emptyList())
@@ -675,8 +675,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         e is AdbPairingRequiredException -> t("Tivi đòi ghép đôi (Gỡ lỗi không dây). Dùng phần \"Ghép đôi bằng mã\" bên dưới.", "The TV needs pairing (Wireless debugging). Use \"Pair with code\" below.")
         // Chế độ chạy trên tivi: nhiều tivi (TCL…) bật Gỡ lỗi USB chỉ mở ADB qua dây, cổng 5555 chưa nghe (22/10/2026).
         laLoiTuChoi(e) && ip.trim() == "127.0.0.1" ->
-            t("Tivi chưa mở ADB qua mạng (cổng 5555), nên app trên tivi chưa tự nối vào được. Cách sửa: trong Tuỳ chọn nhà phát triển bật thêm \"Gỡ lỗi qua mạng\" / \"ADB qua mạng\" (nếu có) rồi Kết nối lại. Tivi chỉ có \"Gỡ lỗi không dây\" thì dùng TiviKit trên điện thoại, chọn Ghép bằng mã. Hoặc cắm tivi vào máy tính, chạy adb tcpip 5555 một lần.",
-                "The TV hasn't opened ADB over the network (port 5555), so the app on the TV can't connect to itself. Fix: in Developer options also turn on \"Network debugging\" / \"ADB over network\" (if there) and Connect again. If the TV only has \"Wireless debugging\", use TiviKit on a phone with Pair with code. Or plug the TV into a computer and run adb tcpip 5555 once.")
+            t("Tivi chưa mở ADB qua mạng (cổng 5555), nên app trên tivi chưa tự nối vào được. Cách sửa: trong Tuỳ chọn nhà phát triển bật thêm \"Gỡ lỗi qua mạng\" / \"ADB qua mạng\" (nếu có) rồi Kết nối lại. Tivi chỉ có \"Gỡ lỗi không dây\" thì dùng MTVkit trên điện thoại, chọn Ghép bằng mã. Hoặc cắm tivi vào máy tính, chạy adb tcpip 5555 một lần.",
+                "The TV hasn't opened ADB over the network (port 5555), so the app on the TV can't connect to itself. Fix: in Developer options also turn on \"Network debugging\" / \"ADB over network\" (if there) and Connect again. If the TV only has \"Wireless debugging\", use MTVkit on a phone with Pair with code. Or plug the TV into a computer and run adb tcpip 5555 once.")
         laLoiTuChoi(e) ->
             t("Tivi từ chối kết nối ở cổng này. Kiểm tra đã bật Gỡ lỗi USB / Gỡ lỗi qua mạng chưa.", "The TV refused the connection on this port. Check USB debugging / Network debugging is on.")
         e.message?.contains("EHOSTUNREACH") == true || e.message?.contains("No route") == true ->
@@ -781,7 +781,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     /** IPv4 của điện thoại trong mạng Wi-Fi (quét tìm tivi LG). */
     internal fun ipWifi(): String? = ipDienThoai()
 
-    /** Mạng để dò [host]: Wi-Fi của điện thoại, trừ khi là chính máy này (TiviKit chạy trên tivi). */
+    /** Mạng để dò [host]: Wi-Fi của điện thoại, trừ khi là chính máy này (MTVkit chạy trên tivi). */
     internal fun mangDo(host: String): Network? = if (host == "127.0.0.1") null else mangNoiBo()
 
     /**
@@ -891,7 +891,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         trangThai = tt
         // Tên app thật từ chính tivi cho tenDep (TrenTv, 27/10/2026): chạy nền, chỉ khi có gói chưa hỏi (app mới cài).
         if (vn.tivikit.dulieu.TenTrenTv.thieu(tt.caiDat)) { val goi = tt.caiDat; viewModelScope.launch { runCatching { docTenTrenTv(goi) } } }
-        // App phụ chạy nền (Home sạch, Khoá, Hẹn giờ, TiviKit Launcher): giữ khỏi bị tối ưu pin / hạ nhóm App Standby, mỗi lần nối.
+        // App phụ chạy nền (Home sạch, Khoá, Hẹn giờ, MTVkit Launcher): giữ khỏi bị tối ưu pin / hạ nhóm App Standby, mỗi lần nối.
         val giu = ThaoTacTv.GIU_SONG.filter { it in tt.caiDat }
         if (giu.isNotEmpty()) viewModelScope.launch { runCatching { io { adb.shell(ThaoTacTv.lenhGiuSong(giu)) } } }
         // Công tắc DNS AdGuard theo đúng tivi (24/10/2026, góp ý kimhuenguyen1964: kết nối lại thì công tắc luôn tắt).
@@ -1340,7 +1340,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         napTuJson(j)
         // Ảnh nền riêng đã đặt từ trước: đọc lại từ tivi để Áp dụng lần sau không thay bằng ảnh theme (23/10/2026).
         // Nhận ra bằng cờ vgs_anh_rieng (từ 2.5.6) hoặc ảnh trên tivi không trùng ảnh của theme nào (bản cũ hơn).
-        // Ảnh VGS cũ (đã bỏ khỏi app) nhận ra theo SHA-256: là ảnh theme, Áp dụng lần sau thay bằng ảnh TiviKit.
+        // Ảnh VGS cũ (đã bỏ khỏi app) nhận ra theo SHA-256: là ảnh theme, Áp dụng lần sau thay bằng ảnh MTVkit.
         if (anhNenRieng == null && j.optBoolean("wallpaper")) {
             val anh = runCatching { io { tv.docAnhNenTv() } }.getOrNull()
             if (anh != null) {
@@ -1438,8 +1438,8 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
 
     fun caiHomeSach() = chay(t("Đang cài Home sạch…", "Installing the clean Home…")) {
         if (chanKhongPhaiTivi) { man = Man.THONG_TIN; return@chay }
-        if (laAndroidCu) error(t("Home sạch cần Android 8 trở lên, tivi/hộp này là Android ${thongTin?.android}. TiviKit chỉ dọn được quảng cáo và app rác trên máy này.", "The clean Home needs Android 8 or later; this TV/box runs Android ${thongTin?.android}. TiviKit can only clean ads and junk apps here."))
-        if (laFireTv) error(t("Fire TV không cho app nào thay màn Home (Amazon khoá). TiviKit chỉ dọn được quảng cáo và app rác trên Fire TV.", "Fire TV does not let any app replace Home (Amazon locks it). On Fire TV TiviKit can only clean ads and junk apps."))
+        if (laAndroidCu) error(t("Home sạch cần Android 8 trở lên, tivi/hộp này là Android ${thongTin?.android}. MTVkit chỉ dọn được quảng cáo và app rác trên máy này.", "The clean Home needs Android 8 or later; this TV/box runs Android ${thongTin?.android}. MTVkit can only clean ads and junk apps here."))
+        if (laFireTv) error(t("Fire TV không cho app nào thay màn Home (Amazon khoá). MTVkit chỉ dọn được quảng cáo và app rác trên Fire TV.", "Fire TV does not let any app replace Home (Amazon locks it). On Fire TV MTVkit can only clean ads and junk apps."))
         val sl = saoLuu ?: io { tv.damBaoSaoLuu(thongTin!!, getprop, ip) }.also { saoLuu = it }
         nhatKy.clear()
         homeKhac = null
@@ -1666,7 +1666,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     fun nhapCauHinh(uri: android.net.Uri) = chay(t("Đang mở file cấu hình…", "Opening the settings file…")) {
         val chu = io { ctx.contentResolver.openInputStream(uri)?.use { it.readBytes().toString(Charsets.UTF_8) } } ?: error(t("Không đọc được file.", "Couldn't read the file."))
         val j = runCatching { JSONObject(chu) }.getOrNull()?.takeIf { it.has("vgs_file") || it.has("dock_apps") }
-            ?: error(t("File này không phải file cấu hình TiviKit.", "This isn't a TiviKit settings file."))
+            ?: error(t("File này không phải file cấu hình MTVkit.", "This isn't a MTVkit settings file."))
         napTuJson(j)
         vn.tivikit.dulieu.themeTheoId(j.optString("vgs_theme"))?.let { themeChon = it }
         if (j.has("vgs_nut_home")) nutHome = j.optBoolean("vgs_nut_home")
@@ -1813,7 +1813,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
         // giành lại Home — damBaoPhimHome sẽ coi launcher đó là app giành nút Home và tắt nó.
         homeKhac = io { tv.launcherKhacDangDung() }
         homeKhac?.let { g ->
-            // Cài đè Home sạch làm nó nhảy lên trước: TiviKit chạy ngay trên tivi thì đưa app về lại (thuPhimHome cũng làm).
+            // Cài đè Home sạch làm nó nhảy lên trước: MTVkit chạy ngay trên tivi thì đưa app về lại (thuPhimHome cũng làm).
             veApp()
             ghi(t("Nút Home đang mở ${tenDep(g)} (launcher bạn chọn) nên app không đổi Home. Muốn Home sạch làm Home: vào Quản lý launcher.",
                 "The Home button opens ${tenDep(g)} (the launcher you chose), so Home was left alone. To make the clean Home the Home, use Launchers."))
@@ -1831,7 +1831,7 @@ class PhienLamViec(app: Application) : AndroidViewModel(app) {
     /**
      * Nút Khởi động lại ở thẻ tivi (màn chính, 25/10/2026): khởi động lại rồi chờ tivi lên và tự nối lại đúng địa chỉ cũ.
      * Chỉ tự nối được với ADB qua mạng cổng cố định (5555); Gỡ lỗi không dây đổi cổng sau khởi động nên báo nối lại bằng
-     * tay. TiviKit chạy ngay trên tivi thì tắt theo tivi.
+     * tay. MTVkit chạy ngay trên tivi thì tắt theo tivi.
      */
     /** Khởi động lại tivi, đợi tivi lên rồi tự nối lại; nối được thì làm tiếp [sau] (VD mở lại màn Làm mới tivi). */
     fun khoiDongLaiVaNoiLai(sau: (() -> Unit)? = null) = chay(t("Đang khởi động lại tivi…", "Rebooting the TV…")) {

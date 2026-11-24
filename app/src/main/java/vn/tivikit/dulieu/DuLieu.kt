@@ -27,7 +27,7 @@ class DuLieu(val mau: List<MauTv>, val thongKe: Map<String, ThongKeGoi>) {
 
     companion object {
         /** Số mẫu tivi trong assets/du-lieu.json, để ghi lên giao diện mà không phải nạp dữ liệu (KeHoachTest kiểm tra). */
-        const val SO_MAU = 457
+        const val SO_MAU = 513
 
         @Volatile private var cache: DuLieu? = null
 
@@ -186,15 +186,15 @@ val TEN_APP = mapOf(
     "com.liskovsoft.smarttubetv" to "SmartTube",
     "org.smartteam.smarttube.tv.orig" to "SmartTube",
     "com.viettel.tv360.tv" to "TV360",
-    "vn.tivikit.kenh" to "Kênh nhanh (TiviKit)",
-    "vn.tivikit.hengio" to "Hẹn giờ (TiviKit)",
-    "vn.tivikit.khoa" to "Khoá trẻ em (TiviKit)",
-    "vn.tivikit.go" to "Gõ tiếng Việt (TiviKit)",
-    "vn.tivikit.launcher" to "TiviKit Launcher",
+    "vn.tivikit.kenh" to "Kênh nhanh (MTVkit)",
+    "vn.tivikit.hengio" to "Hẹn giờ (MTVkit)",
+    "vn.tivikit.khoa" to "Khoá trẻ em (MTVkit)",
+    "vn.tivikit.go" to "Gõ tiếng Việt (MTVkit)",
+    "vn.tivikit.launcher" to "MTVkit Launcher",
     // App phụ trước khi đổi tên gói (25/10/2026), còn trên tivi tới khi được chuyển.
-    "com.icm.cleantv.kenh" to "Kênh nhanh (TiviKit cũ)",
-    "com.icm.cleantv.hengio" to "Hẹn giờ (TiviKit cũ)",
-    "com.icm.cleantv.khoa" to "Khoá trẻ em (TiviKit cũ)",
+    "com.icm.cleantv.kenh" to "Kênh nhanh (MTVkit cũ)",
+    "com.icm.cleantv.hengio" to "Hẹn giờ (MTVkit cũ)",
+    "com.icm.cleantv.khoa" to "Khoá trẻ em (MTVkit cũ)",
     "com.google.android.videos" to "Google TV / Play Phim",
     "com.google.android.play.games" to "Google Play Games",
     "com.amazon.amazonvideo.livingroom" to "Prime Video",
@@ -260,14 +260,14 @@ private val TEN_APP_EN = mapOf(
     "com.ts.launcher" to "Clean Home (Xiaomi build)",
     "com.google.android.leanbacklauncher" to "Stock Home (early Android TV)",
     "com.mitv.tvhome" to "Stock Home (Xiaomi)",
-    "vn.tivikit.kenh" to "Quick channel (TiviKit)",
-    "vn.tivikit.hengio" to "Timer (TiviKit)",
-    "vn.tivikit.khoa" to "Kids lock (TiviKit)",
-    "vn.tivikit.go" to "Vietnamese typing (TiviKit)",
-    "vn.tivikit.launcher" to "TiviKit Launcher",
-    "com.icm.cleantv.kenh" to "Quick channel (old TiviKit)",
-    "com.icm.cleantv.hengio" to "Timer (old TiviKit)",
-    "com.icm.cleantv.khoa" to "Kids lock (old TiviKit)",
+    "vn.tivikit.kenh" to "Quick channel (MTVkit)",
+    "vn.tivikit.hengio" to "Timer (MTVkit)",
+    "vn.tivikit.khoa" to "Kids lock (MTVkit)",
+    "vn.tivikit.go" to "Vietnamese typing (MTVkit)",
+    "vn.tivikit.launcher" to "MTVkit Launcher",
+    "com.icm.cleantv.kenh" to "Quick channel (old MTVkit)",
+    "com.icm.cleantv.hengio" to "Timer (old MTVkit)",
+    "com.icm.cleantv.khoa" to "Kids lock (old MTVkit)",
     "com.google.android.tv.frameworkpackagestubs" to "Google TV's empty browser",
 )
 

@@ -95,7 +95,7 @@ internal fun ManKhoaTre(vm: PhienLamViec) = Cuon {
 private fun TheTrenTv(k: KhoaTreTivi, j: JSONObject) = The(t("Trên tivi", "On the TV"), Icons.Rounded.Lock) {
     val bat = j.optBoolean("bat"); val chay = j.optBoolean("dichVuChay"); val dangKhoa = j.optBoolean("dangKhoa")
     val moDen = j.optLong("moTamDen")
-    // Khoá trẻ em ngay trên TiviKit Launcher (khoa 1.7): khoá tới khi nhập mã, cả khi khoá đang tắt.
+    // Khoá trẻ em ngay trên MTVkit Launcher (khoa 1.7): khoá tới khi nhập mã, cả khi khoá đang tắt.
     val khoaTay = dangKhoa && j.optString("lyDo") == "bo-me-khoa"
     val gio = { ms: Long -> SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(ms)) }
     Phu(if (khoaTay) t("Tivi đang khoá: có người bấm Khoá trẻ em ngay trên tivi. Nhập mã trên tivi, hoặc Mở tạm ở đây.",
@@ -273,7 +273,7 @@ private fun TheHenKhoa(vm: PhienLamViec) = The(t("Hẹn giờ khoá app", "App l
 
 /** Chép chữ nhạy cảm (mã gốc, mã dự phòng): Android 13+ không hiện nội dung trong ô xem trước bộ nhớ tạm. */
 private fun chepKin(ctx: Context, chu: String) {
-    val clip = ClipData.newPlainText("TiviKit", chu)
+    val clip = ClipData.newPlainText("MTVkit", chu)
     if (android.os.Build.VERSION.SDK_INT >= 33) clip.description.extras = PersistableBundle().apply { putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true) }
     runCatching { ctx.getSystemService(ClipboardManager::class.java).setPrimaryClip(clip) }
     Toast.makeText(ctx, t("Đã chép", "Copied"), Toast.LENGTH_SHORT).show()
@@ -319,7 +319,7 @@ private fun TheMaMo(vm: PhienLamViec) = The(t("Mã mở khoá", "Unlock code"), 
             SelectionContainer { Text(MaOtp.nhom(khoa), fontFamily = FontFamily.Monospace, fontSize = 16.sp, letterSpacing = 1.sp) }
             Phu(t("Cất mã gốc này (ghi giấy, trình quản lý mật khẩu): đổi điện thoại thì nhập lại vào app xác thực mới, tivi khác trong nhà dùng chung được. Đừng để ảnh chụp ở nơi trẻ xem được.",
                 "Keep this root key (on paper, in a password manager): add it again on a new phone, and share it with other TVs at home. Don't leave a screenshot where a child can see it."))
-            BuocSo(2, t("Nhập mã 6 số app xác thực đang hiện cho TiviKit.", "Enter the 6-digit code the authenticator shows for TiviKit."))
+            BuocSo(2, t("Nhập mã 6 số app xác thực đang hiện cho MTVkit.", "Enter the 6-digit code the authenticator shows for MTVkit."))
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedTextField(k.maThu, { k.maThu = it.filter(Char::isDigit).take(MaOtp.SO_CHU_SO) }, label = { Text(t("Mã 6 số", "6-digit code")) }, singleLine = true,
                     modifier = Modifier.weight(1f), shape = RoundedCornerShape(12.dp),
@@ -347,8 +347,8 @@ private fun TheMaMo(vm: PhienLamViec) = The(t("Mã mở khoá", "Unlock code"), 
             FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 ChonChip(t("Chép", "Copy"), false) { chepKin(ctx, chu) }
                 if (!ManHinh.laTv) ChonChip(t("Chia sẻ / in", "Share / print"), false) {
-                    val gui = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_SUBJECT, t("Mã dự phòng Khoá trẻ em (TiviKit)", "Kids lock backup codes (TiviKit)"))
-                        .putExtra(Intent.EXTRA_TEXT, t("Mã dự phòng Khoá trẻ em (TiviKit), mỗi mã dùng một lần:\n", "Kids lock backup codes (TiviKit), each works once:\n") + chu)
+                    val gui = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_SUBJECT, t("Mã dự phòng Khoá trẻ em (MTVkit)", "Kids lock backup codes (MTVkit)"))
+                        .putExtra(Intent.EXTRA_TEXT, t("Mã dự phòng Khoá trẻ em (MTVkit), mỗi mã dùng một lần:\n", "Kids lock backup codes (MTVkit), each works once:\n") + chu)
                     runCatching { ctx.startActivity(Intent.createChooser(gui, t("Cất mã dự phòng", "Store the backup codes"))) }
                 }
             }
@@ -402,8 +402,8 @@ internal fun HopNhapMa(vm: PhienLamViec) {
                         label = { Text(t("Mã 6 hoặc 8 số", "6- or 8-digit code")) }, singleLine = true,
                         modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(12.dp),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done), keyboardActions = KeyboardActions(onDone = { k.nhapMa() }))
-                    Phu(t("Mã 6 số của TiviKit trong app xác thực (Google Authenticator, Microsoft Authenticator, Mật khẩu trên iPhone…), hoặc một mã dự phòng 8 số.",
-                        "TiviKit's 6-digit code in the authenticator app (Google Authenticator, Microsoft Authenticator, iPhone Passwords…), or an 8-digit backup code."))
+                    Phu(t("Mã 6 số của MTVkit trong app xác thực (Google Authenticator, Microsoft Authenticator, Mật khẩu trên iPhone…), hoặc một mã dự phòng 8 số.",
+                        "MTVkit's 6-digit code in the authenticator app (Google Authenticator, Microsoft Authenticator, iPhone Passwords…), or an 8-digit backup code."))
                 }
                 if (vm.dangBan) Phu(vm.thongBao)
                 if (k.baoMa.isNotEmpty()) Phu(k.baoMa, Cam)

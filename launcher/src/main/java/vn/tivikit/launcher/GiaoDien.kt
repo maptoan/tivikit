@@ -77,7 +77,7 @@ internal val BongChu = Shadow(Color(0x80000000), Offset(0f, 1.5f), 8f)
 internal val PHIM_OK = setOf(Key.DirectionCenter, Key.Enter, Key.NumPadEnter)
 
 /**
- * Màn Home của TiviKit Launcher: ảnh nền, lời chào + đồng hồ + âm lịch + thông số + câu kinh mỗi ngày ở góc trái, các nút
+ * Màn Home của MTVkit Launcher: ảnh nền, lời chào + đồng hồ + âm lịch + thông số + câu kinh mỗi ngày ở góc trái, các nút
  * kính ở góc phải (Dọn RAM, mạng, Cài đặt, ⏻), dock kính mờ ở dưới (app ghim | app mở gần đây | Tất cả ứng dụng); trang
  * Tất cả ứng dụng, menu app, bảng lịch, cả câu kinh và menu ⏻ đè lên.
  */

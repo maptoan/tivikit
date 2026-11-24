@@ -135,7 +135,7 @@ class LgTivi(private val vm: PhienLamViec) {
         val k = KetNoiLg(ip, vm.mangDo(ip)?.socketFactory)
         val khoa = try {
             k.noi(cu?.khoa?.takeIf { it.isNotBlank() }) {
-                vm.thongBao = t("Nhìn lên tivi: bấm Cho phép (Allow / Đồng ý) để TiviKit điều khiển tivi.", "Look at the TV: press Allow so TiviKit can control it.")
+                vm.thongBao = t("Nhìn lên tivi: bấm Cho phép (Allow / Đồng ý) để MTVkit điều khiển tivi.", "Look at the TV: press Allow so MTVkit can control it.")
             }
         } catch (e: LgTuChoiException) {
             k.dong()

@@ -16,7 +16,7 @@ data class Viec(val gio: Int, val phut: Int, val ngay: Set<Int>, val loai: Strin
         const val BAT = "bat"
         const val TAT = "tat"
         const val MO = "mo"
-        /** Auto Reboot (2/11/2026): chỉ có trong báo thức (Kho.motLan), không nằm trong lịch TiviKit gửi. */
+        /** Auto Reboot (2/11/2026): chỉ có trong báo thức (Kho.motLan), không nằm trong lịch MTVkit gửi. */
         const val KDL = "kdl"
     }
 }
@@ -26,7 +26,7 @@ data class KeTiep(val luc: Long, val viec: List<Viec>)
 
 /**
  * Việc một lần (31/10/2026): [loai] lúc [luc] (ms; tắt tivi thì là giờ tắt, báo trước BAO_TRUOC_MS), chạy xong thì bỏ. Từ
- * nút hẹn tắt sau X phút hay việc một lần lúc HH:MM (TiviKit, màn Hẹn giờ trên tivi).
+ * nút hẹn tắt sau X phút hay việc một lần lúc HH:MM (MTVkit, màn Hẹn giờ trên tivi).
  */
 data class MotLan(val luc: Long, val loai: String, val goi: String? = null) {
     val id: String get() = "$loai-$luc"
@@ -52,7 +52,7 @@ object Lich {
      */
     fun daLo(luc: Long, bay: Long): Boolean = bay - luc > TRE_TOI_DA_MS
 
-    /** Tên việc trong nhật ký, TiviKit đọc để nói cho người dùng: bat, thu (thử đánh thức), tat, mo:<gói>. */
+    /** Tên việc trong nhật ký, MTVkit đọc để nói cho người dùng: bat, thu (thử đánh thức), tat, mo:<gói>. */
     fun tenViec(v: Viec, laThu: Boolean): String = when (v.loai) {
         Viec.MO -> "mo:${v.goi}"
         Viec.BAT -> if (laThu) "thu" else Viec.BAT
@@ -63,7 +63,7 @@ object Lich {
 
     fun laTenGoi(s: String): Boolean = TEN_GOI.matches(s)
 
-    /** Danh sách việc từ JSON TiviKit gửi; null nếu sai dạng (cả danh sách bị từ chối, không lưu nửa vời). */
+    /** Danh sách việc từ JSON MTVkit gửi; null nếu sai dạng (cả danh sách bị từ chối, không lưu nửa vời). */
     fun docJson(s: String?): List<Viec>? = runCatching {
         val a = JSONArray(s ?: return null)
         if (a.length() > TOI_DA) return null
@@ -87,11 +87,11 @@ object Lich {
             .put("bat", v.bat).apply { v.goi?.let { put("goi", it) } }
     })
 
-    /** Sắp theo giờ trong ngày, rồi theo loại (bật trước mở, tắt sau), như TiviKit. */
+    /** Sắp theo giờ trong ngày, rồi theo loại (bật trước mở, tắt sau), như MTVkit. */
     fun sapXep(ds: List<Viec>): List<Viec> = ds.sortedWith(compareBy({ it.gio * 60 + it.phut }, { listOf(Viec.BAT, Viec.MO, Viec.TAT).indexOf(it.loai) }))
 
     /**
-     * Việc một lần TiviKit / màn tivi gửi (31/10/2026): {"loai","goi"?} kèm "sauPhut" (tính từ [bay]), "gio" + "phut" (lần tới
+     * Việc một lần MTVkit / màn tivi gửi (31/10/2026): {"loai","goi"?} kèm "sauPhut" (tính từ [bay]), "gio" + "phut" (lần tới
      * của giờ đó, lanToi) hay "luc" (ms). Null nếu sai dạng.
      */
     fun docMotLan(s: String?, bay: Long, zone: ZoneId): MotLan? = runCatching {

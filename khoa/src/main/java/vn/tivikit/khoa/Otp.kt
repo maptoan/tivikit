@@ -59,7 +59,7 @@ object Otp {
         return (b - 1..b + 1).firstOrNull { it > daDung && ma(khoa, it) == nhap }
     }
 
-    /** Dạng băm (SHA-256 của muối + mã): tivi chỉ giữ dạng này của mã dự phòng và phiên của TiviKit. */
+    /** Dạng băm (SHA-256 của muối + mã): tivi chỉ giữ dạng này của mã dự phòng và phiên của MTVkit. */
     fun bam(muoi: String, ma: String): String =
         MessageDigest.getInstance("SHA-256").digest((muoi + ma).toByteArray()).joinToString("") { "%02x".format(it) }
 }
@@ -90,7 +90,7 @@ data class MaMo(val khoa: String, val daDung: Long = 0, val muoi: String = "", v
         }.getOrNull()
 
         /**
-         * Mã mới TiviKit gửi trong lệnh [o] — "otp" = mã gốc base32, "duPhong" = {muoi, bam: [...]} — gộp vào mã đang có
+         * Mã mới MTVkit gửi trong lệnh [o] — "otp" = mã gốc base32, "duPhong" = {muoi, bam: [...]} — gộp vào mã đang có
          * [cu]. Lấy hai khoá đó ra khỏi [o]. null = lệnh không đổi mã; mã gốc ngắn / băm sai dạng thì báo lỗi.
          */
         fun tuLenh(o: JSONObject, cu: MaMo?): MaMo? {

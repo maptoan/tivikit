@@ -14,7 +14,7 @@ object TuChonNguon {
     const val TV360 = "tv360"
     const val FPT = "fptplay"
     const val M3U = "m3u"
-    /** Kênh trong danh sách IPTV của người dùng, phát bằng app IPTV của TiviKit (1/11/2026). */
+    /** Kênh trong danh sách IPTV của người dùng, phát bằng app IPTV của MTVkit (1/11/2026). */
     const val IPTV = "iptv"
     /** Thứ tự thử khi chưa có lịch sử (anh chọn 1/11/2026; IPTV đứng chỗ M3U, M3U sau cùng). */
     val MAC_DINH = listOf(VTVGO, TV360, FPT, IPTV, M3U)
@@ -24,7 +24,7 @@ object TuChonNguon {
     const val GOI_M3U = "com.m3u.smartphone"
     const val M3U_PHAT = "com.m3u.smartphone.ui.business.channel.PlayerActivity"
     const val M3U_MA_KENH = "shortcut:channel-id"
-    /** Phần phím tắt M3U trong `dumpsys shortcut` (như ThaoTacTv.docKenhM3u của TiviKit). */
+    /** Phần phím tắt M3U trong `dumpsys shortcut` (như ThaoTacTv.docKenhM3u của MTVkit). */
     const val LENH_PHIM_TAT_M3U = "dumpsys shortcut | sed -n '/Package: $GOI_M3U/,/Package: /p'"
 
     /**
@@ -171,7 +171,7 @@ object TuChonNguon {
     private val MA_M3U = Regex("[1-9][0-9]{0,8}")
     private val MA_IPTV = Regex("[A-Za-z0-9_.@:+-]{1,80}")
 
-    /** Nguồn của ô Auto TiviKit gửi qua app ô (kenh/): [{"app":"vtvgo","ten":"VTV1","ma":"1"},{"app":"tv360","so":"001"}…]; mục hỏng thì bỏ. */
+    /** Nguồn của ô Auto MTVkit gửi qua app ô (kenh/): [{"app":"vtvgo","ten":"VTV1","ma":"1"},{"app":"tv360","so":"001"}…]; mục hỏng thì bỏ. */
     fun tuJson(s: String?): List<Nguon> {
         val a = runCatching { JSONArray(s ?: "") }.getOrNull() ?: return emptyList()
         return (0 until a.length()).mapNotNull { a.optJSONObject(it) }.mapNotNull { o ->
@@ -189,7 +189,7 @@ object TuChonNguon {
     }
 
     /**
-     * Thứ tự riêng của các ô Kênh nhanh Auto (TiviKit gửi mỗi khi các ô đổi, lệnh "thu-tu"): [{"ten":"VTV1","nguon":[…]},…]
+     * Thứ tự riêng của các ô Kênh nhanh Auto (MTVkit gửi mỗi khi các ô đổi, lệnh "thu-tu"): [{"ten":"VTV1","nguon":[…]},…]
      * → khoá kênh (XuLyCau.khoaKenh) → nguồn theo đúng thứ tự của ô. Ô hỏng (thiếu tên, không còn nguồn nào) thì bỏ; null nếu
      * không phải danh sách.
      */

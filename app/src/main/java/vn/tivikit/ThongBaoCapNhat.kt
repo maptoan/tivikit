@@ -42,13 +42,13 @@ object ThongBaoCapNhat {
     fun bao(ctx: Context, b: CapNhat.BanMoi) {
         val p = ctx.getSharedPreferences("ota", Context.MODE_PRIVATE)
         if (p.getInt("da_bao", 0) >= b.versionCode) return
-        if (hien(ctx, 1, t("TiviKit ${b.versionName} đã có", "TiviKit ${b.versionName} is out"), b.ghiChu, t("Chạm để cập nhật.", "Tap to update."), moCapNhat = true))
+        if (hien(ctx, 1, t("MTVkit ${b.versionName} đã có", "MTVkit ${b.versionName} is out"), b.ghiChu, t("Chạm để cập nhật.", "Tap to update."), moCapNhat = true))
             p.edit().putInt("da_bao", b.versionCode).apply()
     }
 
     /** Đã tự cài bản [b] lúc chạy nền: báo để người dùng biết app vừa đổi bản và bản đó có gì. */
     fun baoDaCai(ctx: Context, b: CapNhat.BanMoi) {
-        hien(ctx, 2, t("TiviKit đã cập nhật lên ${b.versionName}", "TiviKit updated to ${b.versionName}"), b.ghiChu, "", moCapNhat = false)
+        hien(ctx, 2, t("MTVkit đã cập nhật lên ${b.versionName}", "MTVkit updated to ${b.versionName}"), b.ghiChu, "", moCapNhat = false)
     }
 
     /** Một thông báo của kênh cập nhật; false khi không được phép hiện (Android 13+ chưa cho quyền thông báo). */

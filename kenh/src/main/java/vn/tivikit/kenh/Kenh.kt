@@ -9,9 +9,9 @@ import org.json.JSONObject
  * Ô VTVgo (26/10/2026, [app] vtvgo): mã kênh của VTVgo (contentId trong vtvgo://play) và tên. Ô FPT Play (31/10/2026, [app]
  * fptplay): mã kênh của FPT Play (fptplay.vn/xem-truyen-hinh/<mã>, VD vtv1-hd) và tên. Ô M3U (1/11/2026, [app] m3u): mã kênh
  * (số) trong M3UAndroid, lấy từ phím tắt "channel_<mã>" người dùng tạo trong M3U (Create Shortcut), và tên. Ô Auto (cùng
- * ngày, [app] auto): tên kênh và các [nguon] TiviKit tìm được (mỗi nguồn một Kenh VTVgo / TV360 / FPT Play / IPTV / M3U); Map
+ * ngày, [app] auto): tên kênh và các [nguon] MTVkit tìm được (mỗi nguồn một Kenh VTVgo / TV360 / FPT Play / IPTV / M3U); Map
  * Voice thử lần lượt tới khi có tiếng; [coDinh] = người dùng đặt thứ tự riêng, Map Voice thử đúng thứ tự [nguon]. Ô IPTV (cùng
- * ngày, [app] iptv): mã kênh (tvg-id, hay tên đã gọn) và tên trong danh sách IPTV của người dùng, phát bằng app IPTV của TiviKit.
+ * ngày, [app] iptv): mã kênh (tvg-id, hay tên đã gọn) và tên trong danh sách IPTV của người dùng, phát bằng app IPTV của MTVkit.
  */
 data class Kenh(
     val so: String, val ten: String, val ma: String = "", val app: String = if (ma.isEmpty()) APP_TV360 else APP_VTVGO,
@@ -46,7 +46,7 @@ data class Kenh(
         const val APP_M3U = "m3u"
         const val APP_AUTO = "auto"
         const val APP_IPTV = "iptv"
-        /** App IPTV của TiviKit: màn PhatKenh nhận tên kênh ("ten") và mã kênh ("ma"). */
+        /** App IPTV của MTVkit: màn PhatKenh nhận tên kênh ("ten") và mã kênh ("ma"). */
         const val IPTV = "vn.tivikit.iptv"
         const val IPTV_PHAT = "vn.tivikit.iptv.PhatKenh"
         /** Map Voice: tự chọn nguồn cho ô Auto (màn MoTuDong nhận tên kênh và nguồn). */
@@ -69,7 +69,7 @@ data class Kenh(
         private val MA = Regex("[A-Za-z0-9_-]{1,60}")
         /** Mã kênh của M3U: số nguyên dương (khoá chính trong cơ sở dữ liệu kênh của M3U). */
         private val MA_M3U = Regex("[1-9][0-9]{0,8}")
-        /** Mã kênh IPTV: tvg-id, hay tên đã gọn (như Iptv.MA của TiviKit). */
+        /** Mã kênh IPTV: tvg-id, hay tên đã gọn (như Iptv.MA của MTVkit). */
         private val MA_IPTV = Regex("[A-Za-z0-9_.@:+-]{1,80}")
 
         /** "1" / "01" / "001" → "001", dạng số kênh (shortcutKeyboard) của TV360; ngoài 1..999 → null. */

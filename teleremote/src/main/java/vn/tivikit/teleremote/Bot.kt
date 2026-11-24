@@ -32,7 +32,7 @@ class TelegramRa(private val t: Telegram) : Ra {
     override fun taiTep(id: String, dich: File, toiDa: Long): Boolean = runCatching { t.taiTep(id, dich, toiDa) }.isSuccess
 }
 
-/** Ghi lại những gì bot định trả lời (lệnh thu: TiviKit / người thử xem bot làm gì mà không cần Telegram). */
+/** Ghi lại những gì bot định trả lời (lệnh thu: MTVkit / người thử xem bot làm gì mà không cần Telegram). */
 class GhiRa : Ra {
     val ds = mutableListOf<String>()
     override fun gui(chat: Long, chu: String, banPhim: JSONObject?) { ds += chu + nut(banPhim) }
@@ -164,7 +164,7 @@ class Bot(private val dv: TeleRemoteDichVu) {
             nguoiLa(d, ra, ch)
             return
         }
-        // Lần đầu nhắn: ghi ID số (từ đó khớp theo ID), cập nhật username / tên hiện cho TiviKit hiện.
+        // Lần đầu nhắn: ghi ID số (từ đó khớp theo ID), cập nhật username / tên hiện cho MTVkit hiện.
         val nd2 = XuLyLenh.ghiNguoi(ch, nd, d.nguoi)?.let { moi -> kho.cauHinh = moi; XuLyLenh.tim(moi, d.nguoi) } ?: nd
         LamViec(dv, ra).lam(d, nd2)
     }
@@ -206,8 +206,8 @@ class Bot(private val dv: TeleRemoteDichVu) {
     /** Người không có trong danh sách: nút thì báo không được phép; tin thì ghi chờ duyệt, nhắn họ và chủ tivi một lần. */
     private fun nguoiLa(d: XuLyLenh.Den, ra: Ra, ch: CauHinh) {
         val en = ch.tiengAnh
-        val chuaDuoc = if (en) "You're not allowed to control this TV yet. Ask the TV's owner to approve you in TiviKit → Tele Remote."
-            else "Bạn chưa được phép điều khiển tivi này. Nhờ chủ tivi mở TiviKit → Tele Remote và duyệt bạn."
+        val chuaDuoc = if (en) "You're not allowed to control this TV yet. Ask the TV's owner to approve you in MTVkit → Tele Remote."
+            else "Bạn chưa được phép điều khiển tivi này. Nhờ chủ tivi mở MTVkit → Tele Remote và duyệt bạn."
         if (d.nut != null) {
             ra.traLoiNut(d.idNut, chuaDuoc, canhBao = true)
             return
@@ -215,8 +215,8 @@ class Bot(private val dv: TeleRemoteDichVu) {
         if (!kho.themCho(XinDung(d.nguoi.id, d.nguoi.ten, d.nguoi.tenHien, System.currentTimeMillis()))) return
         ra.gui(d.chat, chuaDuoc)
         val ai = listOf(d.nguoi.ten, d.nguoi.tenHien).filter { it.isNotEmpty() }.joinToString(" · ").ifEmpty { "ID ${d.nguoi.id}" }
-        val bao = if (en) "🔔 $ai wants to use this TV's bot. Approve or ignore below (or in TiviKit → Tele Remote)."
-            else "🔔 $ai muốn dùng bot của tivi. Duyệt hay bỏ qua ngay dưới đây (hay ở TiviKit → Tele Remote)."
+        val bao = if (en) "🔔 $ai wants to use this TV's bot. Approve or ignore below (or in MTVkit → Tele Remote)."
+            else "🔔 $ai muốn dùng bot của tivi. Duyệt hay bỏ qua ngay dưới đây (hay ở MTVkit → Tele Remote)."
         ch.nguoiDung.filter { it.vaiTro == VaiTro.CHU && it.id != 0L }.forEach { ra.gui(it.id, bao, XuLyLenh.bangXinDung(d.nguoi.id, en)) }
         kho.ghi(ai, "xin-dung")
     }

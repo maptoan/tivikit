@@ -6,7 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.view.WindowCompat
 
-/** Màn Home (bí danh .Home có bộ lọc HOME, tắt sẵn đến khi người dùng chọn TiviKit Launcher làm Home ở TiviKit). */
+/** Màn Home (bí danh .Home có bộ lọc HOME, tắt sẵn đến khi người dùng chọn MTVkit Launcher làm Home ở MTVkit). */
 class ManHome : ComponentActivity() {
     private val tt = TrangThaiHome()
     private lateinit var dk: DieuKhien

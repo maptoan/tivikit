@@ -1,8 +1,8 @@
 package vn.tivikit.dulieu
 
 /**
- * Tên app phụ trong các bản thử trước khi TiviKit đổi tên gói sang vn.tivikit (25/10/2026). Không bản phát hành nào có
- * chúng (1.1.0 đã là vn.tivikit), nên từ 31/10/2026 TiviKit thôi tự chuyển dữ liệu từ chúng sang gói mới; chỉ còn dọn
+ * Tên app phụ trong các bản thử trước khi MTVkit đổi tên gói sang vn.tivikit (25/10/2026). Không bản phát hành nào có
+ * chúng (1.1.0 đã là vn.tivikit), nên từ 31/10/2026 MTVkit thôi tự chuyển dữ liệu từ chúng sang gói mới; chỉ còn dọn
  * sót: Khôi phục và kịch bản khôi phục gỡ các gói này, cài / tắt app phụ bỏ tên dịch vụ trợ năng cũ.
  */
 object GoiCu {

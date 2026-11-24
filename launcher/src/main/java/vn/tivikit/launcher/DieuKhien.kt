@@ -45,7 +45,7 @@ class DieuKhien(private val act: ComponentActivity, private val tt: TrangThaiHom
     /** App mở gần đây theo thống kê sử dụng (rỗng = chưa có quyền) và các gói launcher (không đưa vào app gần đây). */
     private var suDung: List<String> = emptyList()
     private var goiHome: Set<String> = emptySet()
-    /** App đọc từ hệ thống (tên của app), và tên riêng TiviKit đặt (ten_app: tên kênh của các ô Kênh nhanh). */
+    /** App đọc từ hệ thống (tên của app), và tên riêng MTVkit đặt (ten_app: tên kênh của các ô Kênh nhanh). */
     private var dsGoc: List<AppTv> = emptyList()
     private var tenRieng: Map<String, String> = emptyMap()
     private val dangTai = HashSet<String>()
@@ -58,7 +58,7 @@ class DieuKhien(private val act: ComponentActivity, private val tt: TrangThaiHom
     private var dangLayThoiTiet = false
     /** Phiên phát của thẻ Đang phát (mở app, tạm dừng / phát tiếp). */
     private var phien: MediaController? = null
-    /** false = chưa được cho phép đọc phiên phát (thử lại mỗi lần màn Home hiện ra: TiviKit có thể vừa cấp quyền). */
+    /** false = chưa được cho phép đọc phiên phát (thử lại mỗi lần màn Home hiện ra: MTVkit có thể vừa cấp quyền). */
     @Volatile private var docDuocDangPhat = true
     /** Câu kinh đang hiện ứng với ngày / tên bộ / file bộ riêng nào (khác thì đọc lại), và ngày đã xét. */
     private var khoaCau: String? = null
@@ -70,9 +70,9 @@ class DieuKhien(private val act: ComponentActivity, private val tt: TrangThaiHom
     private val khoaNgay = act.registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { r ->
         if (r.resultCode == Activity.RESULT_OK) return@registerForActivityResult
         bao(when (r.data?.getStringExtra("loi")) {
-            "chua-co-ma" -> t("Khoá trẻ em chưa có mã: cài mã bằng TiviKit trước", "The Kids lock has no code yet: set one up in TiviKit first")
-            "dich-vu" -> t("Dịch vụ Khoá trẻ em đang tắt: mở Khoá trẻ em trong TiviKit để bật lại", "The Kids lock service is off: open Kids lock in TiviKit to turn it back on")
-            else -> t("Không khoá được: cập nhật Khoá trẻ em bằng TiviKit", "Couldn't lock: update the Kids lock with TiviKit")
+            "chua-co-ma" -> t("Khoá trẻ em chưa có mã: cài mã bằng MTVkit trước", "The Kids lock has no code yet: set one up in MTVkit first")
+            "dich-vu" -> t("Dịch vụ Khoá trẻ em đang tắt: mở Khoá trẻ em trong MTVkit để bật lại", "The Kids lock service is off: open Kids lock in MTVkit to turn it back on")
+            else -> t("Không khoá được: cập nhật Khoá trẻ em bằng MTVkit", "Couldn't lock: update the Kids lock with MTVkit")
         })
     }
 
@@ -84,9 +84,9 @@ class DieuKhien(private val act: ComponentActivity, private val tt: TrangThaiHom
         coBieuTuong = (48 * rong / 960).coerceIn(48, 96)
         // StateFlow phát giá trị hiện tại trước: lần đầu cũng đọc cấu hình ở đây.
         scope.launch { CauHinh.lanDoi.collect { apCauHinh() } }
-        // Lần đầu, và mỗi lần TiviKit gửi / bỏ ảnh nền riêng: dựng lại ảnh nền và bản mờ cho kính.
+        // Lần đầu, và mỗi lần MTVkit gửi / bỏ ảnh nền riêng: dựng lại ảnh nền và bản mờ cho kính.
         scope.launch { CauHinh.lanNen.collect { tt.nen = withContext(Dispatchers.Default) { runCatching { taiNen() }.getOrNull() } ?: tt.nen } }
-        // TiviKit gửi / bỏ ảnh riêng của app (logo kênh): đọc lại ảnh các app đó đang hiện (ảnh cũ giữ tới khi có ảnh mới).
+        // MTVkit gửi / bỏ ảnh riêng của app (logo kênh): đọc lại ảnh các app đó đang hiện (ảnh cũ giữ tới khi có ảnh mới).
         scope.launch {
             CauHinh.lanAnh.collect {
                 val doi = CauHinh.anhDoi.iterator()
@@ -178,7 +178,7 @@ class DieuKhien(private val act: ComponentActivity, private val tt: TrangThaiHom
     }
 
     /**
-     * Câu kinh hôm nay (TrangThaiHome.cau): bộ riêng TiviKit gửi (cau.txt) hay Kinh Pháp Cú đi kèm. Đọc lại khi sang ngày,
+     * Câu kinh hôm nay (TrangThaiHome.cau): bộ riêng MTVkit gửi (cau.txt) hay Kinh Pháp Cú đi kèm. Đọc lại khi sang ngày,
      * khi bật / tắt hay đổi bộ ("cau" trong cấu hình, file cau.txt); cấu hình đổi vì việc khác thì thôi.
      */
     private fun napCau(j: JSONObject = ch.doc()) {
@@ -210,7 +210,7 @@ class DieuKhien(private val act: ComponentActivity, private val tt: TrangThaiHom
         }
     }
 
-    /** Danh sách app hiện ra: tên riêng TiviKit đặt thay tên app. */
+    /** Danh sách app hiện ra: tên riêng MTVkit đặt thay tên app. */
     private fun datApps() {
         val ds = DanhSachApp.doiTen(dsGoc, tenRieng)
         if (ds == tt.apps) return
@@ -341,7 +341,7 @@ class DieuKhien(private val act: ComponentActivity, private val tt: TrangThaiHom
         return w to h
     }
 
-    /** Ảnh nền: ảnh TiviKit gửi (anh-nen.jpg), không có thì ảnh đồi chè đi kèm; đúng cỡ màn hình, tối đa 1920×1080. */
+    /** Ảnh nền: ảnh MTVkit gửi (anh-nen.jpg), không có thì ảnh đồi chè đi kèm; đúng cỡ màn hình, tối đa 1920×1080. */
     private fun taiNen(): NenKinh? {
         val (w, h) = coManHinh()
         val rieng = File(ctx.filesDir, "anh-nen.jpg")
@@ -379,7 +379,7 @@ class DieuKhien(private val act: ComponentActivity, private val tt: TrangThaiHom
 
     override fun canAnh(goi: String) = taiAnh(goi, lai = false)
 
-    /** Đọc ảnh của [goi]; [lai] = đọc lại cả khi đã có. TiviKit gửi ảnh riêng mới giữa lúc đọc thì đọc lại lần nữa. */
+    /** Đọc ảnh của [goi]; [lai] = đọc lại cả khi đã có. MTVkit gửi ảnh riêng mới giữa lúc đọc thì đọc lại lần nữa. */
     private fun taiAnh(goi: String, lai: Boolean) {
         if ((!lai && goi in tt.anh) || !dangTai.add(goi)) return
         val lan = CauHinh.lanAnh.value
@@ -534,9 +534,9 @@ class DieuKhien(private val act: ComponentActivity, private val tt: TrangThaiHom
         try {
             khoaNgay.launch(Intent().setClassName(GOI_KHOA, "$GOI_KHOA.KhoaNgay"))
         } catch (_: ActivityNotFoundException) {
-            bao(t("Cần cập nhật Khoá trẻ em bằng TiviKit", "Update the Kids lock with TiviKit first"))
+            bao(t("Cần cập nhật Khoá trẻ em bằng MTVkit", "Update the Kids lock with MTVkit first"))
         } catch (_: SecurityException) {
-            bao(t("Cần cập nhật Khoá trẻ em bằng TiviKit", "Update the Kids lock with TiviKit first"))
+            bao(t("Cần cập nhật Khoá trẻ em bằng MTVkit", "Update the Kids lock with MTVkit first"))
         }
     }
 
@@ -545,9 +545,9 @@ class DieuKhien(private val act: ComponentActivity, private val tt: TrangThaiHom
         tt.traChon = TrangThaiHome.NGUON
     }
 
-    /** Dịch vụ Nút nguồn chưa bật (TiviKit bật khi cài / cập nhật launcher), hay tivi Android 8 không có lệnh tắt màn hình. */
+    /** Dịch vụ Nút nguồn chưa bật (MTVkit bật khi cài / cập nhật launcher), hay tivi Android 8 không có lệnh tắt màn hình. */
     private fun baoNguon() = bao(
-        if (!NguonDichVu.chay) t("Cần bật Nút nguồn của launcher: cập nhật TiviKit Launcher bằng TiviKit", "Turn on the launcher's power button: update TiviKit Launcher with TiviKit")
+        if (!NguonDichVu.chay) t("Cần bật Nút nguồn của launcher: cập nhật MTVkit Launcher bằng MTVkit", "Turn on the launcher's power button: update MTVkit Launcher with MTVkit")
         else t("Tivi này không cho app tắt: bấm nút nguồn trên remote", "This TV can't be turned off by an app: use the remote's power button")
     )
 }

@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger
 /**
  * Kết nối ADB giữ lâu tới chính tivi (127.0.0.1:5555): một luồng logcat chạy suốt (câu Trợ lý Google vừa nghe) và các lệnh
  * ngắn (đóng Trợ lý, đóng YouTube gốc) trên cùng một kết nối. Phần khoá, chữ ký và gói chép từ launcher/AdbNoiBo.kt
- * (TiviKit Launcher 1.4.1, đã thử trên TX3 và Skyworth). Lần đầu tivi hỏi "Cho phép gỡ lỗi?" cho khoá riêng của Map Voice
+ * (MTVkit Launcher 1.4.1, đã thử trên TX3 và Skyworth). Lần đầu tivi hỏi "Cho phép gỡ lỗi?" cho khoá riêng của Map Voice
  * (filesDir/adbkey). Chỉ giao thức ADB thường (khoá RSA, không TLS): tivi chỉ bật Gỡ lỗi không dây thì không dùng được.
  *
  * Cách dùng: [noi], rồi [mo] luồng logcat, rồi [docMai] trên một luồng riêng (chặn tới khi mất kết nối); [chay] gọi từ luồng
@@ -243,7 +243,7 @@ class PhienAdb(private val thuMuc: File, private val may: String = "127.0.0.1", 
             val kf = KeyFactory.getInstance("RSA")
             if (f.isFile) {
                 // Conscrypt (Android) đọc ra RSAPrivateKey không kèm số mũ công khai: đòi RSAPrivateCrtKey thì đọc hỏng, mỗi lần
-                // nối một khoá mới và tivi hỏi cho phép mãi (thấy với TiviKit Launcher trên TX3). Khoá nào cũng tạo với F4.
+                // nối một khoá mới và tivi hỏi cho phép mãi (thấy với MTVkit Launcher trên TX3). Khoá nào cũng tạo với F4.
                 val rieng = runCatching { kf.generatePrivate(PKCS8EncodedKeySpec(f.readBytes())) as RSAPrivateKey }.getOrNull()
                 if (rieng != null) {
                     val mu = (rieng as? RSAPrivateCrtKey)?.publicExponent ?: RSAKeyGenParameterSpec.F4

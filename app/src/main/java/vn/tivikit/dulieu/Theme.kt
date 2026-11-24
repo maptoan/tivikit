@@ -29,7 +29,7 @@ data class Theme(
 
 val THEMES = listOf(
     // Ảnh vẽ bằng scripts/AnhNenTiviKit.java (26/10/2026), thay giao diện VGS cũ (logo VGS không thuộc MIT).
-    Theme("tivikit", "TiviKit", "TiviKit", "Hình tivi TiviKit trên nền chàm, đổi sắc theo giờ", "TiviKit's TV on indigo, sky follows the time of day",
+    Theme("tivikit", "MTVkit", "MTVkit", "Hình tivi MTVkit trên nền chàm, đổi sắc theo giờ", "MTVkit's TV on indigo, sky follows the time of day",
         mapOf("background_color" to "#0F0E45", "sky_intensity" to 55, "dock_band" to false), "theme/tivikit.jpg", listOf(0xFF080B2A, 0xFF16156A, 0xFF3024B0)),
     Theme("aurora", "Cực quang", "Aurora", "Dải xanh ngọc và tím trên nền navy", "Teal and violet bands on navy",
         mapOf("background_color" to "#070A14", "dock_band" to false), "theme/aurora.jpg", listOf(0xFF0E4F5C, 0xFF3B1E6E)),
@@ -55,12 +55,12 @@ val THEMES = listOf(
         mapOf("columns" to 6, "rows_below_dock" to 1, "background_color" to "#000000"), null, listOf(0xFF111111, 0xFF222233)),
 )
 
-/** Giao diện theo id đã lưu (config.json "vgs_theme", file cấu hình); "vgs" của bản cũ thành giao diện TiviKit. */
+/** Giao diện theo id đã lưu (config.json "vgs_theme", file cấu hình); "vgs" của bản cũ thành giao diện MTVkit. */
 fun themeTheoId(id: String): Theme? = THEMES.firstOrNull { it.id == (if (id == "vgs") "tivikit" else id) }
 
 /**
  * SHA-256 của ảnh nền giao diện VGS cũ (theme/vgs.jpg, bỏ khỏi app 26/10/2026). Tivi còn ảnh này thì đó là ảnh của
- * giao diện chứ không phải ảnh riêng của người dùng, để lần Áp dụng sau thay bằng ảnh TiviKit thay vì giữ lại.
+ * giao diện chứ không phải ảnh riêng của người dùng, để lần Áp dụng sau thay bằng ảnh MTVkit thay vì giữ lại.
  */
 const val SHA256_ANH_VGS_CU = "1df8223bd79e297e8f2acde6967d7187469b1fbaae4659ab485a52c751d4c88b"
 

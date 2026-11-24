@@ -54,7 +54,7 @@ class BangHenGio : Activity() {
             tay.postDelayed(this, NHIP_MS)
         }
     }
-    /** Tên app TiviKit gửi (ô Kênh nhanh mang tên kênh), đọc lại mỗi lần về màn chính. */
+    /** Tên app MTVkit gửi (ô Kênh nhanh mang tên kênh), đọc lại mỗi lần về màn chính. */
     private var tenKho: Map<String, String> = emptyMap()
     private val tenTam = HashMap<String, String>()
     // Mã bố mẹ (Khoá trẻ em): nhập đúng thì 5 phút không hỏi lại lúc màn còn mở.
@@ -132,8 +132,8 @@ class BangHenGio : Activity() {
         })
         cot.addView(chu(chuKeTiep(bay), 16f, TIM_NHAT), lp(4))
         if (HenGioDichVu.dangChay == null) {
-            cot.addView(chu(t("Dịch vụ Hẹn giờ đang tắt nên tắt tivi và mở app đúng giờ có thể không chạy. Bật lại trong Cài đặt → Hỗ trợ tiếp cận → Hẹn giờ (TiviKit), hay bấm Lưu lên tivi ở màn Hẹn giờ của TiviKit.",
-                "The Timer service is off, so timed turn-off and app opening may not run. Turn on Timer (TiviKit) in Settings → Accessibility, or tap Save to the TV on TiviKit's Timer screen."), 15f, VANG), lp(12))
+            cot.addView(chu(t("Dịch vụ Hẹn giờ đang tắt nên tắt tivi và mở app đúng giờ có thể không chạy. Bật lại trong Cài đặt → Hỗ trợ tiếp cận → Hẹn giờ (MTVkit), hay bấm Lưu lên tivi ở màn Hẹn giờ của MTVkit.",
+                "The Timer service is off, so timed turn-off and app opening may not run. Turn on Timer (MTVkit) in Settings → Accessibility, or tap Save to the TV on MTVkit's Timer screen."), 15f, VANG), lp(12))
             cot.addView(nut(t("Mở cài đặt Hỗ trợ tiếp cận", "Open Accessibility settings"), "tro-nang") {
                 theChinh = "tro-nang"
                 runCatching { startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) }
@@ -183,8 +183,8 @@ class BangHenGio : Activity() {
                     Chu.nhatKy(o.optString("viec"), o.optString("kq"), ::ten), 14f, XAM), lp(4))
             }
         }
-        cot.addView(chu(t("Lịch này cũng sửa được trong TiviKit trên điện thoại. Khoá trẻ em đang bật thì thêm, sửa, xoá hay huỷ việc cần mã bố mẹ; hẹn tắt tivi thì không cần.",
-            "This schedule can also be changed in TiviKit on the phone. While the Kids lock is on, adding, editing, deleting or cancelling needs the parent code; setting a turn-off doesn't."), 13f, XAM), lp(22))
+        cot.addView(chu(t("Lịch này cũng sửa được trong MTVkit trên điện thoại. Khoá trẻ em đang bật thì thêm, sửa, xoá hay huỷ việc cần mã bố mẹ; hẹn tắt tivi thì không cần.",
+            "This schedule can also be changed in MTVkit on the phone. While the Kids lock is on, adding, editing, deleting or cancelling needs the parent code; setting a turn-off doesn't."), 13f, XAM), lp(22))
         hien(cot, theChinh ?: if (Build.VERSION.SDK_INT >= 28) "sau-30" else "them")
         dauChinh = dau()
         phutChinh = bay / 60_000
@@ -339,7 +339,7 @@ class BangHenGio : Activity() {
         if (cu == null && lich.size >= Lich.TOI_DA) { bao(t("Tối đa ${Lich.TOI_DA} việc.", "At most ${Lich.TOI_DA} entries.")); return }
         quaMa((if (cu == null) t("Thêm việc hẹn giờ: ", "Add a timer entry: ") else t("Sửa việc hẹn giờ: ", "Edit a timer entry: ")) +
             gioChu(v.gio, v.phut) + " " + Chu.viec(v.loai, v.goi, ::ten)) {
-            // Đọc lại lịch (TiviKit có thể vừa đổi); việc gốc không còn thì thêm như việc mới.
+            // Đọc lại lịch (MTVkit có thể vừa đổi); việc gốc không còn thì thêm như việc mới.
             val moi = kho.lich.toMutableList()
             val i = if (cu == null) -1 else moi.indexOf(cu)
             if (i >= 0) moi[i] = v else moi += v
@@ -477,8 +477,8 @@ class BangHenGio : Activity() {
         if (!khoaChay || SystemClock.elapsedRealtime() < moMaDen) { lam(); return }
         val i = Intent().setClassName(GOI_KHOA, "$GOI_KHOA.XacNhan").putExtra("viec", viec)
         if (runCatching { packageManager.resolveActivity(i, 0) }.getOrNull() == null) {
-            bao(t("Khoá trẻ em trên tivi là bản cũ, chưa hỏi mã giúp app khác được: cập nhật nó bằng TiviKit trên điện thoại rồi thử lại.",
-                "The Kids lock on this TV is too old to ask for the code here: update it with TiviKit on the phone, then try again."))
+            bao(t("Khoá trẻ em trên tivi là bản cũ, chưa hỏi mã giúp app khác được: cập nhật nó bằng MTVkit trên điện thoại rồi thử lại.",
+                "The Kids lock on this TV is too old to ask for the code here: update it with MTVkit on the phone, then try again."))
             return
         }
         choMa = lam

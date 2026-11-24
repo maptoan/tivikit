@@ -10,9 +10,9 @@ import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
 /**
- * Mã mở Khoá trẻ em (28/10/2026, thay PIN 4 số). Lúc cài, TiviKit tạo mã gốc, hiện QR để phụ huynh quét vào app xác thực
+ * Mã mở Khoá trẻ em (28/10/2026, thay PIN 4 số). Lúc cài, MTVkit tạo mã gốc, hiện QR để phụ huynh quét vào app xác thực
  * (Google Authenticator, Microsoft Authenticator, app Mật khẩu của iPhone…), rồi gửi mã gốc lên app khoá trên tivi; mã
- * nhập sau đó do tivi kiểm tra (khoa/Otp.kt, cùng chuẩn RFC 6238: HMAC-SHA1, 6 số, 30 giây). TiviKit không giữ lại mã
+ * nhập sau đó do tivi kiểm tra (khoa/Otp.kt, cùng chuẩn RFC 6238: HMAC-SHA1, 6 số, 30 giây). MTVkit không giữ lại mã
  * gốc: trẻ cầm điện thoại của bố mẹ cũng không xem được mã. Mã dự phòng 8 số dùng một lần, tivi chỉ giữ dạng băm.
  */
 object MaOtp {
@@ -82,8 +82,8 @@ object MaOtp {
 
     /** Liên kết otpauth:// trong QR, cũng mở được app xác thực cài trên chính điện thoại này. */
     fun lienKet(khoa: String, nhan: String = "Khoá trẻ em"): String =
-        "otpauth://totp/TiviKit:" + URLEncoder.encode(nhan, "UTF-8").replace("+", "%20") +
-            "?secret=$khoa&issuer=TiviKit&algorithm=SHA1&digits=6&period=30"
+        "otpauth://totp/MTVkit:" + URLEncoder.encode(nhan, "UTF-8").replace("+", "%20") +
+            "?secret=$khoa&issuer=MTVkit&algorithm=SHA1&digits=6&period=30"
 
     /** [SO_DU_PHONG] mã dự phòng 8 số, khác nhau. */
     fun taoDuPhong(): List<String> {

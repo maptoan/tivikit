@@ -30,7 +30,7 @@ object KenhNhanh {
     const val LOAI_M3U = "m3u"
     /** Ô Auto (1/11/2026): một kênh, nhiều nguồn; Map Voice mở nguồn phát được, mất tiếng thì đổi nguồn. */
     const val LOAI_AUTO = "auto"
-    /** Ô IPTV (1/11/2026): kênh trong danh sách IPTV của người dùng, phát bằng app IPTV của TiviKit (Iptv); [Kenh.ma] = mã kênh. */
+    /** Ô IPTV (1/11/2026): kênh trong danh sách IPTV của người dùng, phát bằng app IPTV của MTVkit (Iptv); [Kenh.ma] = mã kênh. */
     const val LOAI_IPTV = "iptv"
 
     fun goiCua(o: Int): String = if (o == 1) GOI else "$GOI$o"
@@ -226,8 +226,8 @@ object KenhNhanh {
     fun datTen(j: JSONObject, goi: String, ten: String?): JSONObject = datCuaO(j, "app_labels", goi, ten)
 
     /**
-     * Logo kênh của ô [o] (26/10/2026): ảnh kenh-o<n>.jpg TiviKit gửi cạnh config.json, ô trỏ tới bằng app_banners
-     * "vn.tivikit.kenh3=kenh-o3"; Home sạch của TiviKit đọc được (LinkTiles.picture trong bản vá launcher).
+     * Logo kênh của ô [o] (26/10/2026): ảnh kenh-o<n>.jpg MTVkit gửi cạnh config.json, ô trỏ tới bằng app_banners
+     * "vn.tivikit.kenh3=kenh-o3"; Home sạch của MTVkit đọc được (LinkTiles.picture trong bản vá launcher).
      */
     fun tenAnh(o: Int): String = "kenh-o$o"
 

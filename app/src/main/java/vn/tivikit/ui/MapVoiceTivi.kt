@@ -135,8 +135,8 @@ class MapVoiceTivi(private val vm: PhienLamViec) {
     private fun baoTrangThai(): String {
         val tt = trangThai ?: return t("Đã cài nhưng chưa đọc lại được từ tivi. Bấm Làm mới.", "Installed, but couldn't read it back from the TV. Tap Refresh.")
         return when {
-            !tt.dichVuChay -> t("Đã cài, nhưng dịch vụ Map Voice chưa chạy trên tivi: vào Cài đặt → Trợ năng của tivi, bật \"Map Voice (TiviKit)\", rồi bấm Làm mới.",
-                "Installed, but the Map Voice service isn't running on the TV: open the TV's Settings → Accessibility, turn on \"Map Voice (TiviKit)\", then tap Refresh.")
+            !tt.dichVuChay -> t("Đã cài, nhưng dịch vụ Map Voice chưa chạy trên tivi: vào Cài đặt → Trợ năng của tivi, bật \"Map Voice (MTVkit)\", rồi bấm Làm mới.",
+                "Installed, but the Map Voice service isn't running on the TV: open the TV's Settings → Accessibility, turn on \"Map Voice (MTVkit)\", then tap Refresh.")
             tt.adb == "dang-hoi" -> t("Trên tivi đang hiện hộp \"Cho phép gỡ lỗi?\": tích \"Luôn cho phép từ máy tính này\" rồi chọn OK bằng remote. Xong bấm Làm mới.",
                 "The TV is showing \"Allow debugging?\": tick \"Always allow from this computer\" and press OK with the remote. Then tap Refresh.")
             tt.adb == "da-noi" -> t("Xong. Bấm nút mic trên remote và nói, VD \"mở nhạc piano trên YouTube\".",

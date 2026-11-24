@@ -22,7 +22,7 @@ class TrangThaiHome {
 
     var ramTrong by mutableLongStateOf(0L)
     var boNhoTrong by mutableLongStateOf(0L)
-    /** Hiện dòng RAM / bộ nhớ trống dưới đồng hồ, tốc độ mạng dưới nút mạng (TiviKit tắt được: "thong_so", "toc_do"). */
+    /** Hiện dòng RAM / bộ nhớ trống dưới đồng hồ, tốc độ mạng dưới nút mạng (MTVkit tắt được: "thong_so", "toc_do"). */
     var hienThongSo by mutableStateOf(true)
     var hienTocDo by mutableStateOf(true)
     var mang by mutableStateOf<HeThong.Mang?>(null)
@@ -31,13 +31,13 @@ class TrangThaiHome {
     var tocLen by mutableLongStateOf(-1L)
     var coDonRam by mutableStateOf(true)
     var dangDon by mutableStateOf(false)
-    /** Thời tiết nơi TiviKit gửi; null = chưa có nơi / chưa lấy được. */
+    /** Thời tiết nơi MTVkit gửi; null = chưa có nơi / chưa lấy được. */
     var thoiTiet by mutableStateOf<ThoiTiet.HienTai?>(null)
     /** Bài / video đang phát hay tạm dừng trên tivi (thẻ Đang phát); null = không có. */
     var dangPhat by mutableStateOf<BaiDangPhat?>(null)
     /** Câu kinh hôm nay dưới âm lịch; null = đã tắt / chưa đọc xong. */
     var cau by mutableStateOf<CauHomNay?>(null)
-    /** Tivi có app Khoá trẻ em của TiviKit: menu ⏻ có mục Khoá trẻ em ngay. */
+    /** Tivi có app Khoá trẻ em của MTVkit: menu ⏻ có mục Khoá trẻ em ngay. */
     var coKhoa by mutableStateOf(false)
 
     var thuVien by mutableStateOf(false)
@@ -67,7 +67,7 @@ class TrangThaiHome {
     }
 }
 
-/** Câu kinh của hôm nay: [ten] tên bộ TiviKit gửi kèm bộ riêng (null = Kinh Pháp Cú đi kèm, "" = bộ riêng không tên). */
+/** Câu kinh của hôm nay: [ten] tên bộ MTVkit gửi kèm bộ riêng (null = Kinh Pháp Cú đi kèm, "" = bộ riêng không tên). */
 class CauHomNay(val ten: String?, val cau: CauMoiNgay.Cau)
 
 /** Việc màn Home nhờ làm (mở app, sửa dock…); mặc định không làm gì để ảnh xem trước dựng được. */

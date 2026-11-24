@@ -165,7 +165,7 @@ def ghi_chu_app(ghi_chu, muc, xem_du):
 def dong_goi(ban, apk, ghi_chu="", ghi_chu_en=""):
     tach(ban)
     os.makedirs(RA, exist_ok=True)
-    ten = f"TiviKit-{ban}.apk"
+    ten = f"MTVkit-{ban}.apk"
     shutil.copyfile(apk, os.path.join(RA, ten))
     with open(apk, "rb") as f:
         du_lieu = f.read()
@@ -198,7 +198,7 @@ def dong_goi(ban, apk, ghi_chu="", ghi_chu_en=""):
         md += ["## Sửa lỗi", *[f"- {s[0]}" for s in sua], ""]
     md += ["## Cài đặt",
            f"- Cài lần đầu: tải `{ten}` bên dưới về điện thoại Android (hoặc tivi) rồi mở để cài.",
-           "- Đã có TiviKit 1.1.0 trở lên: app tự cập nhật (Android 12+ không cần bấm, máy cũ hơn chạm thông báo một lần).",
+           "- Đã cài MTVkit: app tự cập nhật (Android 12+ không cần bấm, máy cũ hơn chạm thông báo một lần).",
            "", "---", "", "### English", ""]
     if ghi_chu_en:
         md += [ghi_chu_en, ""]
@@ -206,7 +206,7 @@ def dong_goi(ban, apk, ghi_chu="", ghi_chu_en=""):
         md += ["**What's new**", "", *[f"- {s[1]}" for s in moi], ""]
     if sua:
         md += ["**Fixes**", "", *[f"- {s[1]}" for s in sua], ""]
-    md += [f"Install: download `{ten}` below to an Android phone (or TV) and open it. TiviKit 1.1.0 or later updates itself.",
+    md += [f"Install: download `{ten}` below to an Android phone (or TV) and open it. MTVkit updates itself automatically.",
            "",
            f"- SHA-256: `{sha}`",
            f"- Chứng chỉ ký / Signing certificate (SHA-256): `{DAU_CHUNG_CHI}`"]

@@ -92,6 +92,17 @@ jobs:
           scripts/dung-tivikit-launcher.sh
           scripts/dung-tren-tv.sh
 
+      - name: Ký lại Home sạch đi kèm theo khoá MTVkit
+        run: |
+          APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -n 1)
+          doc() { sed -n "s/^$1=//p" ky.properties | tr -d '\r'; }
+          for f in app/src/main/assets/tvhome.apk app/src/main/assets/tvhome-xiaomi.apk; do
+            if ! "$APKSIGNER" verify --print-certs "$f" 2>/dev/null | grep -q "SHA-256 digest: 6a02f271f97c014901bf059f1c6263ed0fc2880cec67121efcd0794935b676c6"; then
+              "$APKSIGNER" sign --ks "$(doc storeFile)" --ks-pass "pass:$(doc storePassword)" \
+                --ks-key-alias "$(doc keyAlias)" --key-pass "pass:$(doc keyPassword)" "$f"
+            fi
+          done
+
       - name: Unit test và dựng app
         run: ./gradlew --console=plain :app:testReleaseUnitTest :app:assembleRelease
 
@@ -100,14 +111,13 @@ jobs:
           APKSIGNER=$(ls "$ANDROID_HOME"/build-tools/*/apksigner | sort -V | tail -n 1)
           "$APKSIGNER" verify --print-certs app/build/outputs/apk/release/app-release.apk | tee "$RUNNER_TEMP/ky.txt"
           if [ -n "${{ secrets.KHOA_KY_BASE64 }}" ]; then
-            grep -q "SHA-256 digest: ec4c282ecefa87e7e959d44de052ccb047a8164c383ff39341d910d85af6f653" "$RUNNER_TEMP/ky.txt" \
-              || { echo "APK không ký bằng khoá TiviKit: máy đã cài sẽ không cập nhật được, dừng."; exit 1; }
+            grep -q "SHA-256 digest: 6a02f271f97c014901bf059f1c6263ed0fc2880cec67121efcd0794935b676c6" "$RUNNER_TEMP/ky.txt" \
+              || { echo "APK không ký bằng khoá MTVkit cố định: máy đã cài sẽ không cập nhật được, dừng."; exit 1; }
             for f in app/src/main/assets/tvhome.apk app/src/main/assets/tvhome-xiaomi.apk; do
-              "$APKSIGNER" verify --print-certs "$f" | grep -q "SHA-256 digest: ec4c282ecefa87e7e959d44de052ccb047a8164c383ff39341d910d85af6f653" \
-                || { echo "$f không ký bằng khoá TiviKit, dừng."; exit 1; }
+              "$APKSIGNER" verify --print-certs "$f" | grep -q "SHA-256 digest: 6a02f271f97c014901bf059f1c6263ed0fc2880cec67121efcd0794935b676c6" \
+                || { echo "$f không ký bằng khoá MTVkit cố định, dừng."; exit 1; }
             done
           else
-            echo "Bản fork sử dụng chữ ký tự tạo, xác thực cấu trúc chữ ký hợp lệ."
             "$APKSIGNER" verify app/build/outputs/apk/release/app-release.apk
           fi
 
@@ -121,7 +131,7 @@ jobs:
       - name: Lưu trữ APK (GitHub Artifacts)
         uses: actions/upload-artifact@v4
         with:
-          name: TiviKit-${{ steps.ban.outputs.ban }}-APK
+          name: MTVkit-${{ steps.ban.outputs.ban }}-APK
           path: dist/
 
       - name: Gắn tag và đăng Release
@@ -135,8 +145,8 @@ jobs:
           git diff --cached --quiet || git commit -m "Phát hành $BAN"
           git tag "v$BAN"
           git push origin "HEAD:$GITHUB_REF_NAME" "v$BAN" || true
-          gh release create "v$BAN" "dist/TiviKit-$BAN.apk" "dist/TiviKit-$BAN.apk.sha256" dist/cap-nhat.json \
-            --title "TiviKit $BAN" --notes-file dist/nhat-ky.md || echo "Release đã hoàn tất hoặc cần kiểm tra"
+          gh release create "v$BAN" "dist/MTVkit-$BAN.apk" "dist/MTVkit-$BAN.apk.sha256" dist/cap-nhat.json \
+            --title "MTVkit $BAN" --notes-file dist/nhat-ky.md || echo "Release đã hoàn tất hoặc cần kiểm tra"
 
       - name: Xoá khoá
         if: always()

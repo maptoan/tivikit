@@ -4,7 +4,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * Tivi LG webOS (25/10/2026, anh Alex: "TiviKit mới chạy được cho Android TV"). Điều khiển qua giao thức SSAP mà app LG
+ * Tivi LG webOS (25/10/2026, anh Alex: "MTVkit mới chạy được cho Android TV"). Điều khiển qua giao thức SSAP mà app LG
  * ThinQ dùng: WebSocket cổng 3000 (ws) hoặc 3001 (wss, firmware mới bắt buộc), ghép đôi bằng hộp "Cho phép" trên
  * tivi — không cần root, không cần chế độ nhà phát triển. Dạng tin nhắn theo aiowebostv của Home Assistant
  * (Apache 2.0) và LGWebOSRemote. Ở đây chỉ dựng / đọc tin nhắn, không đụng mạng, để test được trên máy tính.

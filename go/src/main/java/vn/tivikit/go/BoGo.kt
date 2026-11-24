@@ -13,7 +13,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 /**
- * Bộ gõ trung gian (25/10/2026): lệnh `input text` của Android chỉ gõ được chữ không dấu, nên TiviKit bật tạm bộ gõ
+ * Bộ gõ trung gian (25/10/2026): lệnh `input text` của Android chỉ gõ được chữ không dấu, nên MTVkit bật tạm bộ gõ
  * này (`ime set`), gửi chữ qua ChuProvider (chỉ nhận từ ADB); bộ gõ đưa chữ vào ô nhập đang chọn rồi tự trả bàn phím cũ
  * của tivi. Không hiện bàn phím, không đọc chữ người dùng gõ bằng remote.
  */
@@ -54,7 +54,7 @@ class BoGo : InputMethodService() {
     override fun onCreate() {
         super.onCreate()
         dangChay = this
-        // Lưới an toàn: TiviKit rớt kết nối giữa lúc bật bộ gõ này và lúc gửi chữ → tự trả bàn phím cũ.
+        // Lưới an toàn: MTVkit rớt kết nối giữa lúc bật bộ gõ này và lúc gửi chữ → tự trả bàn phím cũ.
         tay.postDelayed({ traBanPhimCu(getSharedPreferences("go", Context.MODE_PRIVATE).getString("truoc", null)) }, TU_TRA_MS)
     }
 

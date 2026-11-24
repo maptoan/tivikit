@@ -36,7 +36,7 @@ import kotlin.concurrent.thread
 
 /**
  * Dịch vụ trợ năng của Tele Remote (31/10/2026): chạy từ lúc tivi bật, giữ vòng nghe bot Telegram ([Bot]) và kết nối ADB
- * tới chính tivi ([GiuAdb], để bấm phím, gõ chữ, gọi các app phụ của TiviKit, chụp màn hình). Chỉ nghe đổi cửa sổ (app nào
+ * tới chính tivi ([GiuAdb], để bấm phím, gõ chữ, gọi các app phụ của MTVkit, chụp màn hình). Chỉ nghe đổi cửa sổ (app nào
  * vừa hiện, để báo "Đang mở"), không đọc nội dung màn hình, không lọc phím. Người dùng thấy và tắt được trong Cài đặt → Trợ
  * năng.
  */
@@ -137,8 +137,8 @@ class TeleRemoteDichVu : AccessibilityService() {
         val ly = when (j.optString("kq")) {
             "bo-qua" -> if (en) "skipped today, the TV stayed on for 3 hours from $gio" else "hôm nay bỏ qua vì tivi bật suốt 3 giờ từ $gio"
             "loi-khong-co-adb" -> if (en) "couldn't restart at $gio: the TV's network ADB is off" else "không khởi động lại được lúc $gio: ADB qua mạng của tivi đang tắt"
-            "loi-chua-cho-phep" -> if (en) "couldn't restart at $gio: the TV hasn't allowed debugging for the Timer (TiviKit → Timer → Auto Reboot → Save, then Always allow on the TV)"
-                else "không khởi động lại được lúc $gio: tivi chưa cho phép gỡ lỗi cho Hẹn giờ (TiviKit → Hẹn giờ → Auto Reboot → Lưu, rồi chọn Luôn cho phép trên tivi)"
+            "loi-chua-cho-phep" -> if (en) "couldn't restart at $gio: the TV hasn't allowed debugging for the Timer (MTVkit → Timer → Auto Reboot → Save, then Always allow on the TV)"
+                else "không khởi động lại được lúc $gio: tivi chưa cho phép gỡ lỗi cho Hẹn giờ (MTVkit → Hẹn giờ → Auto Reboot → Lưu, rồi chọn Luôn cho phép trên tivi)"
             "tat-loi" -> if (en) "restarted but couldn't turn the screen back off" else "đã khởi động lại nhưng không tắt được màn hình"
             else -> if (en) "couldn't restart at $gio (ADB error)" else "không khởi động lại được lúc $gio (lỗi ADB)"
         }
@@ -168,7 +168,7 @@ class TeleRemoteDichVu : AccessibilityService() {
 
     override fun onInterrupt() {}
 
-    /** Token / cấu hình vừa đổi (TiviKit gửi): bot làm lại với cái mới. */
+    /** Token / cấu hình vừa đổi (MTVkit gửi): bot làm lại với cái mới. */
     fun lamLai() { bot?.lamLai() }
 
     fun noiLai() { adb?.noiLai() }
@@ -225,7 +225,7 @@ class TeleRemoteDichVu : AccessibilityService() {
         return if (Build.VERSION.SDK_INT >= 28) performGlobalAction(GLOBAL_ACTION_LOCK_SCREEN) else lenh("input keyevent 223", 4000) != null
     }
 
-    /** Khởi động lại tivi bằng lệnh reboot qua ADB của chính tivi (như nút ⏻ của TiviKit Launcher; tivi MediaTek không tắt hẳn). */
+    /** Khởi động lại tivi bằng lệnh reboot qua ADB của chính tivi (như nút ⏻ của MTVkit Launcher; tivi MediaTek không tắt hẳn). */
     fun khoiDongLai() {
         thread(isDaemon = true) { lenh("reboot", 10_000) }
     }
@@ -260,11 +260,11 @@ class TeleRemoteDichVu : AccessibilityService() {
 
     fun laHome(goi: String): Boolean = goi in home()
 
-    /** Buộc dừng app [goi] qua ADB (như Quản lý app của TiviKit); false nếu chưa nối ADB. */
+    /** Buộc dừng app [goi] qua ADB (như Quản lý app của MTVkit); false nếu chưa nối ADB. */
     fun dungApp(goi: String): Boolean = lenh("am force-stop $goi", 5000) != null
 
     /**
-     * App 🗂 Tắt đa nhiệm sẽ đóng: (gói, tên) các app người dùng cài đang chạy, trừ TiviKit, app Home, chính bot và app giữ vai
+     * App 🗂 Tắt đa nhiệm sẽ đóng: (gói, tên) các app người dùng cài đang chạy, trừ MTVkit, app Home, chính bot và app giữ vai
      * trò cho tivi (DaNhiemTr), xếp theo tên; null nếu chưa nối ADB.
      */
     fun appDaNhiem(): List<Pair<String, String>>? {
@@ -277,7 +277,7 @@ class TeleRemoteDichVu : AccessibilityService() {
     fun dongDaNhiem(goi: List<String>): Boolean = lenh(DaNhiemTr.lenhDong(goi), 30_000) != null
 
     /**
-     * Gọi app phụ [goi] của TiviKit qua ADB (provider của chúng chỉ nhận lời gọi từ shell): content call, [thamSo] thuần ASCII
+     * Gọi app phụ [goi] của MTVkit qua ADB (provider của chúng chỉ nhận lời gọi từ shell): content call, [thamSo] thuần ASCII
      * không có nháy đơn (XuLyLenh.thamSo, mã hẹn, mã số). null nếu chưa nối ADB / quá giờ.
      */
     fun goiAppPhu(goi: String, phuongThuc: String, thamSo: String? = null, choToiDa: Long = 15_000): String? {
@@ -287,8 +287,8 @@ class TeleRemoteDichVu : AccessibilityService() {
 
     /**
      * Gõ [chu] vào ô nhập đang chọn trên tivi (GoChuTr; [thay]: thay hết chữ đang có trong ô, không thì viết tiếp): "ok", mã
-     * lỗi của bộ gõ ("khong-o-nhap"…), "can-bo-go" (chữ có dấu mà tivi chưa có bộ gõ của TiviKit), "chua-adb". Có bộ gõ của
-     * TiviKit thì gõ mọi chữ qua nó (biết chắc chữ đã vào ô, chưa chọn ô thì báo); chưa có thì chữ không dấu gõ bằng
+     * lỗi của bộ gõ ("khong-o-nhap"…), "can-bo-go" (chữ có dấu mà tivi chưa có bộ gõ của MTVkit), "chua-adb". Có bộ gõ của
+     * MTVkit thì gõ mọi chữ qua nó (biết chắc chữ đã vào ô, chưa chọn ô thì báo); chưa có thì chữ không dấu gõ bằng
      * `input text` (chèn ở con trỏ, không biết có ô hay không).
      */
     fun goChu(chu: String, thay: Boolean): String {
@@ -298,7 +298,7 @@ class TeleRemoteDichVu : AccessibilityService() {
             return if (lenh(GoChuTr.lenhAscii(chu), 10_000) != null) "ok" else "chua-adb"
         }
         var cu = lenh("settings get secure default_input_method", 3000)?.trim().orEmpty()
-        // Bộ gõ đang dùng là của TiviKit (lần trước bị ngắt giữa chừng): trả về bàn phím khác đang bật.
+        // Bộ gõ đang dùng là của MTVkit (lần trước bị ngắt giữa chừng): trả về bàn phím khác đang bật.
         if (!GoChuTr.laBoGoCu(cu)) cu = lenh("ime list -s", 3000).orEmpty().lines().map { it.trim() }.firstOrNull { GoChuTr.laBoGoCu(it) } ?: ""
         return GoChuTr.ketQua(lenh(GoChuTr.lenhBoGo(chu, cu, thay), 15_000).orEmpty())
     }
@@ -332,8 +332,8 @@ class TeleRemoteDichVu : AccessibilityService() {
         .apply { if (coApp(KATNISS)) setPackage(KATNISS) })
 
     /**
-     * Khoá trẻ em ngay, như mục trong menu ⏻ của TiviKit Launcher: màn GoiKhoaNgay gọi KhoaNgay của app khoá (chỉ nhận app
-     * ký cùng khoá TiviKit, gọi bằng startActivityForResult). "" = đã khoá; không thì mã lỗi ("chua-co-ma", "dich-vu"…).
+     * Khoá trẻ em ngay, như mục trong menu ⏻ của MTVkit Launcher: màn GoiKhoaNgay gọi KhoaNgay của app khoá (chỉ nhận app
+     * ký cùng khoá MTVkit, gọi bằng startActivityForResult). "" = đã khoá; không thì mã lỗi ("chua-co-ma", "dich-vu"…).
      */
     fun khoaNgay(): String {
         val f = CompletableFuture<String>()
@@ -388,7 +388,7 @@ class TeleRemoteDichVu : AccessibilityService() {
         return Triple(am.getStreamVolume(loai), max, am.isStreamMute(loai))
     }
 
-    /** Kiểm tra mạng như TiviKit (MangTr): đường ra Internet, Wi-Fi, ping router / Internet / YouTube; null nếu chưa nối ADB. */
+    /** Kiểm tra mạng như MTVkit (MangTr): đường ra Internet, Wi-Fi, ping router / Internet / YouTube; null nếu chưa nối ADB. */
     fun kiemTraMang(): MangTr.KetQua? {
         if (!coAdb()) return null
         val p = lenh("ip route get 1.1.1.1 2>&1; echo @@; dumpsys wifi 2>/dev/null | grep -m 1 mWifiInfo", 10_000)?.replace("\r", "")?.split("@@") ?: return null
@@ -396,7 +396,7 @@ class TeleRemoteDichVu : AccessibilityService() {
         val wifi = MangTr.tuWifiInfo(p.getOrElse(1) { "" })
         val lan = duong?.dev?.takeIf { MangTr.laLan(it) && Regex("^[A-Za-z0-9_.-]+$").matches(it) }
             ?.let { lenh("cat /sys/class/net/$it/speed 2>/dev/null", 3000)?.trim()?.toIntOrNull()?.takeIf { s -> s > 0 } }
-        // Mỗi đích 10 gói cách 0,2 giây, chờ mỗi gói 1 giây (như TiviKit): chừng 2–3 giây một đích.
+        // Mỗi đích 10 gói cách 0,2 giây, chờ mỗi gói 1 giây (như MTVkit): chừng 2–3 giây một đích.
         fun ping(dich: String) = lenh("ping -c 10 -i 0.2 -W 1 $dich 2>&1", 40_000).orEmpty()
         val router = duong?.router?.takeIf { Regex("^[0-9a-fA-F.:]+$").matches(it) }?.let { MangTr.tuPing(ping(it)) }
         val net = MangTr.tuPing(ping("1.1.1.1"))
@@ -430,7 +430,7 @@ class TeleRemoteDichVu : AccessibilityService() {
     fun quayPhim(giay: Int): ByteArray? = quayManHinh(giay)
 
     /**
-     * Đặt [anh] (cắt giữa 16:9) làm ảnh nền TiviKit Launcher như TiviKit (content write anh-nen.jpg qua ADB, đọc lại cỡ ảnh
+     * Đặt [anh] (cắt giữa 16:9) làm ảnh nền MTVkit Launcher như MTVkit (content write anh-nen.jpg qua ADB, đọc lại cỡ ảnh
      * launcher đang dùng); [anh] null = về ảnh nền mặc định. false nếu chưa nối ADB / launcher không nhận.
      */
     fun datNenTkl(anh: File?): Boolean {

@@ -6,7 +6,7 @@ import kotlin.concurrent.thread
 /**
  * Vòng nghe chạy suốt: nối ADB của chính tivi, chạy logcat chỉ lấy dòng câu Trợ lý Google vừa nghe, mỗi câu gọi [nhanCau]
  * (trên luồng đọc, xử lý nặng thì chuyển luồng khác). Mất kết nối thì nối lại, chờ lâu dần tới [CHO_TOI_DA]. Tivi hỏi "Cho
- * phép gỡ lỗi?" thì gọi [dangHoi]; người dùng không cho phép thì thôi nối tới khi TiviKit gọi [noiLai] (khỏi hỏi mãi).
+ * phép gỡ lỗi?" thì gọi [dangHoi]; người dùng không cho phép thì thôi nối tới khi MTVkit gọi [noiLai] (khỏi hỏi mãi).
  */
 class Nghe(private val thuMuc: File, private val nhanCau: (String) -> Unit, private val dangHoi: () -> Unit) {
     enum class TrangThai(val ma: String) {

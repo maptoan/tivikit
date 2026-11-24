@@ -51,7 +51,7 @@ import java.util.Locale
 
 /**
  * Màn Cast SmartTube trên tivi (28/10/2026, biểu tượng trong danh sách app): mã TV chữ to cho khách liên kết (không cần
- * cầm điện thoại có TiviKit), điện thoại đã cast (duyệt, chặn, xoá), tạm ngừng nhận cast, đổi tên, huỷ mọi liên kết.
+ * cầm điện thoại có MTVkit), điện thoại đã cast (duyệt, chặn, xoá), tạm ngừng nhận cast, đổi tên, huỷ mọi liên kết.
  * Việc quản lý cần mã bố mẹ khi Khoá trẻ em đang chạy (ManCoMa); xem mã thì ai cũng xem được.
  */
 class ManCast : ManCoMa() {
@@ -121,7 +121,7 @@ class ManCast : ManCoMa() {
                     Box(Modifier.size(10.dp).background(if (daNoi) Mau.xanh else Mau.cam, CircleShape))
                     Spacer(Modifier.width(8.dp))
                     Chu(when {
-                        !chay -> t("Dịch vụ Cast đang tắt: bật bằng TiviKit trên điện thoại", "The Cast service is off: turn it on with TiviKit on a phone")
+                        !chay -> t("Dịch vụ Cast đang tắt: bật bằng MTVkit trên điện thoại", "The Cast service is off: turn it on with MTVkit on a phone")
                         daNoi -> "$ten · " + t("đã nối YouTube", "connected to YouTube")
                         else -> "$ten · " + t("đang nối YouTube…", "connecting to YouTube…")
                     }, 16.sp, Mau.phu, dong = 1)

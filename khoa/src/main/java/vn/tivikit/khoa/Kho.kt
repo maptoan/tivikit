@@ -14,12 +14,12 @@ class Kho(ctx: Context) {
     var lanCho: Int get() = p.getInt("lan_cho", 0); set(v) = p.edit().putInt("lan_cho", v).apply()
     /** Mã mở khoá (28/10/2026): mã gốc OTP + mã dự phòng; null = chưa cài, tivi không khoá. App không cho sao lưu dữ liệu. */
     var maMo: MaMo? get() = MaMo.doc(p.getString("ma_mo", null)); set(v) = p.edit().putString("ma_mo", v?.json()).apply()
-    /** Phiên của TiviKit (dạng băm) và hạn của nó, xem XacThuc. */
+    /** Phiên của MTVkit (dạng băm) và hạn của nó, xem XacThuc. */
     var phien: String? get() = p.getString("phien", null); set(v) = p.edit().putString("phien", v).apply()
     var phienHet: Long get() = p.getLong("phien_het", 0); set(v) = p.edit().putLong("phien_het", v).apply()
-    /** Bố mẹ khoá tivi ngay (KhoaNgay, menu ⏻ của TiviKit Launcher): khoá tới khi nhập mã, kể cả khi tivi khởi động lại. */
+    /** Bố mẹ khoá tivi ngay (KhoaNgay, menu ⏻ của MTVkit Launcher): khoá tới khi nhập mã, kể cả khi tivi khởi động lại. */
     var khoaTay: Boolean get() = p.getBoolean("khoa_tay", false); set(v) = p.edit().putBoolean("khoa_tay", v).apply()
-    /** Lúc TiviKit báo quên mã (0 = không có). */
+    /** Lúc MTVkit báo quên mã (0 = không có). */
     var yeuCauGo: Long get() = p.getLong("yeu_cau_go", 0); set(v) = p.edit().putLong("yeu_cau_go", v).apply()
     var henGo: Long get() = yeuCauGo; set(v) { yeuCauGo = v }
     val cauHinh: CauHinh? get() = Luat.docJson(json)?.copy(coMa = p.contains("ma_mo"))
@@ -42,7 +42,7 @@ class Kho(ctx: Context) {
 
     // ---------- Khoá theo app (28/10/2026) ----------
 
-    /** Hẹn khoá một lần còn hạn (TiviKit đặt qua hen-khoa). */
+    /** Hẹn khoá một lần còn hạn (MTVkit đặt qua hen-khoa). */
     var hen: List<HenKhoa>
         get() = KhoaApp.conHan(KhoaApp.docHen(p.getString("hen_khoa", null)), System.currentTimeMillis())
         set(v) = p.edit().putString("hen_khoa", KhoaApp.jsonHen(v).toString()).apply()

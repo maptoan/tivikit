@@ -3,7 +3,7 @@ package vn.tivikit.adb
 import java.nio.ByteBuffer
 
 /**
- * Giao thức của scrcpy (Genymobile, Apache 2.0) bản [BAN], phần TiviKit dùng để xem màn hình tivi ngay trên điện thoại
+ * Giao thức của scrcpy (Genymobile, Apache 2.0) bản [BAN], phần MTVkit dùng để xem màn hình tivi ngay trên điện thoại
  * (26/10/2026): lệnh chạy máy chủ trên tivi, đầu gói của luồng video, gói phím / chạm gửi lên tivi. Máy chủ phải đúng
  * bản [BAN] (scrcpy đổi giao thức giữa các bản, xem doc/develop.md của bản đó); đổi bản thì sửa cả scripts/tai-scrcpy.sh.
  */

@@ -12,7 +12,7 @@ import org.json.JSONObject
 import java.time.ZoneId
 
 /**
- * TiviKit đặt / đọc lịch qua ADB:
+ * MTVkit đặt / đọc lịch qua ADB:
  *   content call --uri content://vn.tivikit.hengio --method dat --arg '[{"gio":6,"phut":30,"ngay":[1,2,3,4,5],"loai":"bat"}]'
  *   content call --uri content://vn.tivikit.hengio --method thu --arg 120   (thử đánh thức sau 120 giây)
  *   content call --uri content://vn.tivikit.hengio --method doc

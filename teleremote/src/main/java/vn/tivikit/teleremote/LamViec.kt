@@ -64,7 +64,7 @@ class LamViec(internal val dv: TeleRemoteDichVu, internal val ra: Ra) {
             return
         }
         // Bàn phím chính vừa có nút mới (Tele Remote cập nhật): gửi lại một lần cho người này, khỏi phải bấm /start. Lệnh thử
-        // của TiviKit (chat 0) không tính: người thật chưa thấy bàn phím đó.
+        // của MTVkit (chat 0) không tính: người thật chưa thấy bàn phím đó.
         if (d.chat != 0L && nd.id != 0L && !dv.kho.coBanPhim(nd.id)) {
             dv.kho.ghiBanPhim(nd.id)
             if (viec != XuLyLenh.Menu && viec != XuLyLenh.Them) ra.gui(d.chat, chuBanPhimMoi(nd), banPhim(nd))
@@ -216,8 +216,8 @@ class LamViec(internal val dv: TeleRemoteDichVu, internal val ra: Ra) {
                 ra.gui(d.chat, when (kq) {
                     "khong-o-nhap" -> t("Trên tivi chưa chọn ô nhập chữ: dùng ⬆️⬇️⬅️➡️ trên bảng điều khiển chọn ô (VD ô tìm kiếm) rồi bấm ⌨️ Gõ chữ lại.",
                         "No text field is selected on the TV: use ⬆️⬇️⬅️➡️ on the remote pad to select one (e.g. a search box), then tap ⌨️ Type again.")
-                    "can-bo-go" -> t("Chữ có dấu cần bộ gõ tiếng Việt của TiviKit trên tivi: mở TiviKit → Tele Remote → Cài lại / cập nhật. Chữ không dấu thì gõ được ngay.",
-                        "Accented text needs TiviKit's Vietnamese typing helper on the TV: open TiviKit → Tele Remote → Reinstall / update. Plain text works now.")
+                    "can-bo-go" -> t("Chữ có dấu cần bộ gõ tiếng Việt của MTVkit trên tivi: mở MTVkit → Tele Remote → Cài lại / cập nhật. Chữ không dấu thì gõ được ngay.",
+                        "Accented text needs MTVkit's Vietnamese typing helper on the TV: open MTVkit → Tele Remote → Reinstall / update. Plain text works now.")
                     "chua-adb" -> chuChuaAdb()
                     else -> t("Chưa gõ được ($kq).", "Couldn't type it ($kq).")
                 }, banPhim(nd))
@@ -237,7 +237,7 @@ class LamViec(internal val dv: TeleRemoteDichVu, internal val ra: Ra) {
             ds.isNotEmpty() -> ra.gui(d.chat, t("📺 Kênh nhanh: bấm một kênh để mở.", "📺 Quick channel: tap a channel to open it."), XuLyLenh.bangKenh(ds, tatCa, en))
             tatCa -> ra.gui(d.chat, t("Tivi chưa có ô Kênh nhanh: bấm 📺 Tất cả kênh, hay gõ \"mở VTV3\".", "The TV has no Quick channel tiles: tap 📺 All channels, or type \"open VTV3\"."),
                 XuLyLenh.bangKenh(ds, true, en))
-            else -> ra.gui(d.chat, t("Tivi chưa có ô Kênh nhanh nào. Thêm ở TiviKit → Kênh nhanh.", "The TV has no Quick channel tiles yet. Add them in TiviKit → Quick channel."))
+            else -> ra.gui(d.chat, t("Tivi chưa có ô Kênh nhanh nào. Thêm ở MTVkit → Kênh nhanh.", "The TV has no Quick channel tiles yet. Add them in MTVkit → Quick channel."))
         }
     }
 
@@ -253,7 +253,7 @@ class LamViec(internal val dv: TeleRemoteDichVu, internal val ra: Ra) {
     }
 
     /**
-     * App YouTube: app Map Voice đang dùng (app chọn ở TiviKit → Map Voice, chưa chọn thì SmartTube / TizenTube có trên tivi),
+     * App YouTube: app Map Voice đang dùng (app chọn ở MTVkit → Map Voice, chưa chọn thì SmartTube / TizenTube có trên tivi),
      * không có Map Voice thì SmartTube, TizenTube, YouTube gốc.
      */
     private fun appYouTube(): String? {
@@ -297,7 +297,7 @@ class LamViec(internal val dv: TeleRemoteDichVu, internal val ra: Ra) {
         val loi = when {
             goi.isEmpty() -> t("Chưa biết app nào đang mở (tivi đang ở màn bảo vệ?).", "Not sure which app is showing (is the screensaver on?).")
             dv.laHome(goi) -> t("Tivi đang ở màn Home: không có app nào để dừng.", "The TV is on its Home screen: no app to stop.")
-            goi.startsWith("vn.tivikit") -> t("Không buộc dừng app của TiviKit.", "TiviKit's own apps aren't force-stopped.")
+            goi.startsWith("vn.tivikit") -> t("Không buộc dừng app của MTVkit.", "MTVkit's own apps aren't force-stopped.")
             !dv.dungApp(goi) -> chuChuaAdb()
             else -> null
         }
@@ -347,7 +347,7 @@ class LamViec(internal val dv: TeleRemoteDichVu, internal val ra: Ra) {
     private fun dongAppNen(d: Den, nd: NguoiDung) {
         ra.traLoiNut(d.idNut, t("Đang đóng app nền…", "Closing background apps…"))
         val truoc = dv.soDo(doCpu = false).ramCon
-        // am kill-all chỉ đóng tiến trình nền an toàn để đóng, không đụng app đang mở (như Làm mới tivi của TiviKit).
+        // am kill-all chỉ đóng tiến trình nền an toàn để đóng, không đụng app đang mở (như Làm mới tivi của MTVkit).
         if (dv.lenh("am kill-all", 10_000) == null) {
             ra.gui(d.chat, chuChuaAdb())
             return
@@ -377,7 +377,7 @@ class LamViec(internal val dv: TeleRemoteDichVu, internal val ra: Ra) {
 
     /** Chữ và nút của bảng Hẹn giờ đọc từ app Hẹn giờ; chưa cài / chưa nối ADB thì chữ báo và không có nút. */
     private fun bangHenGio(): Pair<String, JSONObject?> {
-        if (!dv.coApp(HEN_GIO)) return t("Tivi chưa có Hẹn giờ: cài ở TiviKit → Hẹn giờ.", "The TV has no Timer yet: install it in TiviKit → Timer.") to null
+        if (!dv.coApp(HEN_GIO)) return t("Tivi chưa có Hẹn giờ: cài ở MTVkit → Hẹn giờ.", "The TV has no Timer yet: install it in MTVkit → Timer.") to null
         val j = dv.goiAppPhu(HEN_GIO, "doc")?.let(XuLyLenh::jsonTrong) ?: return chuChuaAdb() to null
         val hg = ChuBot.henGio(j, dv.tenTivi(), en, ZoneId.systemDefault(), ::tenAppHen)
         return hg.chu to XuLyLenh.bangHenGio(hg.motLan, en)
@@ -418,7 +418,7 @@ class LamViec(internal val dv: TeleRemoteDichVu, internal val ra: Ra) {
     // ---------- Khoá trẻ em (app vn.tivikit.khoa) ----------
 
     private fun bangKhoa(): Pair<String, JSONObject?> {
-        if (!dv.coApp(KHOA)) return t("Tivi chưa có Khoá trẻ em: cài ở TiviKit → Khoá trẻ em.", "The TV has no Kids lock yet: install it in TiviKit → Kids lock.") to null
+        if (!dv.coApp(KHOA)) return t("Tivi chưa có Khoá trẻ em: cài ở MTVkit → Khoá trẻ em.", "The TV has no Kids lock yet: install it in MTVkit → Kids lock.") to null
         val j = dv.goiAppPhu(KHOA, "doc")?.let(XuLyLenh::jsonTrong) ?: return chuChuaAdb() to null
         val chu = ChuBot.khoa(j, dv.tenTivi(), System.currentTimeMillis(), en, ZoneId.systemDefault(), dv::tenApp)
         return chu to (if (j.optBoolean("bat")) XuLyLenh.bangKhoa(en, j.optBoolean("coOtp")) else null)
@@ -428,7 +428,7 @@ class LamViec(internal val dv: TeleRemoteDichVu, internal val ra: Ra) {
         val loi = dv.khoaNgay()
         ra.traLoiNut(d.idNut, when (loi) {
             "" -> t("🔒 Đã khoá tivi: mở lại cần mã của bố mẹ.", "🔒 The TV is locked: unlocking needs the parent's code.")
-            "chua-co-ma" -> t("Tivi chưa có mã bố mẹ: đặt mã ở TiviKit → Khoá trẻ em trước.", "The TV has no parent code yet: set one in TiviKit → Kids lock first.")
+            "chua-co-ma" -> t("Tivi chưa có mã bố mẹ: đặt mã ở MTVkit → Khoá trẻ em trước.", "The TV has no parent code yet: set one in MTVkit → Kids lock first.")
             "dich-vu" -> t("Dịch vụ Khoá trẻ em trên tivi đang tắt.", "The Kids lock service on the TV is off.")
             else -> t("Chưa khoá được ($loi).", "Couldn't lock it ($loi).")
         }, canhBao = loi.isNotEmpty())
@@ -438,7 +438,7 @@ class LamViec(internal val dv: TeleRemoteDichVu, internal val ra: Ra) {
         hienBang(d, bangKhoa(), traLoi = false)
     }
 
-    /** Mở tạm [phut] phút: tivi có mã bố mẹ thì hỏi mã (tin kế tiếp), chưa có mã thì mở luôn như TiviKit. */
+    /** Mở tạm [phut] phút: tivi có mã bố mẹ thì hỏi mã (tin kế tiếp), chưa có mã thì mở luôn như MTVkit. */
     private fun hoiMa(d: Den, nd: NguoiDung, phut: Int) {
         ra.traLoiNut(d.idNut)
         val j = dv.goiAppPhu(KHOA, "doc")?.let(XuLyLenh::jsonTrong)
@@ -496,7 +496,7 @@ class LamViec(internal val dv: TeleRemoteDichVu, internal val ra: Ra) {
 
     private fun chup(d: Den, nd: NguoiDung) {
         if (!ch.chupManHinh) {
-            ra.gui(d.chat, t("Chụp màn hình đang tắt: bật ở TiviKit → Tele Remote.", "Screenshots are off: turn them on in TiviKit → Tele Remote."))
+            ra.gui(d.chat, t("Chụp màn hình đang tắt: bật ở MTVkit → Tele Remote.", "Screenshots are off: turn them on in MTVkit → Tele Remote."))
             return
         }
         ra.dangLam(d.chat, "upload_photo")
@@ -562,8 +562,8 @@ class LamViec(internal val dv: TeleRemoteDichVu, internal val ra: Ra) {
         }
         ra.gui(d.chat, if (dv.coApp(MAP_VOICE)) t("Bot chưa hiểu câu này, và Trợ lý Google trên tivi đang tắt. Thử: “mở nhạc trịnh”, “mở VTV3”, “mở Netflix”.",
             "The bot didn't get that, and the TV's Google Assistant is off. Try: “play piano music”, “open Netflix”.")
-            else t("Bot chưa hiểu câu này. Cài Map Voice ở TiviKit để nhắn như nói: “mở nhạc trịnh”, “mở VTV3”…",
-            "The bot didn't get that. Install Map Voice in TiviKit to type like talking: “play piano music”…"), banPhim(nd))
+            else t("Bot chưa hiểu câu này. Cài Map Voice ở MTVkit để nhắn như nói: “mở nhạc trịnh”, “mở VTV3”…",
+            "The bot didn't get that. Install Map Voice in MTVkit to type like talking: “play piano music”…"), banPhim(nd))
     }
 
     private fun link(d: Den, nd: NguoiDung, url: String) {
@@ -606,7 +606,7 @@ class LamViec(internal val dv: TeleRemoteDichVu, internal val ra: Ra) {
         }
         val ok = dv.chieu(dich, tep.laVideo)
         if (ok && !tep.laVideo) dv.anhCuoi = dich
-        // Chủ, tivi có TiviKit Launcher: ảnh vừa chiếu đặt được làm ảnh nền Home.
+        // Chủ, tivi có MTVkit Launcher: ảnh vừa chiếu đặt được làm ảnh nền Home.
         val nen = ok && !tep.laVideo && nd.vaiTro == VaiTro.CHU && dv.coApp(TKL)
         ra.gui(d.chat, when {
             !ok -> t("Không mở được màn chiếu trên tivi.", "Couldn't open the viewer on the TV.")
@@ -622,8 +622,8 @@ class LamViec(internal val dv: TeleRemoteDichVu, internal val ra: Ra) {
         if (d.nut != null && d.idTin != 0L) ra.sua(d.chat, d.idTin, bang.first, bang.second) else ra.gui(d.chat, bang.first, bang.second)
     }
 
-    internal fun chuChuaAdb() = t("Tivi chưa nối ADB của chính nó: mở TiviKit → Tele Remote xem cách nối.",
-        "The TV isn't connected to its own ADB yet: open TiviKit → Tele Remote to fix it.")
+    internal fun chuChuaAdb() = t("Tivi chưa nối ADB của chính nó: mở MTVkit → Tele Remote xem cách nối.",
+        "The TV isn't connected to its own ADB yet: open MTVkit → Tele Remote to fix it.")
 
     internal fun ghi(nd: NguoiDung, viec: String) = dv.kho.ghi(nd.ten.ifEmpty { nd.tenHien }, viec)
 

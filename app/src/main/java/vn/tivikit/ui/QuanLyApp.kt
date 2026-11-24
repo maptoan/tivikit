@@ -66,7 +66,7 @@ class QuanLyApp(private val vm: PhienLamViec) {
 
     /**
      * Gói của chính app này (Home sạch, Khoá trẻ em — cả bản trước khi đổi tên gói, đang chờ cài mã OTP — Kênh nhanh,
-     * Hẹn giờ, bộ gõ tiếng Việt, Cast SmartTube, Map Voice, Tele Remote, IPTV, TiviKit Launcher, TiviKit khi chạy trên tivi): không gỡ / xoá dữ
+     * Hẹn giờ, bộ gõ tiếng Việt, Cast SmartTube, Map Voice, Tele Remote, IPTV, MTVkit Launcher, MTVkit khi chạy trên tivi): không gỡ / xoá dữ
      * liệu / buộc dừng ở đây (buộc dừng làm Android bỏ dịch vụ trợ năng của chúng, Hẹn giờ mất báo thức; xoá dữ liệu IPTV mất link danh sách).
      */
     fun baoVe(a: App) = a.tv.pkg in ThaoTacTv.HOME_SACH || laKhoa(a) ||
@@ -177,7 +177,7 @@ class QuanLyApp(private val vm: PhienLamViec) {
     }
 
     fun dung(a: App) = vm.chay(t("Đang buộc dừng ${a.tenHien}…", "Force-stopping ${a.tenHien}…")) {
-        if (baoVe(a)) error(t("${a.tenHien} là app của TiviKit, không buộc dừng ở đây.", "${a.tenHien} is part of TiviKit; it can't be force-stopped here."))
+        if (baoVe(a)) error(t("${a.tenHien} là app của MTVkit, không buộc dừng ở đây.", "${a.tenHien} is part of MTVkit; it can't be force-stopped here."))
         vm.damBaoKetNoi()
         vm.io { tvApp.dung(a.tv.pkg) }
         bao = t("Đã buộc dừng ${a.tenHien}.", "${a.tenHien} force-stopped.")
@@ -197,7 +197,7 @@ class QuanLyApp(private val vm: PhienLamViec) {
         bao = t("Đã xoá dữ liệu ${a.tenHien}: app như mới cài.", "${a.tenHien}'s data cleared: it's like freshly installed.")
     }
 
-    /** Tắt được ở màn này: không phải app của chính TiviKit, gói lõi Android hay app tivi cần để chạy (KeHoach). */
+    /** Tắt được ở màn này: không phải app của chính MTVkit, gói lõi Android hay app tivi cần để chạy (KeHoach). */
     fun duocTat(a: App): Boolean = !baoVe(a) && !KeHoach.laGoiLoiAndroid(a.tv.pkg) &&
         vm.trangThai?.let { KeHoach.laGoiCanGiu(a.tv.pkg, it) } != true
 
@@ -229,8 +229,8 @@ class QuanLyApp(private val vm: PhienLamViec) {
     }
 
     fun go(a: App) = vm.chay(t("Đang gỡ ${a.tenHien}…", "Uninstalling ${a.tenHien}…")) {
-        if (baoVe(a) || laHome(a)) error(t("${a.tenHien} đang là màn Home hoặc là app của TiviKit: đổi Home / gỡ ở Quản lý launcher trước.",
-            "${a.tenHien} is the Home screen or part of TiviKit: change Home / remove it under Launchers first."))
+        if (baoVe(a) || laHome(a)) error(t("${a.tenHien} đang là màn Home hoặc là app của MTVkit: đổi Home / gỡ ở Quản lý launcher trước.",
+            "${a.tenHien} is the Home screen or part of MTVkit: change Home / remove it under Launchers first."))
         vm.damBaoKetNoi()
         val out = vm.io { vm.tv.goApp(a.tv.pkg) }
         if (!out.contains("Success")) error(t("Gỡ không được: ${out.trim()}", "Uninstall failed: ${out.trim()}"))

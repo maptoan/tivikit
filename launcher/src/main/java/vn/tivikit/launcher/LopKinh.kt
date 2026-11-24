@@ -174,7 +174,7 @@ private fun GiotNguon(m: MucNguon, dau: FocusRequester?, modifier: Modifier, onC
 
 // ---------- Câu kinh mỗi ngày ----------
 
-/** "Kinh Pháp Cú", tên bộ riêng TiviKit gửi, hay "Câu mỗi ngày" nếu bộ riêng không tên. */
+/** "Kinh Pháp Cú", tên bộ riêng MTVkit gửi, hay "Câu mỗi ngày" nếu bộ riêng không tên. */
 private fun tenBo(c: CauHomNay): String = when {
     c.ten == null -> t("Kinh Pháp Cú", "Dhammapada")
     c.ten.isBlank() -> t("Câu mỗi ngày", "Daily verse")

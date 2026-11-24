@@ -5,8 +5,8 @@ import java.util.Base64
 import org.json.JSONObject
 
 /**
- * Gõ chữ từ Telegram vào ô nhập đang chọn trên tivi (31/10/2026), cùng cách với nút Gõ chữ của TiviKit (GoChu, PhimTv):
- * chữ thuần ASCII gõ bằng `input text`; chữ có dấu (hay emoji) đi qua bộ gõ vn.tivikit.go (TiviKit cài cùng Tele Remote),
+ * Gõ chữ từ Telegram vào ô nhập đang chọn trên tivi (31/10/2026), cùng cách với nút Gõ chữ của MTVkit (GoChu, PhimTv):
+ * chữ thuần ASCII gõ bằng `input text`; chữ có dấu (hay emoji) đi qua bộ gõ vn.tivikit.go (MTVkit cài cùng Tele Remote),
  * bật tạm vài giây để đưa chữ vào rồi trả bàn phím cũ của tivi.
  */
 object GoChuTr {
@@ -17,7 +17,7 @@ object GoChuTr {
     /** Có ký tự `input text` không gõ được (chữ có dấu, đ, emoji…): phải đi qua bộ gõ. */
     fun canBoGo(s: String): Boolean = s.any { it !in ' '..'~' }
 
-    /** Bộ gõ đang dùng trên tivi đọc được là tên hợp lệ, không phải bộ gõ của TiviKit (lần trước bị ngắt giữa chừng). */
+    /** Bộ gõ đang dùng trên tivi đọc được là tên hợp lệ, không phải bộ gõ của MTVkit (lần trước bị ngắt giữa chừng). */
     fun laBoGoCu(s: String): Boolean = TEN_BO_GO.matches(s) && !s.startsWith("$GOI/")
 
     /**

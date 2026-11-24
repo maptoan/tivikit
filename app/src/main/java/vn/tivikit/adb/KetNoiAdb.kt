@@ -37,7 +37,7 @@ class KetNoiAdb private constructor(
 
     override fun getPrivateKey(): PrivateKey = khoa
     override fun getCertificate(): Certificate = chungChi
-    override fun getDeviceName(): String = "TiviKit"
+    override fun getDeviceName(): String = "MTVkit"
 
     /** Địa chỉ của lần kết nối thành công gần nhất (cả Gỡ lỗi không dây, connectTls cũng đi qua đây). */
     @Volatile var diemCuoi: Pair<String, Int>? = null
@@ -208,7 +208,7 @@ class KetNoiAdb private constructor(
     /**
      * Đọc luồng tới khi [xong] đúng với phần đã nhận, hoặc luồng đóng, hoặc quá [giay] giây. Có [dau] (dấu kết thúc tự chèn)
      * thì chỉ dò dấu trong phần mới nhận, không giải mã lại cả phần đã nhận sau mỗi lần đọc (28/10/2026: ảnh 8 MB qua base64
-     * phải giải mã hàng GB chữ, quá hạn 120 giây khi TiviKit chạy trên hộp).
+     * phải giải mã hàng GB chữ, quá hạn 120 giây khi MTVkit chạy trên hộp).
      */
     private fun docToiKhi(stream: io.github.muntashirakon.adb.AdbStream, giay: Int = 120, dau: String? = null, xong: (String) -> Boolean): String =
         docHoacHetGio(stream, giay, dau, xong) ?: throw java.io.IOException("Tivi không trả lời sau $giay giây")
@@ -446,7 +446,7 @@ class KetNoiAdb private constructor(
             }
             val gen = KeyPairGenerator.getInstance("RSA").apply { initialize(2048) }
             val cap = gen.generateKeyPair()
-            val ten = X500Name("CN=TiviKit")
+            val ten = X500Name("CN=MTVkit")
             val tu = Date()
             val den = Date(tu.time + 3650L * 24 * 3600 * 1000)
             val builder = JcaX509v3CertificateBuilder(ten, BigInteger.valueOf(tu.time), tu, den, ten, cap.public)

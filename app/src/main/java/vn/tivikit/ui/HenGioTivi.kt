@@ -143,8 +143,8 @@ class HenGioTivi(private val vm: PhienLamViec) {
         val tt = trangThai
         bao = when {
             tt == null -> t("Đã gửi lịch nhưng chưa đọc lại được từ tivi. Bấm Làm mới.", "Sent, but couldn't read it back from the TV. Tap Refresh.")
-            !tt.dichVuChay -> t("Đã lưu, nhưng dịch vụ Hẹn giờ chưa chạy trên tivi: vào Cài đặt → Trợ năng của tivi, bật \"Hẹn giờ (TiviKit)\", rồi bấm Làm mới.",
-                "Saved, but the Timer service isn't running on the TV: open the TV's Settings → Accessibility, turn on \"Timer (TiviKit)\", then tap Refresh.")
+            !tt.dichVuChay -> t("Đã lưu, nhưng dịch vụ Hẹn giờ chưa chạy trên tivi: vào Cài đặt → Trợ năng của tivi, bật \"Hẹn giờ (MTVkit)\", rồi bấm Làm mới.",
+                "Saved, but the Timer service isn't running on the TV: open the TV's Settings → Accessibility, turn on \"Timer (MTVkit)\", then tap Refresh.")
             tt.keTiep > 0 -> t("Đã lưu lên tivi. ", "Saved to the TV. ") + keTiepChu(tt)
             else -> t("Đã lưu lên tivi. Lịch đang trống hoặc đang tắt hết.", "Saved to the TV. The schedule is empty or all off.")
         }
@@ -256,15 +256,15 @@ class HenGioTivi(private val vm: PhienLamViec) {
         }
     }
 
-    /** Khởi động lại tivi ngay bằng Auto Reboot (Thử ngay): lên lại thì tivi tự tắt màn hình. TiviKit mất kết nối lúc đó. */
+    /** Khởi động lại tivi ngay bằng Auto Reboot (Thử ngay): lên lại thì tivi tự tắt màn hình. MTVkit mất kết nối lúc đó. */
     fun thuKdl() = vm.chay(t("Đang gửi lệnh khởi động lại…", "Sending the restart…")) {
         vm.damBaoKetNoi()
         docTrangThaiTv()
         if (trangThai?.kdl?.adb != "da-noi") error(t("Bấm Lưu Auto Reboot trước (cho app Hẹn giờ nối ADB của tivi), rồi thử.",
             "Tap Save Auto Reboot first (lets the Timer app use the TV's ADB), then test."))
         vm.io { vm.tv.thuAutoReboot() }
-        kdlBao = t("Đã gửi: tivi khởi động lại trong vài giây, lên lại (1–2 phút) thì tự tắt màn hình. TiviKit mất kết nối lúc đó, nối lại sau khi tivi lên.",
-            "Sent: the TV restarts in a few seconds and turns its screen off once it's back (1–2 min). TiviKit loses the connection meanwhile; reconnect after.")
+        kdlBao = t("Đã gửi: tivi khởi động lại trong vài giây, lên lại (1–2 phút) thì tự tắt màn hình. MTVkit mất kết nối lúc đó, nối lại sau khi tivi lên.",
+            "Sent: the TV restarts in a few seconds and turns its screen off once it's back (1–2 min). MTVkit loses the connection meanwhile; reconnect after.")
     }
 
     /** "Lần tới: 04:00 Thứ Ba." hay "Đang chờ tivi tắt (hẹn 04:00), kiểm lại lúc 04:15." theo giờ của tivi. */

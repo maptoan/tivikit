@@ -8,7 +8,7 @@ import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * Cấu hình màn Home trong cau-hinh.json (thư mục riêng của app). TiviKit ghi qua CauHinhProvider (ten, dock, ngon_ngu,
+ * Cấu hình màn Home trong cau-hinh.json (thư mục riêng của app). MTVkit ghi qua CauHinhProvider (ten, dock, ngon_ngu,
  * noi, ten_app, cau); màn Home ghi dock khi người dùng sửa ngay trên tivi và lịch sử app vừa mở (gan_day).
  */
 class CauHinh(ctx: Context) {
@@ -31,14 +31,14 @@ class CauHinh(ctx: Context) {
     companion object {
         private val KHOA = Any()
 
-        /** Tăng mỗi lần cấu hình đổi (kể cả TiviKit ghi qua ADB) để màn Home đọc lại. */
+        /** Tăng mỗi lần cấu hình đổi (kể cả MTVkit ghi qua ADB) để màn Home đọc lại. */
         val lanDoi = MutableStateFlow(0)
 
-        /** Tăng mỗi lần TiviKit gửi / bỏ ảnh nền riêng (CauHinhProvider) để màn Home dựng lại ảnh nền và kính. */
+        /** Tăng mỗi lần MTVkit gửi / bỏ ảnh nền riêng (CauHinhProvider) để màn Home dựng lại ảnh nền và kính. */
         val lanNen = MutableStateFlow(0)
 
         /**
-         * Tăng mỗi lần TiviKit gửi / bỏ ảnh riêng của một app (logo kênh của ô Kênh nhanh, CauHinhProvider); các gói đó nằm
+         * Tăng mỗi lần MTVkit gửi / bỏ ảnh riêng của một app (logo kênh của ô Kênh nhanh, CauHinhProvider); các gói đó nằm
          * trong [anhDoi] tới khi màn Home đọc lại ảnh của chúng.
          */
         val lanAnh = MutableStateFlow(0)
@@ -56,7 +56,7 @@ class CauHinh(ctx: Context) {
         }
 
         /**
-         * Ghép cấu hình TiviKit gửi ([moi]) vào [cu]: chỉ nhận "ten" (chữ, tối đa 40 ký tự, "" = bỏ tên), "dock" (mảng tên
+         * Ghép cấu hình MTVkit gửi ([moi]) vào [cu]: chỉ nhận "ten" (chữ, tối đa 40 ký tự, "" = bỏ tên), "dock" (mảng tên
          * gói hợp lệ), "ngon_ngu" ("vi" / "en" / "" = theo tivi), "noi" (nơi xem thời tiết {ten, lat, lon}; sai / rỗng =
          * bỏ), "ten_app" (tên riêng {gói: tên}, gộp vào tên đã có; "" = bỏ tên riêng của gói đó), "cau" (câu kinh mỗi
          * ngày {bat, ten}: bật / tắt, tên bộ câu riêng; "" = bỏ tên), "thong_so" và "toc_do" (hiện dòng RAM / bộ nhớ trống
@@ -122,10 +122,10 @@ class CauHinh(ctx: Context) {
         const val THONG_SO = "thong_so"
         const val TOC_DO = "toc_do"
 
-        /** Tên bộ câu riêng TiviKit gửi kèm cau.txt ("" nếu không có). */
+        /** Tên bộ câu riêng MTVkit gửi kèm cau.txt ("" nếu không có). */
         fun tenCau(j: JSONObject): String = j.optJSONObject("cau")?.optString("ten").orEmpty()
 
-        /** Tên riêng TiviKit đặt cho app ("ten_app", như tên kênh của các ô Kênh nhanh): gói → tên. */
+        /** Tên riêng MTVkit đặt cho app ("ten_app", như tên kênh của các ô Kênh nhanh): gói → tên. */
         fun tenApp(j: JSONObject): Map<String, String> {
             val o = j.optJSONObject("ten_app") ?: return emptyMap()
             return o.keys().asSequence().mapNotNull { g -> (o.opt(g) as? String)?.trim()?.takeIf { it.isNotEmpty() && Dock.hopLe(g) }?.let { g to it } }.toMap()

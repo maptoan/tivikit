@@ -6,7 +6,7 @@ import kotlin.concurrent.thread
 /**
  * Giữ kết nối ADB tới chính tivi (127.0.0.1:5555) cho các lệnh ngắn: như vòng nghe của Map Voice (mapvoice/Nghe.kt) nhưng
  * không chạy logcat. Mất kết nối thì nối lại, chờ lâu dần tới [CHO_TOI_DA]. Tivi hỏi "Cho phép gỡ lỗi?" thì gọi [dangHoi];
- * người dùng không cho phép thì thôi nối tới khi TiviKit gọi [noiLai] (khỏi hỏi mãi).
+ * người dùng không cho phép thì thôi nối tới khi MTVkit gọi [noiLai] (khỏi hỏi mãi).
  */
 class GiuAdb(private val thuMuc: File, private val dangHoi: () -> Unit) {
     enum class TrangThai(val ma: String) {

@@ -130,7 +130,7 @@ object PhimRieng {
 
     /**
      * Đích "SmartTube – tìm bằng giọng nói" (27/10/2026, anh chủ nhà muốn nút 597 trên remote Skyworth bật tìm kiếm giọng
-     * nói của SmartTube): Home sạch (bản vá TiviKit, RemoteKeys.launch) gửi link intent: này. SmartTube nhận
+     * nói của SmartTube): Home sạch (bản vá MTVkit, RemoteKeys.launch) gửi link intent: này. SmartTube nhận
      * `youtube://search?launch=voice` thì mở màn tìm kiếm (IntentExtractor.isStartVoiceCommand), và bật mic ngay nếu trong
      * SmartTube bật Cài đặt → Tìm kiếm → "Tìm kiếm bằng giọng nói tức thì". Home sạch bản cũ không hiểu đích này.
      */

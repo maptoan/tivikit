@@ -55,7 +55,7 @@ internal fun ManLauncher(vm: PhienLamViec) {
         if (tt != null) {
             TheTiviKitLauncher(vm, ql)
             TheNutHome(vm, ql, tt)
-            // TiviKit Launcher có thẻ riêng ở trên.
+            // MTVkit Launcher có thẻ riêng ở trên.
             val ds = tt.ds.filter { it.goi != TiviKitLauncher.GOI }
             Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Text(t("${ds.size} launcher", "${ds.size} launchers"), fontSize = 13.sp, color = ChuPhu, modifier = Modifier.weight(1f))
@@ -73,23 +73,23 @@ internal fun ManLauncher(vm: PhienLamViec) {
             vn.tivikit.dulieu.GoiY.DS.filter { it.nhom == vn.tivikit.dulieu.GoiY.Nhom.LAUNCHER }.forEach { g -> HangGoiY(vm, g, g.goi.firstOrNull { it in caiDat }) }
             if (vm.baoGoiY.isNotEmpty()) Phu(vm.baoGoiY, Xanh)
         }
-        Phu(t("Launcher của hãng thường được Android ưu tiên hơn launcher tự cài (mức ưu tiên ghi ở từng hàng): muốn launcher tự cài làm Home thì phải tắt launcher của hãng; Google TV còn setupwraith thì không tắt được, Home sạch mở đè lên thay. Mọi thay đổi ghi vào bản sao lưu: Khôi phục tivi trả Home như trước khi dùng TiviKit.",
-            "Android usually favours the maker's launcher over ones you install (the priority is shown on each row): for an installed launcher to be Home, the maker's must be disabled; a Google TV with setupwraith can't, so the clean Home opens over it instead. Every change goes into the backup: restoring the TV puts Home back as it was before TiviKit."))
+        Phu(t("Launcher của hãng thường được Android ưu tiên hơn launcher tự cài (mức ưu tiên ghi ở từng hàng): muốn launcher tự cài làm Home thì phải tắt launcher của hãng; Google TV còn setupwraith thì không tắt được, Home sạch mở đè lên thay. Mọi thay đổi ghi vào bản sao lưu: Khôi phục tivi trả Home như trước khi dùng MTVkit.",
+            "Android usually favours the maker's launcher over ones you install (the priority is shown on each row): for an installed launcher to be Home, the maker's must be disabled; a Google TV with setupwraith can't, so the clean Home opens over it instead. Every change goes into the backup: restoring the TV puts Home back as it was before MTVkit."))
     }
     ql.hoi?.let { HopHoiLauncher(vm, ql, it) }
 }
 
 /**
- * Thẻ TiviKit Launcher (27/10/2026): màn Home kính mờ của TiviKit, APK đi kèm app, cài lên tivi từ điện thoại; mở thử, đặt
+ * Thẻ MTVkit Launcher (27/10/2026): màn Home kính mờ của MTVkit, APK đi kèm app, cài lên tivi từ điện thoại; mở thử, đặt
  * làm Home (qua đúng đường Đặt làm Home của các launcher khác), cập nhật, gỡ.
  */
 @Composable
 private fun TheTiviKitLauncher(vm: PhienLamViec, ql: QuanLyLauncher) {
     val k = ql.tkl
     val laHome = ql.tklLaHome()
-    The("TiviKit Launcher", Icons.Rounded.AutoAwesome) {
-        Phu(t("Màn Home kính mờ của TiviKit: đồng hồ lớn, âm lịch, lời chào theo tên, RAM / bộ nhớ trống, nút Dọn RAM, Wi-Fi, dock app như máy Mac. Cài từ điện thoại, không cần cài TiviKit lên tivi.",
-            "TiviKit's frosted-glass Home: big clock, lunar date, greeting by name, free RAM / storage, a Free RAM button, Wi-Fi, a Mac-style app dock. Installed from the phone; TiviKit itself isn't needed on the TV."))
+    The("MTVkit Launcher", Icons.Rounded.AutoAwesome) {
+        Phu(t("Màn Home kính mờ của MTVkit: đồng hồ lớn, âm lịch, lời chào theo tên, RAM / bộ nhớ trống, nút Dọn RAM, Wi-Fi, dock app như máy Mac. Cài từ điện thoại, không cần cài MTVkit lên tivi.",
+            "MTVkit's frosted-glass Home: big clock, lunar date, greeting by name, free RAM / storage, a Free RAM button, Wi-Fi, a Mac-style app dock. Installed from the phone; MTVkit itself isn't needed on the TV."))
         if (k?.daCai == true) Row(horizontalArrangement = Arrangement.spacedBy(6.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(t("Bản ${k.ban} trên tivi", "Version ${k.ban} on the TV"), fontWeight = FontWeight.SemiBold)
             if (laHome) Chip(t("Nút Home mở", "Home opens it"), Xanh)
@@ -117,8 +117,8 @@ private fun TheTiviKitLauncher(vm: PhienLamViec, ql: QuanLyLauncher) {
 }
 
 /**
- * Tuỳ chỉnh TiviKit Launcher từ điện thoại: tên lời chào và nơi xem thời tiết (dùng chung với Home sạch), ảnh nền có sẵn
- * trong TiviKit hoặc ảnh từ điện thoại (cắt giữa 16:9), rồi Áp dụng lên tivi.
+ * Tuỳ chỉnh MTVkit Launcher từ điện thoại: tên lời chào và nơi xem thời tiết (dùng chung với Home sạch), ảnh nền có sẵn
+ * trong MTVkit hoặc ảnh từ điện thoại (cắt giữa 16:9), rồi Áp dụng lên tivi.
  */
 @Composable
 private fun TuyChinhTkl(vm: PhienLamViec, ql: QuanLyLauncher, k: TiviKitLauncher.TrangThai) {
@@ -162,7 +162,7 @@ private fun TuyChinhTkl(vm: PhienLamViec, ql: QuanLyLauncher, k: TiviKitLauncher
 private fun ThongTinHomeTkl(ql: QuanLyLauncher, k: TiviKitLauncher.TrangThai) {
     Text(t("Thông tin trên Home", "Info on the Home screen"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
     if (k.hienThi == null) {
-        Phu(t("Cần bản TiviKit Launcher mới: bấm Cập nhật ở trên.", "Needs a newer TiviKit Launcher: tap Update above."), Cam)
+        Phu(t("Cần bản MTVkit Launcher mới: bấm Cập nhật ở trên.", "Needs a newer MTVkit Launcher: tap Update above."), Cam)
         return
     }
     Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
@@ -184,7 +184,7 @@ private fun CauMoiNgayTkl(vm: PhienLamViec, ql: QuanLyLauncher, k: TiviKitLaunch
     Text(t("Câu kinh mỗi ngày", "Daily verse"), fontSize = 14.sp, fontWeight = FontWeight.SemiBold)
     val c = k.cau
     if (c == null) {
-        Phu(t("Cần bản TiviKit Launcher mới: bấm Cập nhật ở trên.", "Needs a newer TiviKit Launcher: tap Update above."), Cam)
+        Phu(t("Cần bản MTVkit Launcher mới: bấm Cập nhật ở trên.", "Needs a newer MTVkit Launcher: tap Update above."), Cam)
         return
     }
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -284,7 +284,7 @@ private fun HangLauncher(vm: PhienLamViec, ql: QuanLyLauncher, tt: Launcher.Tran
                 Text(tenDep(m.goi), fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis, color = if (m.dangTat) ChuPhu else ChuChinh)
                 if (tenDep(m.goi) != m.goi) Text(m.goi, fontSize = 11.sp, color = ChuPhu, maxLines = 1, overflow = TextOverflow.Ellipsis)
                 Phu(listOfNotNull(
-                    when (m.loai) { Loai.HOME_SACH -> "TiviKit"; Loai.CAI_THEM -> t("tự cài", "installed"); Loai.GOC -> t("của hãng", "maker's") },
+                    when (m.loai) { Loai.HOME_SACH -> "MTVkit"; Loai.CAI_THEM -> t("tự cài", "installed"); Loai.GOC -> t("của hãng", "maker's") },
                     ql.ban[m.goi]?.let { "v$it" },
                     t("ưu tiên ${m.uuTien}", "priority ${m.uuTien}"),
                 ).joinToString(" · "))
@@ -380,7 +380,7 @@ private fun HopHoiLauncher(vm: PhienLamViec, ql: QuanLyLauncher, hoi: QuanLyLaun
         }
         is QuanLyLauncher.Hoi.Go -> Triple(t("Gỡ ${tenDep(hoi.m.goi)}?", "Uninstall ${tenDep(hoi.m.goi)}?"),
             t("Launcher và dữ liệu của nó (bố cục, cài đặt) bị xoá khỏi tivi.", "The launcher and its data (layout, settings) are removed from the TV."), t("Gỡ", "Uninstall"))
-        QuanLyLauncher.Hoi.GoTkl -> Triple(t("Gỡ TiviKit Launcher?", "Uninstall TiviKit Launcher?"),
+        QuanLyLauncher.Hoi.GoTkl -> Triple(t("Gỡ MTVkit Launcher?", "Uninstall MTVkit Launcher?"),
             t("Dock đã sắp xếp trên tivi bị xoá; cài lại từ đây lúc nào cũng được.", "The dock you arranged on the TV is removed; you can install it again from here any time."), t("Gỡ", "Uninstall"))
         QuanLyLauncher.Hoi.ThuNut -> Triple(t("Bấm thử nút Home?", "Test the Home button?"),
             t("Tivi sẽ mở Cài đặt rồi bấm Home, như khi bạn bấm Home trên remote: app đang mở trên tivi sẽ bị đóng.", "The TV will open Settings and press Home, like the remote's Home button: whatever is open on the TV gets closed."),

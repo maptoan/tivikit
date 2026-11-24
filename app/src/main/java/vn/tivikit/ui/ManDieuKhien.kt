@@ -49,7 +49,7 @@ import vn.tivikit.t
 @Composable
 internal fun ManDieuKhien(vm: PhienLamViec) {
     val x = vm.xemManHinh
-    // Chạy TiviKit ngay trên tivi thì tự xem chính mình là vô nghĩa.
+    // Chạy MTVkit ngay trên tivi thì tự xem chính mình là vô nghĩa.
     val xemDuoc = !vn.tivikit.ManHinh.laTv && vm.ip.trim() != "127.0.0.1"
     val vongDoi = androidx.compose.ui.platform.LocalLifecycleOwner.current
     // Kênh điều khiển scrcpy cho phím ăn ngay và thẻ Đang phát (27/10/2026): chạy khi màn hiện (addObserver gửi ngay ON_START

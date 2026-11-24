@@ -85,7 +85,7 @@ object DanhSach {
     }
 
     /**
-     * Tên kênh để so (như KenhNhanh.khoaTen của TiviKit, khoaKenh của Map Voice): không dấu, bỏ "kênh", "truyền hình", HD /
+     * Tên kênh để so (như KenhNhanh.khoaTen của MTVkit, khoaKenh của Map Voice): không dấu, bỏ "kênh", "truyền hình", HD /
      * FHD / UHD / 4K, chỉ giữ a-z 0-9, gộp tên khác ("QPVN HD" = "Quốc phòng Việt Nam").
      */
     fun khoa(ten: String): String {
@@ -118,7 +118,7 @@ object DanhSach {
     private fun trungTen(goc: String, ten: String) = goc == ten || gon(goc) == ten
 
     /**
-     * Tên kênh như TiviKit đặt cho ô (KenhNhanh.tenSach): bỏ dấu phẩy, nháy, ký tự shell, "=", xuống dòng; gộp khoảng trắng;
+     * Tên kênh như MTVkit đặt cho ô (KenhNhanh.tenSach): bỏ dấu phẩy, nháy, ký tự shell, "=", xuống dòng; gộp khoảng trắng;
      * tối đa 30 ký tự.
      */
     fun gon(s: String): String = s.replace(RE_KY_TU_LA, " ").trim().replace(RE_KHOANG_TRANG, " ").take(30)

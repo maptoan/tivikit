@@ -34,7 +34,7 @@ data class AutoReboot(val bat: Boolean = false, val gio: Int = 4, val phut: Int 
         /** Tivi lên lại trong chừng này sau lệnh khởi động lại thì là do Auto Reboot: tắt màn hình. */
         const val SAU_KHOI_DONG_MS = 15 * 60_000L
 
-        /** Cấu hình TiviKit gửi ({"bat","gio","phut","ngay"}); null nếu sai dạng. */
+        /** Cấu hình MTVkit gửi ({"bat","gio","phut","ngay"}); null nếu sai dạng. */
         fun doc(s: String?): AutoReboot? = runCatching {
             val o = JSONObject(s ?: return null)
             val n = o.getJSONArray("ngay")
@@ -113,7 +113,7 @@ object ChayAutoReboot {
 
     /**
      * Khởi động lại ngay, chạy nền. Ghi cờ trước (ghi chắc: tivi tắt ngay sau lệnh) để lên lại thì tắt màn hình. Lúc tự chạy
-     * không ai ở trước tivi nên không chờ người bấm Cho phép; [thu] (nút Thử ngay ở TiviKit) thì chờ tối đa 60 giây. Lỗi thì
+     * không ai ở trước tivi nên không chờ người bấm Cho phép; [thu] (nút Thử ngay ở MTVkit) thì chờ tối đa 60 giây. Lỗi thì
      * bỏ cờ, ghi nhật ký và (lúc tự chạy) báo Tele Remote.
      */
     fun khoiDongLai(ctx: Context, dot: Long, thu: Boolean) {
@@ -129,7 +129,7 @@ object ChayAutoReboot {
                 kho.datCoKhoiDong(0)
                 val ma = maLoi(kq)
                 kho.ghi(VIEC, ma)
-                // TiviKit thấy phải cho phép lại (khoá bị gỡ khỏi tivi, hay lần trước chỉ cho phép một lần).
+                // MTVkit thấy phải cho phép lại (khoá bị gỡ khỏi tivi, hay lần trước chỉ cho phép một lần).
                 when (kq) {
                     AdbNoiBo.KetQua.CHUA_CHO_PHEP -> kho.kdlAdb = "chua-cho-phep"
                     AdbNoiBo.KetQua.KHONG_CO -> kho.kdlAdb = "khong-co"
@@ -165,7 +165,7 @@ object ChayAutoReboot {
     }
 
     /**
-     * Nối thử ADB của tivi (TiviKit gọi lúc lưu Auto Reboot): lần đầu tivi hỏi Cho phép gỡ lỗi. Chờ người dùng tới 2 phút:
+     * Nối thử ADB của tivi (MTVkit gọi lúc lưu Auto Reboot): lần đầu tivi hỏi Cho phép gỡ lỗi. Chờ người dùng tới 2 phút:
      * Khoá trẻ em đang bật thì che hộp đó bằng màn hỏi mã bố mẹ, bố mẹ mở app xác thực gõ mã trước (Skyworth 2/11/2026).
      * Kết quả ở Kho.kdlAdb.
      */

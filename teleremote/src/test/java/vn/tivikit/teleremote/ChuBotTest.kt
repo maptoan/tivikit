@@ -104,7 +104,7 @@ class ChuBotTest {
 
     @Test
     fun daNhiem() {
-        assertEquals("🗂 Tắt đa nhiệm · Skyworth\nKhông có app nào đang mở, ngoài app hệ thống của tivi và TiviKit.",
+        assertEquals("🗂 Tắt đa nhiệm · Skyworth\nKhông có app nào đang mở, ngoài app hệ thống của tivi và MTVkit.",
             ChuBot.hoiDaNhiem(emptyList(), "Skyworth", false))
         val hoi = ChuBot.hoiDaNhiem(listOf("AirScreen", "Kodi", "SmartTube"), "Skyworth", false).lines()
         assertEquals("Đang mở 3 app: AirScreen, Kodi, SmartTube", hoi[1])

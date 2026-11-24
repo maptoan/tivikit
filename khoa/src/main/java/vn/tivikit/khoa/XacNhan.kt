@@ -5,9 +5,9 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 
 /**
- * App khác của TiviKit xin mã bố mẹ trước một việc quản lý (28/10/2026, Cast SmartTube: duyệt / chặn điện thoại, huỷ mọi
+ * App khác của MTVkit xin mã bố mẹ trước một việc quản lý (28/10/2026, Cast SmartTube: duyệt / chặn điện thoại, huỷ mọi
  * liên kết, tạm ngừng nhận cast). Gọi bằng startActivityForResult, extra "viec" = việc định làm (hiện trên ô nhập mã). Chỉ
- * nhận app ký cùng khoá TiviKit. Khoá đang tắt hay chưa có mã thì trả RESULT_OK ngay; không thì dịch vụ khoá hiện ô nhập
+ * nhận app ký cùng khoá MTVkit. Khoá đang tắt hay chưa có mã thì trả RESULT_OK ngay; không thì dịch vụ khoá hiện ô nhập
  * mã: đúng mã thì RESULT_OK, Back hay để yên thì RESULT_CANCELED.
  */
 class XacNhan : Activity() {

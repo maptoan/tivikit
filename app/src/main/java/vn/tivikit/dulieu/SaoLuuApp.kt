@@ -9,7 +9,7 @@ import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 
 /**
- * Sao lưu dữ liệu TiviKit ra một file zip, để giữ lại hoặc mang sang điện thoại khác (25/10/2026, sau lần đổi tên gói
+ * Sao lưu dữ liệu MTVkit ra một file zip, để giữ lại hoặc mang sang điện thoại khác (25/10/2026, sau lần đổi tên gói
  * làm mất dữ liệu trên điện thoại): bản sao lưu từng tivi (filesDir/sao-luu), bộ cài đặt mẫu kèm file APK
  * (filesDir/bo-cai), tivi gần đây; tuỳ chọn kèm khoá kết nối ADB (filesDir/adb) để tivi đã cho phép không hỏi lại.
  * Nhập là gộp: bản sao lưu cùng tivi giữ ảnh "trước khi dọn" của bản cũ hơn và cộng các gói đã tắt; bộ cài trùng id giữ
@@ -67,10 +67,10 @@ object SaoLuuApp {
             out.toByteArray()
         }
 
-    /** Mục lục của file [f], chưa ghi gì; không phải bản sao lưu TiviKit thì lỗi. */
+    /** Mục lục của file [f], chưa ghi gì; không phải bản sao lưu MTVkit thì lỗi. */
     fun xem(f: File): NoiDung = ZipFile(f).use { z ->
         val m = z.getEntry("manifest.json")?.let { JSONObject(docGioiHan(z, it, 256 * 1024).toString(Charsets.UTF_8)) }
-        require(m != null && m.optString("loai") == LOAI) { "khong phai ban sao luu TiviKit" }
+        require(m != null && m.optString("loai") == LOAI) { "khong phai ban sao luu MTVkit" }
         NoiDung(m.optInt("soSaoLuu"), m.optInt("soBoCai"), KHOA_ADB.all { z.getEntry(it) != null }, m.optLong("luc"))
     }
 

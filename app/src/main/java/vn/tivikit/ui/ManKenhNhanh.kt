@@ -44,8 +44,8 @@ internal fun ManKenhNhanh(vm: PhienLamViec) = Cuon {
     val k = vm.kenhNhanh
     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(t("Kênh nhanh", "Quick channel"), style = KieuTieuDeLon)
-        Phu(t("Mỗi ô kênh là một ô trên Home sạch và TiviKit Launcher, mở thẳng một kênh (VTV1, VTV3, HTV7…) trên TV360, VTVgo, FPT Play hoặc danh sách IPTV (ô Auto: nguồn nào đang phát được), mang logo kênh và biểu tượng app đó ở góc, gán được một nút remote riêng. Tối đa ${KenhNhanh.SO_O} ô; mỗi ô là một app rất nhỏ TiviKit cài lên tivi.",
-            "Each channel tile is a tile on the clean Home and TiviKit Launcher that opens one channel (VTV1, VTV3, HTV7…) in TV360, VTVgo, FPT Play or an IPTV playlist (Auto tiles: whichever source plays), with the channel's logo and that app's icon in the corner, and can get its own remote button. Up to ${KenhNhanh.SO_O} tiles; each is a tiny app TiviKit installs on the TV."))
+        Phu(t("Mỗi ô kênh là một ô trên Home sạch và MTVkit Launcher, mở thẳng một kênh (VTV1, VTV3, HTV7…) trên TV360, VTVgo, FPT Play hoặc danh sách IPTV (ô Auto: nguồn nào đang phát được), mang logo kênh và biểu tượng app đó ở góc, gán được một nút remote riêng. Tối đa ${KenhNhanh.SO_O} ô; mỗi ô là một app rất nhỏ MTVkit cài lên tivi.",
+            "Each channel tile is a tile on the clean Home and MTVkit Launcher that opens one channel (VTV1, VTV3, HTV7…) in TV360, VTVgo, FPT Play or an IPTV playlist (Auto tiles: whichever source plays), with the channel's logo and that app's icon in the corner, and can get its own remote button. Up to ${KenhNhanh.SO_O} tiles; each is a tiny app MTVkit installs on the TV."))
     }
     if (vm.daCoHomeSach && k.homeCu) CanhBaoKenh(vm,
         t("Home sạch trên tivi là bản cũ nên ô chưa hiện logo kênh. Mở Home sạch, bấm Áp dụng lên tivi một lần (app tự cập nhật, giữ giao diện).",
@@ -112,8 +112,8 @@ internal fun ManKenhNhanh(vm: PhienLamViec) = Cuon {
         "All ${KenhNhanh.SO_O} tiles are used. Tap the pencil on a tile to change its channel, or remove a tile for another channel."))
     if (k.bao.isNotEmpty()) Phu(k.bao, if (k.baoLech) Cam else Xanh)
 
-    Phu(t("Ô TV360 dùng cổng nhận lệnh giọng nói của TV360 (cùng đường với \"Xem VTV1 trên TV360\" của Google Assistant), không phải giao diện công khai: bản TV360 sau có thể đổi, khi đó ô chỉ mở TV360 như thường. Ô VTVgo mở bằng link kênh của VTVgo, ô FPT Play bằng link kênh của FPT Play (fptplay.vn/xem-truyen-hinh/…), ô IPTV bằng app IPTV của TiviKit (phát kênh trong danh sách theo link); ô Auto nhờ Map Voice thử các nguồn đó. Ô M3U làm trước đây vẫn chạy, sửa thì thành ô IPTV. Logo kênh tải từ VTVgo / FPT Play / danh sách IPTV lúc lưu ô (app không đóng sẵn logo của đài; kênh không có logo thì ô ghi tên kênh), biểu tượng app ở góc ô lấy từ chính app đó trên tivi. Hẹn giờ cũng mở được từng ô (VD 18:58 mở VTV1). Khôi phục tivi gỡ hết các ô.",
-        "TV360 tiles use TV360's voice-command entry (the one Google Assistant uses for \"Watch VTV1 on TV360\"), not a public interface: a later TV360 may change it, and the tiles then just open TV360. VTVgo tiles open VTVgo's channel link, FPT Play tiles FPT Play's channel link (fptplay.vn/xem-truyen-hinh/…), IPTV tiles TiviKit's IPTV app (it plays the channel from the playlist at the link); Auto tiles let Map Voice try those sources. M3U tiles made earlier still work and become IPTV tiles when edited. Channel logos come from VTVgo / FPT Play / the IPTV playlist when a tile is saved (no station logos are bundled with the app; a channel without one gets its name on the tile), and the app icon in the corner comes from that app on the TV. The Timer can open each tile too (e.g. 18:58 opens VTV1). Restoring the TV removes all tiles."))
+    Phu(t("Ô TV360 dùng cổng nhận lệnh giọng nói của TV360 (cùng đường với \"Xem VTV1 trên TV360\" của Google Assistant), không phải giao diện công khai: bản TV360 sau có thể đổi, khi đó ô chỉ mở TV360 như thường. Ô VTVgo mở bằng link kênh của VTVgo, ô FPT Play bằng link kênh của FPT Play (fptplay.vn/xem-truyen-hinh/…), ô IPTV bằng app IPTV của MTVkit (phát kênh trong danh sách theo link); ô Auto nhờ Map Voice thử các nguồn đó. Ô M3U làm trước đây vẫn chạy, sửa thì thành ô IPTV. Logo kênh tải từ VTVgo / FPT Play / danh sách IPTV lúc lưu ô (app không đóng sẵn logo của đài; kênh không có logo thì ô ghi tên kênh), biểu tượng app ở góc ô lấy từ chính app đó trên tivi. Hẹn giờ cũng mở được từng ô (VD 18:58 mở VTV1). Khôi phục tivi gỡ hết các ô.",
+        "TV360 tiles use TV360's voice-command entry (the one Google Assistant uses for \"Watch VTV1 on TV360\"), not a public interface: a later TV360 may change it, and the tiles then just open TV360. VTVgo tiles open VTVgo's channel link, FPT Play tiles FPT Play's channel link (fptplay.vn/xem-truyen-hinh/…), IPTV tiles MTVkit's IPTV app (it plays the channel from the playlist at the link); Auto tiles let Map Voice try those sources. M3U tiles made earlier still work and become IPTV tiles when edited. Channel logos come from VTVgo / FPT Play / the IPTV playlist when a tile is saved (no station logos are bundled with the app; a channel without one gets its name on the tile), and the app icon in the corner comes from that app on the TV. The Timer can open each tile too (e.g. 18:58 opens VTV1). Restoring the TV removes all tiles."))
     if (vm.moChonKenh) HopChonKenhGo(vm)
     if (k.moChonFpt) HopChonKenhFpt(vm)
     if (k.moChonIptv) HopChonKenhIptv(vm)
@@ -184,7 +184,7 @@ private fun SoanFpt(vm: PhienLamViec) {
 
 /**
  * Ô soạn, kênh IPTV (1/11/2026): kênh trong danh sách IPTV (.m3u) theo link của người dùng (link rút gọn cũng được), phát
- * bằng app IPTV của TiviKit. App IPTV tự tải lại danh sách theo link, nên danh sách đổi nguồn kênh thì ô vẫn mở được.
+ * bằng app IPTV của MTVkit. App IPTV tự tải lại danh sách theo link, nên danh sách đổi nguồn kênh thì ô vẫn mở được.
  */
 @Composable
 private fun SoanIptv(vm: PhienLamViec) {
@@ -210,12 +210,12 @@ private fun SoanIptv(vm: PhienLamViec) {
         NutPhu(t("Kênh khác trong danh sách", "Other channels in the playlist"), Icons.Rounded.Search) { k.moChonIptv = true }
     }
     if (dangChon != null) Text(t("Kênh của ô: ${dangChon.ten}", "Tile channel: ${dangChon.ten}"), fontWeight = FontWeight.SemiBold, color = ChuChinh)
-    Phu(t("Dán link danh sách IPTV (link .m3u, link rút gọn cũng được), bấm Tải danh sách rồi chọn kênh. Tivi phát kênh bằng app IPTV của TiviKit (cài lúc lưu ô), theo User-Agent / Referer danh sách ghi cho từng kênh. App IPTV tự tải lại danh sách theo link này (khi danh sách đã cũ hơn 2 giờ, hay khi kênh không phát được), nên nguồn kênh trong danh sách đổi thì ô vẫn mở đúng kênh. Đang xem: lên / xuống đổi kênh trong danh sách, OK xem tên kênh. ✓ = kênh đã có ô.",
-        "Paste the IPTV playlist link (an .m3u link or a short link), tap Load playlist, then pick a channel. The TV plays it in TiviKit's IPTV app (installed when the tile is saved), with each channel's User-Agent / Referer as the playlist gives them. The IPTV app reloads the playlist from this link (when it's over 2 hours old, or when a channel won't play), so the tile keeps opening the right channel when the playlist's sources change. While watching: up / down changes channel within the playlist, OK shows the channel name. ✓ = already has a tile."))
+    Phu(t("Dán link danh sách IPTV (link .m3u, link rút gọn cũng được), bấm Tải danh sách rồi chọn kênh. Tivi phát kênh bằng app IPTV của MTVkit (cài lúc lưu ô), theo User-Agent / Referer danh sách ghi cho từng kênh. App IPTV tự tải lại danh sách theo link này (khi danh sách đã cũ hơn 2 giờ, hay khi kênh không phát được), nên nguồn kênh trong danh sách đổi thì ô vẫn mở đúng kênh. Đang xem: lên / xuống đổi kênh trong danh sách, OK xem tên kênh. ✓ = kênh đã có ô.",
+        "Paste the IPTV playlist link (an .m3u link or a short link), tap Load playlist, then pick a channel. The TV plays it in MTVkit's IPTV app (installed when the tile is saved), with each channel's User-Agent / Referer as the playlist gives them. The IPTV app reloads the playlist from this link (when it's over 2 hours old, or when a channel won't play), so the tile keeps opening the right channel when the playlist's sources change. While watching: up / down changes channel within the playlist, OK shows the channel name. ✓ = already has a tile."))
 }
 
 /**
- * Ô soạn Auto (1/11/2026): một kênh, nhiều nguồn. TiviKit tìm kênh cùng tên trên VTVgo, TV360 (số kênh đã biết), FPT Play,
+ * Ô soạn Auto (1/11/2026): một kênh, nhiều nguồn. MTVkit tìm kênh cùng tên trên VTVgo, TV360 (số kênh đã biết), FPT Play,
  * danh sách IPTV và phím tắt M3U; bấm ô thì Map Voice mở lần lượt tới khi có tiếng, nhớ nguồn lên nhanh, mất tiếng 9 giây
  * thì đổi nguồn.
  */

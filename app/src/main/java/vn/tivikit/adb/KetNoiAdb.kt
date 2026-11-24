@@ -217,7 +217,7 @@ class KetNoiAdb private constructor(
     private fun docHoacHetGio(stream: io.github.muntashirakon.adb.AdbStream, giay: Int, dau: String? = null, xong: (String) -> Boolean): String? {
         val out = BoDem()
         val dauB = dau?.toByteArray(Charsets.UTF_8)
-        @Volatile var daThayDau = false
+        val daThayDau = java.util.concurrent.atomic.AtomicBoolean(false)
         val hetHan = System.currentTimeMillis() + giay * 1000L
         val luong = Thread {
             runCatching {
@@ -228,7 +228,7 @@ class KetNoiAdb private constructor(
                     if (n < 0) break
                     val du = synchronized(out) {
                         out.them(buf, n)
-                        if (dauB != null) out.coOCuoi(dauB, n).also { if (it) daThayDau = true } else xong(out.chu())
+                        if (dauB != null) out.coOCuoi(dauB, n).also { if (it) daThayDau.set(true) } else xong(out.chu())
                     }
                     if (du) break
                 }
@@ -240,7 +240,7 @@ class KetNoiAdb private constructor(
             luong.interrupt()
             return null
         }
-        if (dauB != null && !daThayDau) {
+        if (dauB != null && !daThayDau.get()) {
             throw java.io.IOException("Luồng ADB đóng trước khi lệnh kết thúc")
         }
         return synchronized(out) { out.chu() }.replace("\r", "")

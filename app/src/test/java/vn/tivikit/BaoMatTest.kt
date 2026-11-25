@@ -147,7 +147,8 @@ class BaoMatTest {
 
         // Giải mã bằng khoá khác hoặc sửa 1 ký tự bản mã phải bị GCM tag từ chối (trả null).
         assertNull(MaHoaKho.moVoiKhoa(maA, khoa2))
-        val biSua = maA.dropLast(1) + (if (maA.last() == 'A') 'B' else 'A')
+        val viTriSua = maA.lastIndexOf(':') + 1
+        val biSua = maA.substring(0, viTriSua) + (if (maA[viTriSua] == 'A') 'B' else 'A') + maA.substring(viTriSua + 1)
         assertNull(MaHoaKho.moVoiKhoa(biSua, khoa1))
         assertNull(MaHoaKho.moVoiKhoa("khong-co-tien-to", khoa1))
     }

@@ -24,7 +24,8 @@ class MaHoaKhoTest {
 
         // Sai khoá hoặc dữ liệu bị chỉnh sửa đều bị từ chối.
         assertNull(MaHoaKho.moVoiKhoa(c1, k2))
-        val sua = c1.dropLast(1) + (if (c1.last() == 'x') 'y' else 'x')
+        val viTriSua = c1.lastIndexOf(':') + 1
+        val sua = c1.substring(0, viTriSua) + (if (c1[viTriSua] == 'A') 'B' else 'A') + c1.substring(viTriSua + 1)
         assertNull(MaHoaKho.moVoiKhoa(sua, k1))
         assertNull(MaHoaKho.moVoiKhoa("enc1:ngan:du", k1))
     }
